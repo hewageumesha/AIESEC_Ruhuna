@@ -98,7 +98,8 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<excludes>
-						<exclude>
+						<exclude>mvn spring-boot:run
+
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
@@ -109,3 +110,4 @@
 	</build>
 
 </project>
+
