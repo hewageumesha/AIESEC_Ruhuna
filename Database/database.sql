@@ -14,10 +14,10 @@ CREATE TABLE User (
     Full_Name VARCHAR(200) GENERATED ALWAYS AS (CONCAT(First_Name, ' ', Last_Name)) STORED, -- Saves space
     Password VARCHAR(255) NOT NULL, -- Store hashed passwords
     Profile_Photo VARCHAR(255),
-	Birthday DATE NOT NULL,
+    Birthday DATE NOT NULL,
     Date_Joined Date NOT NULL,
     Assigned_Team VARCHAR(255) NOT NULL, 
-	Status ENUM('Active', 'Inactive') DEFAULT 'Active',  -- Single column for status
+    Status ENUM('Active', 'Inactive') DEFAULT 'Active',  -- Single column for status
     CHECK (Status IN ('Active', 'Inactive')) -- Ensures only valid values
 );
 
@@ -66,21 +66,21 @@ CREATE TABLE User_Role_Function (
     FOREIGN KEY (TL_ID) REFERENCES Team_Leader(TL_ID) ON DELETE CASCADE,
     FOREIGN KEY (M_ID) REFERENCES Members(M_ID) ON DELETE CASCADE,
     FOREIGN KEY (Role_ID) REFERENCES Roles(Role_ID) ON DELETE CASCADE,
-	FOREIGN KEY (Function_ID) REFERENCES Functions(Function_ID) ON DELETE CASCADE
+    FOREIGN KEY (Function_ID) REFERENCES Functions(Function_ID) ON DELETE CASCADE
 );
 
 -- Table: Task
 CREATE TABLE Task (
     Task_ID INT PRIMARY KEY AUTO_INCREMENT,
     Title VARCHAR(200) NOT NULL,
-    Description TEXT NOT NULL,
+    Descriptions TEXT NOT NULL,
     Status ENUM('Not Started', 'In Progress', 'Completed') DEFAULT 'Not Started',
     Priority ENUM('Low', 'Medium', 'High') DEFAULT 'Medium',
     Date ENUM('Start Date', 'End Date') DEFAULT (CURRENT_DATE),
-	LCP_ID INT NULL,
+    LCP_ID INT NULL,
     LCVP_ID INT NULL,
     TL_ID INT NULL,
-	FOREIGN KEY (LCP_ID) REFERENCES Local_Committee_President(LCP_ID) ON DELETE CASCADE,
+    FOREIGN KEY (LCP_ID) REFERENCES Local_Committee_President(LCP_ID) ON DELETE CASCADE,
     FOREIGN KEY (LCVP_ID) REFERENCES Local_Committee_Vice_President(LCVP_ID) ON DELETE CASCADE,
     FOREIGN KEY (TL_ID) REFERENCES Team_Leader(TL_ID) ON DELETE CASCADE
 );
@@ -90,7 +90,6 @@ CREATE TABLE Event (
     Event_ID INT PRIMARY KEY AUTO_INCREMENT,
     Descriptions TEXT NOT NULL,
     Event_Name VARCHAR(200) NOT NULL,
-    Event_Date DATE NOT NULL,
     Start_Date DATE NOT NULL,
     End_Date DATE NOT NULL,
     Event_Time TIME NOT NULL,
@@ -111,7 +110,7 @@ CREATE TABLE Event_Gallery (
     Image_URL VARCHAR(255),
     LCP_ID INT NULL,
     LCVP_ID INT NULL,
-	FOREIGN KEY (LCP_ID) REFERENCES Local_Committee_President(LCP_ID) ON DELETE CASCADE,
+    FOREIGN KEY (LCP_ID) REFERENCES Local_Committee_President(LCP_ID) ON DELETE CASCADE,
     FOREIGN KEY (LCVP_ID) REFERENCES Local_Committee_Vice_President(LCVP_ID) ON DELETE CASCADE,
     FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID) ON DELETE CASCADE
 );
@@ -121,11 +120,11 @@ CREATE TABLE Birthday_Management (
     Birthday_ID INT PRIMARY KEY AUTO_INCREMENT,
     Flyer_Photo VARCHAR(255) NULL,
     Notification_Status ENUM('Not Sent', 'Sent') DEFAULT 'Not Sent',
-	LCP_ID INT NOT NULL,
+    LCP_ID INT NOT NULL,
     LCVP_ID INT NOT NULL,
     TL_ID INT NOT NULL,
     M_ID INT NOT NULL,
-	FOREIGN KEY (LCP_ID) REFERENCES Local_Committee_President(LCP_ID) ON DELETE CASCADE,
+    FOREIGN KEY (LCP_ID) REFERENCES Local_Committee_President(LCP_ID) ON DELETE CASCADE,
     FOREIGN KEY (LCVP_ID) REFERENCES Local_Committee_Vice_President(LCVP_ID) ON DELETE CASCADE,
     FOREIGN KEY (TL_ID) REFERENCES Team_Leader(TL_ID) ON DELETE CASCADE,
     FOREIGN KEY (M_ID) REFERENCES Members(M_ID) ON DELETE CASCADE
@@ -153,7 +152,7 @@ CREATE TABLE Expense (
     Category VARCHAR(50) NOT NULL,
     Date DATE DEFAULT (CURRENT_DATE) NOT NULL,
     FOREIGN KEY (LCP_ID) REFERENCES Local_Committee_President(LCP_ID) ON DELETE CASCADE,
-	FOREIGN KEY (LCVP_ID) REFERENCES Local_Committee_Vice_President(LCVP_ID) ON DELETE CASCADE
+    FOREIGN KEY (LCVP_ID) REFERENCES Local_Committee_Vice_President(LCVP_ID) ON DELETE CASCADE
 );
 
 -- Table: Announcement Management
