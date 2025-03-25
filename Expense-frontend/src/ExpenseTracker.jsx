@@ -11,11 +11,14 @@ const ExpenseTracker = () => {
         category: "Food",
         description: "",
         paymentMethod: "Cash",
+        role: "LCP",  // Default role
+        userId: "" // Will store either LCP ID or LCVP ID
     });
 
     const handleChange = (e) => {
         setExpense({ ...expense, [e.target.name]: e.target.value });
     };
+    
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -27,6 +30,8 @@ const ExpenseTracker = () => {
             category: "Food",
             description: "",
             paymentMethod: "Cash",
+            role: "LCP",
+            userId: ""
         });
     };
 
@@ -38,6 +43,23 @@ const ExpenseTracker = () => {
                     <input type="text" name="id" value={expense.id} onChange={handleChange} placeholder="Expense ID" required />
                     <input type="date" name="date" value={expense.date} onChange={handleChange} required />
                     <input type="number" name="amount" value={expense.amount} onChange={handleChange} placeholder="Amount" required />
+
+                    {/* Role Dropdown: LCP or LCVP */}
+                    <select name="role" value={expense.role} onChange={handleChange}>
+                        <option value="LCP">LCP</option>
+                        <option value="LCVP">LCVP</option>
+                    </select>
+
+                    {/* User ID (LCP_ID or LCVP_ID) */}
+                    <input 
+                        type="text" 
+                        name="userId" 
+                        value={expense.userId} 
+                        onChange={handleChange} 
+                        placeholder="Enter LCP/LCVP ID" 
+                        required 
+                    />
+
                     <select name="category" value={expense.category} onChange={handleChange}>
                         <option>Food</option>
                         <option>Transport</option>
@@ -67,6 +89,8 @@ const ExpenseTracker = () => {
                             <p><strong>Category:</strong> {exp.category}</p>
                             <p><strong>Description:</strong> {exp.description}</p>
                             <p><strong>Payment Method:</strong> {exp.paymentMethod}</p>
+                            <p><strong>Role:</strong> {exp.role}</p>
+                            <p><strong>User ID:</strong> {exp.userId}</p>
                         </div>
                     ))
                 )}
