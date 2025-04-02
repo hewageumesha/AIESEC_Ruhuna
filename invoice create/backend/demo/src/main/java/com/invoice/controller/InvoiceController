@@ -1,4 +1,4 @@
-package com.invoice.demo.invoicegenerator.controller;
+package com.invoice.demo.controller;
 
 import com.aiesec.invoicegenerator.service.InvoiceService;
 import org.springframework.http.HttpHeaders;
