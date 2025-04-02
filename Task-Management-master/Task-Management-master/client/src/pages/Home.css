@@ -1,0 +1,83 @@
+/* Home.css */
+.home-container {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    text-align: center;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .avatar {
+    margin-right: 10px;
+  }
+  
+  .avatar-circle {
+    width: 50px;
+    height: 50px;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .welcome-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .description {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+  }
+  
+  .task-info {
+    margin-top: 20px;
+  }
+  
+  .task-count {
+    font-weight: bold;
+    color: #444;
+    margin-bottom: 10px;
+  }
+  
+  .btn {
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    transition: 0.3s ease-in-out;
+  }
+  
+  .show-tasks {
+    background-color: #007bff;
+    color: white;
+    margin-right: 10px;
+  }
+  
+  .create-task {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .btn:hover {
+    opacity: 0.8;
+  }
+
+ 
+  
