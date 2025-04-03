@@ -7,7 +7,7 @@ const CreateTask: React.FC = () => {
   const [taskName, setTaskName] = useState('');
   const [description, setDescription] = useState('');
   const [deadLine, setDeadline] = useState('');
-  const [workOfStatus, setWorkStatus] = useState('');
+  const [status, setStatus] = useState(''); // Use frontend-friendly name
   const [priority, setPriority] = useState('MEDIUM'); // Default Priority
   const { userId } = useParams();
 
@@ -16,12 +16,12 @@ const CreateTask: React.FC = () => {
       taskName,
       description,
       deadLine,
-      workOfStatus,
-      priority, // Added Priority Field
+      workOfStatus: status, // Map frontend-friendly status to backend field workOfStatus
+      priority,
     };
 
     fetch(`http://localhost:8080/api/user/${userId}/task/`, {
-      method: 'POST',           
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -84,8 +84,8 @@ const CreateTask: React.FC = () => {
         <label className="form-label">Work Status:</label>
         <select
           className="form-input"
-          value={workOfStatus}
-          onChange={(e) => setWorkStatus(e.target.value)}
+          value={status} // Use frontend-friendly name
+          onChange={(e) => setStatus(e.target.value)} // Update frontend status
         >
           <option value="not-started">Not Started</option>
           <option value="in-progress">In Progress</option>
