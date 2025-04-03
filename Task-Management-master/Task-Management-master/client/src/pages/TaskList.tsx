@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
 interface User {
   userId: string;
@@ -47,34 +48,29 @@ const TaskList: React.FC = () => {
   };
 
   const handleDeleteTask = async (taskId: number) => {
-    try {
-      const deleteResponse = await fetch(`http://localhost:8080/api/user/${userId}/${taskId}/`, {
-        method: "DELETE",
-      });
-      if (!deleteResponse.ok) throw new Error("Failed to delete task");
-      setTasks((prevTasks) => prevTasks.filter((task) => task.taskId !== taskId));
-    } catch (error: any) {
-      console.error("Error deleting task:", error.message);
-    }
-  };
-
-  const handleMarkAsComplete = async (taskId: number) => {
-    try {
-      const markAsCompleteResponse = await fetch(`http://localhost:8080/api/user/${userId}/${taskId}/`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ workOfStatus: "Complete" }),
-      });
-
-      if (!markAsCompleteResponse.ok) throw new Error("Failed to mark task as complete");
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.taskId === taskId ? { ...task, workOfStatus: "Complete" } : task
-        )
-      );
-    } catch (error: any) {
-      console.error("Error marking task as complete:", error.message);
-    }
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to delete this task?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const deleteResponse = await fetch(`http://localhost:8080/api/user/${userId}/${taskId}/`, {
+            method: "DELETE",
+          });
+          if (!deleteResponse.ok) throw new Error("Failed to delete task");
+          setTasks((prevTasks) => prevTasks.filter((task) => task.taskId !== taskId));
+          Swal.fire("Deleted!", "Your task has been deleted.", "success");
+        } catch (error: any) {
+          console.error("Error deleting task:", error.message);
+          Swal.fire("Error!", "Failed to delete the task.", "error");
+        }
+      }
+    });
   };
 
   return (
@@ -110,9 +106,6 @@ const TaskList: React.FC = () => {
               <td className="py-2 px-4 flex gap-2 justify-center">
                 <button className="text-blue-500 hover:underline" onClick={() => handleEditTask(task.taskId)}>✏️</button>
                 <button className="text-red-500 hover:underline" onClick={() => handleDeleteTask(task.taskId)}>🗑️</button>
-                {task.workOfStatus !== "Complete" && (
-                  <button className="text-green-500 hover:underline" onClick={() => handleMarkAsComplete(task.taskId)}>✅</button>
-                )}
               </td>
             </tr>
           ))}
