@@ -23,13 +23,17 @@ public class TaskController {
 
 
     // ✅ POST: Create Task with Default Priority if not provided
+    // POST: Create Task with Assigned User
     @PostMapping("/{userId}/task/")
     public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto taskDto, @PathVariable Integer userId) {
         if (taskDto.getPriority() == null) {
-            taskDto.setPriority(Priority.MEDIUM); // ✅ Default Priority to MEDIUM
+            taskDto.setPriority(Priority.MEDIUM);
         }
-        TaskDto createdTaskDto = this.taskService.createTask(taskDto, userId);
-        return new ResponseEntity<>(createdTaskDto, HttpStatus.CREATED);
+        if (taskDto.getWorkOfStatus() == null || taskDto.getWorkOfStatus().isEmpty()) {
+            taskDto.setWorkOfStatus("pending");
+        }
+        TaskDto createdTask = taskService.createTask(taskDto, userId);
+        return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
     }
 
     // ✅ PUT: Update Task
@@ -66,5 +70,7 @@ public class TaskController {
         List<UserDto> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
+
+
 
 }
