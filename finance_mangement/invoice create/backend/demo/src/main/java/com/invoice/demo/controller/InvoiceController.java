@@ -25,12 +25,12 @@ public class InvoiceController {
     public ResponseEntity<byte[]> generateInvoice(@RequestBody InvoiceRequest request) {
         ByteArrayOutputStream pdf = invoiceService.createInvoicePdf(request);
 
-        return ResponseEntity.ok()
+       return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice.pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf.toByteArray());
     }
-
+    
     @PostMapping("/save")
     public ResponseEntity<String> saveInvoice(@RequestBody InvoiceRequest request) {
         String filePath = invoiceService.saveInvoiceToFile(request);
@@ -45,9 +45,10 @@ public class InvoiceController {
             return ResponseEntity.notFound().build();
         }
 
-        FileInputStream fileInputStream = new FileInputStream(file);
+        FileInputStream fileInputStream=new FileInputStream(file);
         byte[] pdfBytes = fileInputStream.readAllBytes();
         fileInputStream.close();
+        
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + invoiceNo + ".pdf")
