@@ -13,7 +13,7 @@ interface Task {
   taskName: string;
   deadline: string | null;
   priority: string;
-  workOfStatus: string;
+  workOfStatus: string; // Keep backend field name
   description: string;
 }
 
@@ -93,15 +93,13 @@ const TaskList: React.FC = () => {
               <td className="py-2 px-4 text-black">{task.taskName}</td>
               <td className="py-2 px-4 text-black">{task.description}</td>
               <td className="py-2 px-4">
-                <span className={
-                  task.priority === "High" ? "bg-red-400 text-white px-2 py-1 rounded-full" :
-                  task.priority === "Medium" ? "bg-yellow-400 text-white px-2 py-1 rounded-full" :
-                  "bg-green-400 text-white px-2 py-1 rounded-full"
-                }>{task.priority || "No priority"}</span>
+                <span className={task.priority === "HIGH" ? "bg-red-400 text-white px-2 py-1 rounded-full" :
+                  task.priority === "MEDIUM" ? "bg-yellow-400 text-white px-2 py-1 rounded-full" :
+                  "bg-green-400 text-white px-2 py-1 rounded-full"}>{task.priority || "No priority"}</span>
               </td>
               <td className="py-2 px-4 text-black">{task.deadline ? task.deadline : "No due date"}</td>
-              <td className={`py-2 px-4 ${task.workOfStatus === "Complete" ? "bg-green-400 text-white px-2 py-1 rounded-full" : "bg-yellow-400 text-white px-2 py-1 rounded-full"}`}>
-                {task.workOfStatus}
+              <td className={`py-2 px-4 ${task.workOfStatus === "completed" ? "bg-green-400 text-white px-2 py-1 rounded-full" : "bg-yellow-400 text-white px-2 py-1 rounded-full"}`}>
+                {task.workOfStatus} {/* Keep backend field name */}
               </td>
               <td className="py-2 px-4 flex gap-2 justify-center">
                 <button className="text-blue-500 hover:underline" onClick={() => handleEditTask(task.taskId)}>✏️</button>
