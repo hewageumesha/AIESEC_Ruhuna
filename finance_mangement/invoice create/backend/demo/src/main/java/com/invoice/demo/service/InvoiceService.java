@@ -4,13 +4,16 @@ import com.invoice.demo.controller.InvoiceRequest;
 import com.invoice.demo.model.Invoice;
 import com.invoice.demo.repository.InvoiceRepository;
 import org.springframework.stereotype.Service;
-import java.io.*;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.io.font.constants.StandardFonts;
+
+import java.io.*;
 
 @Service
 public class InvoiceService {
@@ -23,25 +26,24 @@ public class InvoiceService {
 
     public ByteArrayOutputStream createInvoicePdf(InvoiceRequest request) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Document document = new Document();
 
         try {
-            PdfWriter.getInstance(document, outputStream);
-            document.open();
-            document.addTitle("Invoice");
+            PdfWriter writer = new PdfWriter(outputStream);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
 
-            Font titleFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
-            Font textFont = new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL);
+            PdfFont titleFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+            PdfFont textFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 
-            document.add(new Paragraph("Invoice", titleFont));
-            document.add(new Paragraph("Invoice No: " + request.getInvoiceNo(), textFont));
-            document.add(new Paragraph("Date: " + request.getDate(), textFont));
-            document.add(new Paragraph("Due Date: " + request.getDueDate(), textFont));
-            document.add(new Paragraph("Description: " + request.getDescription(), textFont));
-            document.add(new Paragraph("Project Fee: " + request.getProjectFee(), textFont));
-            document.add(new Paragraph("Volunteer Name: " + request.getVolunteerName(), textFont));
-            document.add(new Paragraph("AIESEC Entity: " + request.getAiesecEntity(), textFont));
-            document.add(new Paragraph("Receiver's Signature: " + request.getReceiverSignature(), textFont));
+            document.add(new Paragraph("Invoice").setFont(titleFont).setFontSize(16));
+            document.add(new Paragraph("Invoice No: " + request.getInvoiceNo()).setFont(textFont));
+            document.add(new Paragraph("Date: " + request.getDate()).setFont(textFont));
+            document.add(new Paragraph("Due Date: " + request.getDueDate()).setFont(textFont));
+            document.add(new Paragraph("Description: " + request.getDescription()).setFont(textFont));
+            document.add(new Paragraph("Project Fee: " + request.getProjectFee()).setFont(textFont));
+            document.add(new Paragraph("Volunteer Name: " + request.getVolunteerName()).setFont(textFont));
+            document.add(new Paragraph("AIESEC Entity: " + request.getAiesecEntity()).setFont(textFont));
+            document.add(new Paragraph("Receiver's Signature: " + request.getReceiverSignature()).setFont(textFont));
 
             document.close();
         } catch (Exception e) {
