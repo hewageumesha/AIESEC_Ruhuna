@@ -10,6 +10,6 @@ import java.util.List;
 public interface TaskRepo extends JpaRepository<Task, Integer> {
     List<Task> findByUser(User user);
 
-
+    List<Task> findByAssignedToUserId(Integer userId);
 }
 

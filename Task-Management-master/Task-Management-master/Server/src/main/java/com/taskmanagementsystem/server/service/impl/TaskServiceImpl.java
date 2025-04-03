@@ -38,6 +38,16 @@ public class TaskServiceImpl implements TaskService {
         task.setDescription(taskDto.getDescription());
         task.setDeadLine(taskDto.getDeadLine());
         task.setWorkOfStatus(taskDto.getWorkOfStatus());
+        task.setPriority(taskDto.getPriority());
+        task.setUser(user);
+
+        if(taskDto.getAssignedTo() != null){
+            User assignedUser = userRepo.findById(taskDto.getAssignedTo())
+                    .orElseThrow(ResourcesNotFoundException::new);
+            task.setAssignedTo(assignedUser);
+        }
+
+
 
         user.getTasks().add(task);
 
