@@ -21,12 +21,20 @@ public class Task {
     @Column(name = "description",length = 1000)
     private String description;
 
+
+
     @Enumerated(EnumType.STRING)
     @Column(name = "priority")
     private Priority priority;
 
     @Column(name = "work_of_status",nullable = false)
     private String workOfStatus;
+
     @ManyToOne
+    @JoinColumn(name = "user_user_id")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_to")
+    private User assignedTo;
 }

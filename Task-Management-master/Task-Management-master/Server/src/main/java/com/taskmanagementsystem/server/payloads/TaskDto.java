@@ -17,4 +17,6 @@ public class TaskDto {
     private String description;
     private Priority priority;
     private String workOfStatus;
+    private Integer userId;
+    private Integer assignedTo;
 }
