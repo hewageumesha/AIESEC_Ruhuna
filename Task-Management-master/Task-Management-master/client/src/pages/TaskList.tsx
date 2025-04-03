@@ -73,6 +73,86 @@ const TaskList: React.FC = () => {
     });
   };
 
+  const handlePriorityChange = async (taskId: number, newPriority: string) => {
+    try {
+      const updateResponse = await fetch(`http://localhost:8080/api/user/${userId}/${taskId}/priority`, {
+        method: "PUT",
+        body: JSON.stringify({ priority: newPriority }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!updateResponse.ok) throw new Error("Failed to update priority");
+      const updatedTask = await updateResponse.json();
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.taskId === taskId ? { ...task, priority: updatedTask.priority } : task
+        )
+      );
+      Swal.fire("Updated!", "Task priority has been updated.", "success");
+    } catch (error: any) {
+      console.error("Error updating priority:", error.message);
+      Swal.fire("Error!", "Failed to update priority.", "error");
+    }
+  };
+
+  const handleStatusChange = async (taskId: number, newStatus: string) => {
+    try {
+      const updateResponse = await fetch(`http://localhost:8080/api/user/${userId}/${taskId}/status`, {
+        method: "PUT",
+        body: JSON.stringify({ workOfStatus: newStatus }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!updateResponse.ok) throw new Error("Failed to update status");
+      const updatedTask = await updateResponse.json();
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.taskId === taskId ? { ...task, workOfStatus: updatedTask.workOfStatus } : task
+        )
+      );
+      Swal.fire("Updated!", "Task status has been updated.", "success");
+    } catch (error: any) {
+      console.error("Error updating status:", error.message);
+      Swal.fire("Error!", "Failed to update status.", "error");
+    }
+  };
+
+  const renderPriorityOptions = (task: Task) => {
+    const priorityOptions = ["High", "Medium", "Low"];
+    return (
+      <select
+        value={task.priority}
+        onChange={(e) => handlePriorityChange(task.taskId, e.target.value)}
+        className="bg-gray-300 text-black px-2 py-1 rounded"
+      >
+        {priorityOptions.map((priority) => (
+          <option key={priority} value={priority}>
+            {priority}
+          </option>
+        ))}
+      </select>
+    );
+  };
+
+  const renderStatusOptions = (task: Task) => {
+    const statusOptions = ["In Progress", "Complete"];
+    return (
+      <select
+        value={task.workOfStatus}
+        onChange={(e) => handleStatusChange(task.taskId, e.target.value)}
+        className="bg-gray-300 text-black px-2 py-1 rounded"
+      >
+        {statusOptions.map((status) => (
+          <option key={status} value={status}>
+            {status}
+          </option>
+        ))}
+      </select>
+    );
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       {userDetails && <h2 className="text-2xl font-bold text-black mb-4">Task List for {userDetails.username}</h2>}
@@ -92,17 +172,9 @@ const TaskList: React.FC = () => {
             <tr key={task.taskId} className="border-b hover:bg-gray-200">
               <td className="py-2 px-4 text-black">{task.taskName}</td>
               <td className="py-2 px-4 text-black">{task.description}</td>
-              <td className="py-2 px-4">
-                <span className={
-                  task.priority === "High" ? "bg-red-400 text-white px-2 py-1 rounded-full" :
-                  task.priority === "Medium" ? "bg-yellow-400 text-white px-2 py-1 rounded-full" :
-                  "bg-green-400 text-white px-2 py-1 rounded-full"
-                }>{task.priority || "No priority"}</span>
-              </td>
+              <td className="py-2 px-4">{renderPriorityOptions(task)}</td>
               <td className="py-2 px-4 text-black">{task.deadline ? task.deadline : "No due date"}</td>
-              <td className={`py-2 px-4 ${task.workOfStatus === "Complete" ? "bg-green-400 text-white px-2 py-1 rounded-full" : "bg-yellow-400 text-white px-2 py-1 rounded-full"}`}>
-                {task.workOfStatus}
-              </td>
+              <td className="py-2 px-4">{renderStatusOptions(task)}</td>
               <td className="py-2 px-4 flex gap-2 justify-center">
                 <button className="text-blue-500 hover:underline" onClick={() => handleEditTask(task.taskId)}>✏️</button>
                 <button className="text-red-500 hover:underline" onClick={() => handleDeleteTask(task.taskId)}>🗑️</button>
