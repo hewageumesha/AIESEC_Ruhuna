@@ -20,14 +20,33 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private UserRepo userRepo;
     @Override
-    public TaskDto createTask(TaskDto taskDto,Integer UserId) {
-        User user=this.userRepo.findById(UserId).orElseThrow(()-> new ResourcesNotFoundException("User","User Id",UserId));
-        Task task=this.DtoToTask(taskDto);
-        user.setNoOfTask(user.getNoOfTask()+1);
-        task.setUser(user);
-        Task saved=this.taskRepo.save(task);
-        return this.taskToDto(saved);
+    public TaskDto createTask(TaskDto taskDto, Integer userId) {
+        // Fetch the user who will create the task
+        User user = this.userRepo.findById(userId)
+                .orElseThrow(() -> new ResourcesNotFoundException("User", "userId", userId));
 
+        // Convert TaskDto to Task entity
+        Task task = this.DtoToTask(taskDto);
+
+        if (taskDto.getAssignedTo() != null) {
+            User assignee = this.userRepo.findById(taskDto.getAssignedTo()).orElseThrow(() -> new ResourcesNotFoundException("User", "assignedTo", taskDto.getAssignedTo()));
+            task.setAssignedTo(assignee);
+        }
+
+        // Increment the number of tasks assigned to the user
+        user.setNoOfTask(user.getNoOfTask() + 1);
+
+        // Associate the task with the user
+        task.setUser(user);
+
+        // Save the task entity to the database
+        Task saved = this.taskRepo.save(task);
+
+        // Save the user (if the noOfTask update needs to be persisted separately)
+        this.userRepo.save(user);
+
+        // Convert the saved task entity back to TaskDto to return to the client
+        return this.taskToDto(saved);
     }
     @Override
     public TaskDto taskUpdate(TaskDto taskDto, Integer taskId, Integer UserId) {
