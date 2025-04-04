@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TaskList from "./TaskList";
+import AssignedTasksList from "../AssignedTasksList";
 
 const Home: React.FC = () => {
   const { userId } = useParams();
@@ -73,6 +74,7 @@ const Home: React.FC = () => {
         </div>
 
         <TaskList />
+        <AssignedTasksList/>
 
         <div className="flex justify-between items-center mt-6">
           <p className="text-lg font-semibold">Number of Tasks: {numberOfTasks}</p>

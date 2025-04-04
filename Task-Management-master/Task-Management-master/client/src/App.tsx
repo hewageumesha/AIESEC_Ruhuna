@@ -9,6 +9,8 @@ import TaskList from "./pages/TaskList";
 import CreateTask from "./pages/CreateTask";
 import Task from "./pages/Task";
 import EditTask from "./pages/EditTask";
+import AssignedTasksList from "./AssignedTasksList" // Add the import for the new component
+
 
 
 function App() {
@@ -26,6 +28,8 @@ function App() {
             <Route path="/user/:userId/CreateTask" element={<CreateTask/>}/>
             <Route path="/user/:userId/:taskId" element={<Task/>}/>
             <Route path="/user/:userId/task/:taskId" element={<EditTask />} />
+            <Route path="/user/:userId/assigned-tasks" element={<AssignedTasksList />} />
+            
             </Routes>
         </Layout>
       </Router>
