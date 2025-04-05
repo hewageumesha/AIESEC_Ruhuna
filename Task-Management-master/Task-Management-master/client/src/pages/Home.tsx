@@ -48,30 +48,7 @@ const Home: React.FC = () => {
             <span className="mr-2">+</span> Create Task
           </button>
         </div>
-        <div className="flex space-x-4 mb-6">
-          <input 
-            type="text" 
-            placeholder="Search tasks..." 
-            className="p-3 border rounded w-1/3" 
-          />
-          <select className="p-3 border rounded">
-            <option>Filter by Priority</option>
-            <option>High</option>
-            <option>Medium</option>
-            <option>Low</option>
-          </select>
-          <select className="p-3 border rounded">
-            <option>Filter by Status</option>
-            <option>Not-Started</option>
-            <option>In-Progress</option>
-            <option>Completed</option>
-          </select>
-          <select className="p-3 border rounded">
-            <option>LCP</option>
-            <option>LCVP</option>
-            <option>Member</option>
-          </select>
-        </div>
+       
 
         <TaskList />
         <AssignedTasksList/>
