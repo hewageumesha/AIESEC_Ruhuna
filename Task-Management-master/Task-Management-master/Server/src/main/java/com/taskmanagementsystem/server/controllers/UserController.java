@@ -1,10 +1,12 @@
 package com.taskmanagementsystem.server.controllers;
 
 
+import com.taskmanagementsystem.server.entities.Task;
 import com.taskmanagementsystem.server.entities.User;
 import com.taskmanagementsystem.server.payloads.ApiResponse;
 import com.taskmanagementsystem.server.payloads.SignInRequest;
 import com.taskmanagementsystem.server.payloads.UserDto;
+import com.taskmanagementsystem.server.service.TaskService;
 import com.taskmanagementsystem.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,9 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TaskService taskService;
 
     //POST method-create User
     @PostMapping("/")
@@ -51,6 +56,7 @@ public class UserController {
         List<UserDto> users= this.userService.getAllUsers();
         return new ResponseEntity<>(users,HttpStatus.CREATED);
     }
+
 
     @PostMapping("/signing/")
     public ResponseEntity<ApiResponse> signIn(@RequestBody SignInRequest signInRequest) {

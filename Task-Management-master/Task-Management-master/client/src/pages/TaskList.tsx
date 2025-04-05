@@ -133,6 +133,7 @@ const TaskList: React.FC = () => {
                   {task.priority || "No priority"}
                 </span>
               </td>
+              
               <td className="py-2 px-4 text-gray-700">{task.deadline || "No due date"}</td>
               <td className="py-2 px-4">
                 <span

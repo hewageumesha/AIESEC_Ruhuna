@@ -1,5 +1,6 @@
 package com.taskmanagementsystem.server.service;
 
+import com.taskmanagementsystem.server.entities.Task;
 import com.taskmanagementsystem.server.payloads.TaskDto;
 
 import java.util.List;
@@ -10,5 +11,6 @@ public interface TaskService {
     TaskDto getTaskById(Integer taskId,Integer UserId);
     void deleteTask(Integer TaskId,Integer UserId);
     List<TaskDto> getAllTasksByUser(Integer UserId);
+
 
 }
