@@ -13,4 +13,7 @@ public interface TaskService {
     List<TaskDto> getAllTasksByUser(Integer UserId);
 
 
+    List<Task> getTasksAssignedToUser(String userId);
+
+
 }

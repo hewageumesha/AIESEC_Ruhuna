@@ -19,6 +19,8 @@ public class TaskServiceImpl implements TaskService {
     private TaskRepo taskRepo;
     @Autowired
     private UserRepo userRepo;
+
+
     @Override
     public TaskDto createTask(TaskDto taskDto, Integer userId) {
         // Fetch the user who will create the task
@@ -96,6 +98,11 @@ public class TaskServiceImpl implements TaskService {
         User user=this.userRepo.findById(UserId).orElseThrow(()-> new ResourcesNotFoundException("User","User Id",(long)UserId));
         List<Task> tasks=this.taskRepo.findByUser(user);
         return tasks.stream().map(this::taskToDto).toList();
+    }
+
+    @Override
+    public List<Task> getTasksAssignedToUser(String userId) {
+        return taskRepo.findByAssignedToUserId(Integer.valueOf(userId));
     }
 
     public Task DtoToTask(TaskDto taskDto){

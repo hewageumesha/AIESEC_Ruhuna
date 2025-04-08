@@ -1,5 +1,6 @@
 package com.taskmanagementsystem.server.controllers;
 
+import com.taskmanagementsystem.server.entities.Task;
 import com.taskmanagementsystem.server.payloads.TaskDto;
 import com.taskmanagementsystem.server.payloads.UserDto;
 import com.taskmanagementsystem.server.service.TaskService;
@@ -70,6 +71,12 @@ public class TaskController {
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
+    }
+
+
+    @GetMapping("/api/tasks/assigned/{userId}")
+    public List<Task> getTasksAssignedToUser(@PathVariable String userId) {
+        return taskService.getTasksAssignedToUser(userId);
     }
 
 
