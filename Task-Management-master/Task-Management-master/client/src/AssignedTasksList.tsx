@@ -22,7 +22,7 @@ const AssignedToMeTaskList: React.FC = () => {
 
     const fetchAssignedTasks = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/user/tasks/assigned`);
+        const response = await fetch(`http://localhost:8080/api/user/assigned/${userId}`);
         const allTasks = await response.json();
 
         // Filter only tasks assigned to the logged-in user
