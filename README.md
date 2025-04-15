@@ -8,4 +8,8 @@ Backend: Java + Spring Boot
 Database: MySQL
 
 create management information system to aiesec
-There are several tasks in this system 
+There are several systems in here
+user management 
+task management 
+event management
+birthday maangement
