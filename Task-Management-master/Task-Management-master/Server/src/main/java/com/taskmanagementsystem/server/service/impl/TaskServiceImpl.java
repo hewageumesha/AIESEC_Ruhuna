@@ -101,8 +101,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getTasksAssignedToUser(String userId) {
-        return taskRepo.findByAssignedToUserId(Integer.valueOf(userId));
+    public List<Task> getTasksAssignedToUser(Integer userId) {
+        return taskRepo.findByAssignedToUserId(userId);
     }
 
     public Task DtoToTask(TaskDto taskDto){
@@ -115,14 +115,19 @@ public class TaskServiceImpl implements TaskService {
         task.setWorkOfStatus(taskDto.getWorkOfStatus());
         return task;
     }
-    public TaskDto taskToDto(Task task){
-        TaskDto taskDto=new TaskDto();
+    public TaskDto taskToDto(Task task) {
+        TaskDto taskDto = new TaskDto();
         taskDto.setTaskId(task.getTaskId());
         taskDto.setTaskName(task.getTaskName());
         taskDto.setDescription(task.getDescription());
         taskDto.setPriority(task.getPriority());
         taskDto.setDeadLine(task.getDeadLine());
         taskDto.setWorkOfStatus(task.getWorkOfStatus());
-        return  taskDto;
+
+        if (task.getAssignedTo() != null) {
+            taskDto.setAssignedTo(task.getAssignedTo().getUserId());
+        }
+
+        return taskDto;
     }
 }
