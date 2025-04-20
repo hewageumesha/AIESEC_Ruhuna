@@ -77,7 +77,7 @@ public class TaskController {
     // ✅ Fix - Update to:
     @GetMapping("/assigned/{userId}")
     public List<Task> getTasksAssignedToUser(@PathVariable Integer userId) {
-        return taskService.getTasksAssignedToUser(String.valueOf(userId));
+        return taskService.getTasksAssignedToUser(userId);
     }
 
 
