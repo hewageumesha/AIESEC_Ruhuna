@@ -1,7 +1,5 @@
 package com.aiesec.service.interfaces;
 
-
-
 import com.aiesec.dto.GuestUserDTO;
 
 import java.util.List;

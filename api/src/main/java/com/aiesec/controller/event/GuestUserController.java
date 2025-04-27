@@ -12,10 +12,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/guest-users")
-@RequiredArgsConstructor
+
 public class GuestUserController {
 
     private final GuestUserService service;
+    public GuestUserController(GuestUserService service) {
+        this.service = service;
+    }
+
 
     // Create a new guest user
     @PostMapping

@@ -1,10 +1,9 @@
 package com.aiesec.model.event;
 
-
-
-import com.aiesec.model.User; 
+import com.aiesec.model.User;
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "event_experience")
@@ -14,6 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class EventExperience {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "experience_id")
@@ -22,6 +22,7 @@ public class EventExperience {
     @ManyToOne
     @JoinColumn(name = "Event_ID", nullable = false)
     private Event event;
+
 
     @ManyToOne
     @JoinColumn(name = "User_ID", referencedColumnName = "User_ID")
@@ -37,8 +38,9 @@ public class EventExperience {
     @Column(name = "Testimonial", columnDefinition = "TEXT")
     private String testimonial;
 
-    //@Column(name = "date_created", nullable = false)
-    //private LocalDate dateCreated;
+
+    @Column(name = "date_created", nullable = false)
+    private LocalDate dateCreated;
 
 
 

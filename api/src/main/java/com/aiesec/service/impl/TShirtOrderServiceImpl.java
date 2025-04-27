@@ -5,8 +5,11 @@ package com.aiesec.service.impl;
 import com.aiesec.dto.TshirtOrderDTO;
 import com.aiesec.model.*;
 import com.aiesec.mapper.TShirtOrderMapper;
+import com.aiesec.model.event.GuestUser;
+import com.aiesec.model.event.Merchandise;
+import com.aiesec.model.event.TShirtOrder;
 import com.aiesec.repository.event.*;
-import com.aiesect.service.interfaces.TShirtOrderService;
+import com.aiesec.service.interfaces.TShirtOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +52,7 @@ public class TShirtOrderServiceImpl implements TShirtOrderService {
 
         existingOrder.setMerchandise(merchandise);
         existingOrder.setQuantity(dto.getQuantity());
-        existingOrder.setSize(Enum.valueOf(com.example.EventManagement.enums.TshirtSize.class, dto.getSize()));
+        existingOrder.setSize(Enum.valueOf(com.aiesec.enums.TshirtSize.class, dto.getSize()));
         existingOrder.setUser(user);
         existingOrder.setGuestUser(guest);
 

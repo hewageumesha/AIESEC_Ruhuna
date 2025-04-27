@@ -1,43 +1,62 @@
 package com.aiesec.mapper;
 
-
-import com.aiesec.dto.EventExperienceDTO; 
-import com.aiesec.model.event.Event; 
-import com.aiesec.model.event.GuestUser; 
+import com.aiesec.dto.EventExperienceDTO;
 import com.aiesec.model.User;
+import com.aiesec.model.event.Event;
 import com.aiesec.model.event.EventExperience;
+import com.aiesec.model.event.GuestUser;
 
 public class EventExperienceMapper {
-
+/*
+    // Convert Entity -> DTO
     public static EventExperienceDTO toDTO(EventExperience experience) {
-        return EventExperienceDTO.builder()
-                .experienceId(experience.getExperienceId())
-                .eventId(experience.getEvent().getEventId())
-                .userId(experience.getUser() != null ? experience.getUser().getUserId() : null)
-                .guestUserId(experience.getGuestUser() != null ? experience.getGuestUser().getGuestUserId() : null)
-                .rating(experience.getRating())
-                .testimonial(experience.getTestimonial())
-                // .dateCreated(experience.getDateCreated()) // Uncomment if needed
-                .build();
+        if (experience == null) {
+            return null;
+        }
+
+        EventExperienceDTO dto = new EventExperienceDTO();
+        dto.setExperienceId(experience.getExperienceId());
+
+        if (experience.getEvent() != null) {
+            dto.setEventId(experience.getEvent().getEventId());
+        }
+
+        if (experience.getUser() != null) {
+            dto.setUserId(experience.getUser().getId());
+        }
+
+        if (experience.getGuestUser() != null) {
+            dto.setGuestUserId(experience.getGuestUser().getGuestUserId());
+        }
+
+        dto.setRating(experience.getRating());
+        dto.setTestimonial(experience.getTestimonial());
+        // dto.setDateCreated(experience.getDateCreated());  // Uncomment if you add dateCreated later
+
+        return dto;
     }
 
+    // Convert DTO -> Entity
     public static EventExperience toEntity(EventExperienceDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
         EventExperience experience = new EventExperience();
         experience.setExperienceId(dto.getExperienceId());
 
-        // Set Event
-        Event event = new Event();
-        event.setEventId(dto.getEventId());
-        experience.setEvent(event);
+        if (dto.getEventId() != null) {
+            Event event = new Event();
+            event.setEventId(dto.getEventId());
+            experience.setEvent(event);
+        }
 
-        // Set User
         if (dto.getUserId() != null) {
             User user = new User();
-            user.setUserId(dto.getUserId());
+            user.setId(dto.getUserId());
             experience.setUser(user);
         }
 
-        // Set GuestUser
         if (dto.getGuestUserId() != null) {
             GuestUser guestUser = new GuestUser();
             guestUser.setGuestUserId(dto.getGuestUserId());
@@ -46,8 +65,9 @@ public class EventExperienceMapper {
 
         experience.setRating(dto.getRating());
         experience.setTestimonial(dto.getTestimonial());
-        // experience.setDateCreated(dto.getDateCreated()); // Uncomment if needed
+        // experience.setDateCreated(dto.getDateCreated());  // Uncomment if you add dateCreated later
 
         return experience;
-    }
+
+    }*/
 }
