@@ -16,7 +16,7 @@ export default function FooterComponent() {
                         <div>
                             <Footer.Title title="Youth" />
                             <Footer.LinkGroup col>
-                                <Footer.Link href="#">Global Talent</Footer.Link>
+                                <Footer.Link> <Link to="global-intern">Global Talent</Link></Footer.Link>
                                 <Footer.Link href="#">Global Teacher</Footer.Link>
                                 <Footer.Link href="#">Global Volunteer</Footer.Link>
                                 <Footer.Link href="#">Become a member</Footer.Link>

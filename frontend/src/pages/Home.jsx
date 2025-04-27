@@ -1,12 +1,36 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import PostCard from '../components/PostCard';
+import PhotoSlider from "../components/PhotoSlider";
 
 export default function Home() {
   const [events, setEvents] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const photoCollection = [
+    { 
+      id: 1, 
+      url: '/image1.jpg', 
+      alt: 'Aiesec in Ruhuna' 
+    },
+    { 
+      id: 2, 
+      url: '/image2.jpg', 
+      alt: 'Aiesec in Ruhuna' 
+    },
+    { 
+      id: 3, 
+      url: '/image3.jpg', 
+      alt: 'Aiesec in Ruhuna' 
+    },
+    { 
+      id: 4, 
+      url: '/image4.jpg', 
+      alt: 'Aiesec in Ruhuna' 
+    },
+  ];
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -35,11 +59,8 @@ export default function Home() {
 
   return (
     <div>
-      <div className='flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto'>
-        <h1 className='text-3xl font-bold lg:text-6xl text-center'>Welcome to AIESEC in Ruhuna</h1>
-        <p className='text-gray-500 text-xs sm:text-sm text-center'>
-          Empowering young people for a better future
-        </p>
+      <div>
+        <PhotoSlider photos={photoCollection}/>
       </div>
 
       <div className='max-w-6xl mx-auto p-3 flex flex-col gap-8 py-7'>
