@@ -4,9 +4,11 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Data
-@AllArgsConstructor
+
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 
 public class EventDTO {

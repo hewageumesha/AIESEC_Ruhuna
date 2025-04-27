@@ -37,6 +37,110 @@ public class Event {
     @Column(name = "Descriptions", nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalTime getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(LocalTime eventTime) {
+        this.eventTime = eventTime;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
+    }
+
+    public User getLcp() {
+        return lcp;
+    }
+
+    public void setLcp(User lcp) {
+        this.lcp = lcp;
+    }
+
+    public User getLcvp() {
+        return lcvp;
+    }
+
+    public void setLcvp(User lcvp) {
+        this.lcvp = lcvp;
+    }
+
+    public EventSeries getSeries() {
+        return series;
+    }
+
+    public void setSeries(EventSeries series) {
+        this.series = series;
+    }
+
+    public User getCreatedByLcp() {
+        return createdByLcp;
+    }
+
+    public void setCreatedByLcp(User createdByLcp) {
+        this.createdByLcp = createdByLcp;
+    }
+
+    public User getApprovedByLcvp() {
+        return approvedByLcvp;
+    }
+
+    public void setApprovedByLcvp(User approvedByLcvp) {
+        this.approvedByLcvp = approvedByLcvp;
+    }
+
     @NotNull(message = "Start date is required")
     @Column(name = "Start_Date", nullable = false)
     private LocalDate startDate;

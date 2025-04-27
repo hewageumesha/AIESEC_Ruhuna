@@ -11,7 +11,7 @@ import {
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
-  const {loading, error: errorMessage} = useSelector(state => state.user);
+  const {loading} = useSelector(state => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
