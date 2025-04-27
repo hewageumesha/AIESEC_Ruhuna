@@ -1,9 +1,8 @@
 package com.aiesec.mapper;
 
-
-
 import com.aiesec.dto.TshirtOrderDTO;
 import com.aiesec.model.event.*;
+import com.aiesec.model.User;
 
 public class TShirtOrderMapper {
 
@@ -15,7 +14,7 @@ public class TShirtOrderMapper {
                 .merchandiseId(order.getMerchandise() != null ? order.getMerchandise().getId() : null)
                 .quantity(order.getQuantity())
                 .size(order.getSize().name())
-                .userId(order.getUser() != null ? order.getUser().getUserId() : null)
+                .userId(order.getUser() != null ? order.getUser().getId() : null)
                 .guestUserId(order.getGuestUser() != null ? order.getGuestUser().getGuestUserId() : null)
                 .build();
     }
@@ -27,7 +26,7 @@ public class TShirtOrderMapper {
                 .orderId(dto.getOrderId())
                 .merchandise(merchandise)
                 .quantity(dto.getQuantity())
-                .size(Enum.valueOf(com.example.EventManagement.enums.TshirtSize.class, dto.getSize()))
+                .size(Enum.valueOf(com.aiesec.enums.TshirtSize.class, dto.getSize()))
                 .user(user)
                 .guestUser(guestUser)
                 .build();
