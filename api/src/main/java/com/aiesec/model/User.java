@@ -3,6 +3,9 @@ package com.aiesec.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+
+import java.sql.Date;
+
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,10 +33,12 @@ public class User {
     @NotEmpty
     private String password;
 
-    private String birthday;
-    private String joinedDate;
+    @Temporal(TemporalType.DATE)
+    private Date birthday;
 
-    @ColumnDefault("https://www.pngplay.com/wp-content/uploads/12/User-Avatar-Profile-Clip-Art-Transparent-PNG.png")
+    @Temporal(TemporalType.DATE)
+    private Date joinedDate;
+
     private String profilePicture;
 
     @Enumerated(EnumType.STRING)
@@ -110,22 +115,7 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public String getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(String birthday) {
-        this.birthday = birthday;
-    }
-
-    public String getJoinedDate() {
-        return joinedDate;
-    }
-
-    public void setJoinedDate(String joinedDate) {
-        this.joinedDate = joinedDate;
-    }
+    
 
     public String getProfilePicture() {
         return profilePicture;
@@ -165,6 +155,22 @@ public class User {
 
     public void setDepartment(Department department) {
         this.department = department;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public Date getJoinedDate() {
+        return joinedDate;
+    }
+
+    public void setJoinedDate(Date joinedDate) {
+        this.joinedDate = joinedDate;
     }
 
 }
