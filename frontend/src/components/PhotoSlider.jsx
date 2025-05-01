@@ -37,13 +37,6 @@ const PhotoSlider = ({ photos }) => {
         className="absolute inset-0 bg-cover bg-center opacity-0"
         style={{ backgroundImage: `url(${photos[nextIndex]?.url || ''})` }}
       />
-      
-      {/* Text overlay */}
-      <div className="absolute inset-0 flex items-center justify-center p-11">
-        <div className="text-white text-center p-2 rounded-lg bg-black bg-opacity-80">
-          <h1 className="text-9xl font-bold text-[#037EF3]">Welcome to AIESEC in Ruhuna</h1>
-        </div>
-      </div>
     </div>
   );
 };

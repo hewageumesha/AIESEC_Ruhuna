@@ -67,7 +67,7 @@ export default function DashSidebar() {
       <Sidebar.Items>
         <Sidebar.ItemGroup className='flex flex-col gap-1'>
          
-          { (currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team Leader') && (
+          { (currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
             <>
               <Link to='/dashboard?tab=dash'>
                 <Sidebar.Item
@@ -105,7 +105,7 @@ export default function DashSidebar() {
                 </Link>
             </>
           )}
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team Leader' ) && (
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' ) && (
             <>
               <Link to='/dashboard?tab=task'>
                 <Sidebar.Item

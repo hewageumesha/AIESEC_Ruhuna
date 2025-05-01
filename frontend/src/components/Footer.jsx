@@ -17,35 +17,27 @@ export default function FooterComponent() {
                             <Footer.Title title="Youth" />
                             <Footer.LinkGroup col>
                                 <Footer.Link> <Link to="global-intern">Global Talent</Link></Footer.Link>
-                                <Footer.Link href="#">Global Teacher</Footer.Link>
-                                <Footer.Link href="#">Global Volunteer</Footer.Link>
-                                <Footer.Link href="#">Become a member</Footer.Link>
+                                <Footer.Link> <Link to="global-teacher">Global Teacher</Link></Footer.Link>
+                                <Footer.Link> <Link to="global-volunteer">Global Volunteer</Link></Footer.Link>
+                                <Footer.Link> <Link to="become-member">Become a member</Link></Footer.Link>
                             </Footer.LinkGroup>
                         </div>
                         <div>
-                            <Footer.Title title="Organization" />
+                            <Footer.Title title=" " />
                             <Footer.LinkGroup col>
-                                <Footer.Link href="#">Partner with us</Footer.Link>
-                                <Footer.Link href="#">Global Volunteer</Footer.Link>
-                                <Footer.Link href="#">Global Talent</Footer.Link>
-                                <Footer.Link href="#">Global Teacher</Footer.Link>
+                                <Footer.Link href="#">About us</Footer.Link>
+                                <Footer.Link href="#">Press</Footer.Link>
+                                <Footer.Link href="https://aiesec-alumni.org/">Alumni</Footer.Link>
+                                
                             </Footer.LinkGroup>
-                        </div>
+                        </div> 
                         <div>
-                                <Footer.Title title="About" />
-                                <Footer.LinkGroup col>
-                                    <Footer.Link href="#" target='_blank' rel='noopener noreferrer'>AIESEC</Footer.Link>
-                                    <Footer.Link href="https://www.instagram.com/lc_ruhuna/" target='_blank' rel='noopener noreferrer'>AIESEC UOR</Footer.Link>
-                                    <Footer.Link href="#" target='_blank' rel='noopener noreferrer'>Alumni</Footer.Link>
-                                </Footer.LinkGroup>
-                        </div>
-                        <div>
-                            <Footer.Title title="Legal" />
+                            <Footer.Title title=" " />
                             <Footer.LinkGroup col>
-                                <Footer.Link href="#">Privacy Policy</Footer.Link>
-                                <Footer.Link href="#">Terms &amp; Conditions</Footer.Link>
+                                <Footer.Link href="#" target='_blank' rel='noopener noreferrer'>Help</Footer.Link>
+                                <Footer.Link >Partner with us</Footer.Link>
                             </Footer.LinkGroup>
-                        </div>  
+                        </div> 
                     </div>      
                 </div>
                 <Footer.Divider />
