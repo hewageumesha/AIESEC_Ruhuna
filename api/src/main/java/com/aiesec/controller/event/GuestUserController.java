@@ -16,6 +16,7 @@ import java.util.List;
 public class GuestUserController {
 
     private final GuestUserService service;
+
     public GuestUserController(GuestUserService service) {
         this.service = service;
     }
