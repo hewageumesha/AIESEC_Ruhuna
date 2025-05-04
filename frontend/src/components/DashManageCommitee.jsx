@@ -8,7 +8,7 @@ const DashManageCommittee = ({ userRole, departments, functions, onSubmit }) => 
     departmentName: "",
     functionName: "",
     startDate: "",
-    roleType: "Team Leader", // Default to Team Leader
+    roleType: "Team_Leader", // Default to Team Leader
   });
 
   const navigate = useNavigate();
@@ -60,7 +60,7 @@ const DashManageCommittee = ({ userRole, departments, functions, onSubmit }) => 
         departmentName: "",
         functionName: "",
         startDate: "",
-        roleType: "Team Leader",
+        roleType: "Team_Leader",
       });
     } catch (error) {
       alert("An error occurred while processing the request.");
@@ -98,7 +98,7 @@ const DashManageCommittee = ({ userRole, departments, functions, onSubmit }) => 
             className="border p-2 w-full rounded-md"
           >
             {(userRole === "LCP") && <option value="LCVP">LCVP</option>}
-            <option value="Team Leader">Team Leader</option>
+            <option value="Team_Leader">Team Leader</option>
             <option value="Member">Team Member</option>
           </select>
         </div>

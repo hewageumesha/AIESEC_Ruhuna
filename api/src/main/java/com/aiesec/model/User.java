@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.sql.Date;
 
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 

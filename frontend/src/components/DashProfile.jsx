@@ -269,15 +269,18 @@ export default function UserProfile() {
         {imageFileUploadError && (
           <Alert color='failure'>{imageFileUploadError}</Alert>
         )}
-        <div>
-          <p><strong>First Name:</strong> {currentUser.firstName}</p>
-          <p><strong>Last Name:</strong> {currentUser.lastName}</p>
-          <p><strong>Role:</strong> {currentUser.role}</p>
-          <p><strong>Department:</strong> {formData.departmentName}</p>
-          <p><strong>Function:</strong> {formData.functionName}</p>
-          <p><strong>Joined Date:</strong> {currentUser.joinedDate}</p>
         </div>
-      </div>
+        {(currentUser.role === 'LCP')} 
+          <div>
+          <p><strong>First Name:</strong> Krishanthi</p>
+          <p><strong>Last Name:</strong> Christina</p>
+          <p><strong>Role:</strong> LCP</p>
+          <p><strong>Department:</strong> Others</p>
+          <p><strong>Function:</strong> President</p>
+          <p><strong>Joined Date:</strong> 2023-01-05</p>
+        </div>
+        
+        
 
       {/* <form onSubmit={handlePasswordSubmit} className='flex flex-col gap-4 mt-5'>
         <TextInput

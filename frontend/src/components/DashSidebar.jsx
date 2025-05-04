@@ -8,7 +8,7 @@ import {
     HiChartPie,
     HiUserGroup,
 } from 'react-icons/hi';
-import { HiRectangleStack } from "react-icons/hi2";
+import { HiRectangleStack  , HiChatBubbleLeftEllipsis} from "react-icons/hi2";
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { signoutSuccess } from '../redux/user/userSlice';
@@ -40,7 +40,7 @@ export default function DashSidebar() {
       } else {
         dispatch(signoutSuccess());
          console.log('User signed out successfully:', data.message);
-        navigate('/sign-in');
+        navigate('');
       }
     } catch (error) {
       console.log(error.message);
@@ -54,7 +54,7 @@ export default function DashSidebar() {
     if (currentUser != null) {
       if (currentUser.role === 'LCP') return true;  
       if (currentUser.role === 'LCVP') return 'LCVP';
-      if (currentUser.role === 'Team Leader') return 'Team Leader';
+      if (currentUser.role === 'Team_Leader') return 'Team_Leader';
     }
     return 'Member';
   }; // You can replace this with a loading spinner if needed
@@ -91,6 +91,16 @@ export default function DashSidebar() {
                     as='div'
                 >
                 Manage Committee
+                </Sidebar.Item>
+                </Link>
+
+                <Link to='/dashboard?tab=comments'>
+                <Sidebar.Item
+                    active={tab === 'comments'}
+                    icon={ HiChatBubbleLeftEllipsis }
+                    as='div'
+                >
+                Comments
                 </Sidebar.Item>
                 </Link>
 
