@@ -75,8 +75,8 @@ export default function Home() {
       {/* Our Programs Section */}
       <section className="max-w-6xl mx-auto px-4 py-12 ">
         <div className="text-center md:text-left">
-          <h1 className="text-5xl font-bold mb-4">Our Programs</h1>
-          <p className="text-2xl mb-8 text-gray-500">
+          <h1 className="text-5xl font-bold mb-4 dark:text-white">Our Programs</h1>
+          <p className="text-2xl mb-8 text-gray-500 dark:text-gray-300">
             We aim to develop leadership qualities and capabilities in young people with these programs
           </p>
 
@@ -117,8 +117,8 @@ export default function Home() {
           
           {/* Text Content Column */}
           <div className="md:w-1/2 text-center md:text-left">
-            <h2 className="text-4xl font-bold mb-4">Join AIESEC and Create these experiences yourself</h2>
-            <p className="text-gray-600 mb-6 text-2xl">
+            <h2 className="text-4xl font-bold mb-4 dark:text-white">Join AIESEC and Create these experiences yourself</h2>
+            <p className="text-gray-600 mb-6 text-2xl dark:text-gray-300">
               Join one of our local chapters and develop yourself through practical experiences in the world's largest youth-led organization.
             </p>
             
