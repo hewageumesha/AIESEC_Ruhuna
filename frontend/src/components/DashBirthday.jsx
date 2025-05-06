@@ -1,5 +1,11 @@
-import React from 'react'
+import React from 'react';
+import BirthdayReminderDashboard from './BirthdayReminderDashboard';
 
 export default function DashBirthday() {
-  return <div>DashBirthday</div>;
+  return (
+    <div>
+      <h2>Birthday Reminder</h2>
+      <BirthdayReminderDashboard />
+    </div>
+  );
 }
