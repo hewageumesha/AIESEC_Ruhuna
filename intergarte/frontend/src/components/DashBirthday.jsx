@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
-import AddBirthday from '../birthday-reminder-frontend/pages/AddBirthday';
-import Home from '../birthday-reminder-frontend/pages/Home';
+// import AddBirthday from '../pages/AddBirthday';
+// import Home from '../pages/Home';
 
 export default function DashBirthday() {
   return (
