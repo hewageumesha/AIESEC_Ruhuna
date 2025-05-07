@@ -9,6 +9,10 @@ import Header from "./components/Header";
 import Footer from './components/Footer';
 import Gallery from './pages/Gallery';
 import PrivateRoute from "./components/PrivateRoute";
+import GlobalIntern from "./pages/GlobalIntern";
+import GlobalVolunteer from "./pages/GlobalVolunteer";
+import GlobalTeacher from "./pages/GlobalTeacher";
+import BecomeMember from "./pages/BecomeMember";
 //import './index.css'
 
 function App() {
@@ -24,6 +28,10 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<PrivateRoute/>}/>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/global-intern" element={<GlobalIntern />} />
+        <Route path="/global-teacher" element={<GlobalTeacher />} />
+        <Route path="/global-volunteer" element={<GlobalVolunteer />} />
+        <Route path="/become-member" element={<BecomeMember />} />
       </Routes>
     <Footer/>
     </BrowserRouter>

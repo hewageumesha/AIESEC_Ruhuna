@@ -7,8 +7,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.sql.Date;
+<<<<<<< HEAD
 import java.time.LocalDate;
 
+=======
+
+import org.hibernate.annotations.ColumnDefault;
+>>>>>>> origin/main
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -38,10 +43,17 @@ public class User {
     private String password;
 
     @Temporal(TemporalType.DATE)
+<<<<<<< HEAD
     private LocalDate birthday;
 
     @Temporal(TemporalType.DATE)
     private LocalDate joinedDate;
+=======
+    private Date birthday;
+
+    @Temporal(TemporalType.DATE)
+    private Date joinedDate;
+>>>>>>> origin/main
 
     private String profilePicture;
 
@@ -119,6 +131,7 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+<<<<<<< HEAD
 
     public LocalDate getBirthday() {
         return birthday;
@@ -135,6 +148,9 @@ public class User {
     public void setJoinedDate(LocalDate joinedDate) {
         this.joinedDate = joinedDate;
     }
+=======
+    
+>>>>>>> origin/main
 
     public String getProfilePicture() {
         return profilePicture;
@@ -175,4 +191,24 @@ public class User {
     public void setDepartment(Department department) {
         this.department = department;
     }
+<<<<<<< HEAD
+=======
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public Date getJoinedDate() {
+        return joinedDate;
+    }
+
+    public void setJoinedDate(Date joinedDate) {
+        this.joinedDate = joinedDate;
+    }
+
+>>>>>>> origin/main
 }

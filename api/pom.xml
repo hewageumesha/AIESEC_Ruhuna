@@ -28,6 +28,7 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
+<<<<<<< HEAD
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -41,6 +42,9 @@
 			<scope>provided</scope>
 		</dependency>
 
+=======
+		<!-- Spring Boot Starter Web (REST API support) -->
+>>>>>>> origin/main
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
