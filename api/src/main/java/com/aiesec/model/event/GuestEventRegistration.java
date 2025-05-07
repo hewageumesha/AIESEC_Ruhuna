@@ -1,38 +1,90 @@
 package com.aiesec.model.event;
 
-
+import com.aiesec.enums.InterestStatus;
 import jakarta.persistence.*;
-import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "guest_event_registration")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+
 public class GuestEventRegistration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Registration_ID")
     private Long id;
+    private Long eventId;
 
-    @ManyToOne
-    @JoinColumn(name = "Guest_ID", nullable = false)
-    private GuestUser guestUser;
+    private String guestName;
+    private String email;
+    private String phone;
+    private LocalDateTime registrationDate;
+    @Enumerated(EnumType.STRING)
+    private InterestStatus interestStatus;
+    private String comment;
 
-    @ManyToOne
-    @JoinColumn(name = "Event_ID", nullable = false)
-    private Event event;
+    public Long getId() {
+        return id;
+    }
 
-    @Column(name = "Excitement_Level")
-    private Integer excitementLevel;  // Optional: e.g. 1–5
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    @Column(name = "Expectation", columnDefinition = "TEXT")
-    private String expectation;
+    public Long getEventId() {
+        return eventId;
+    }
 
-    @Column(name = "Registered_At", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime registeredAt;
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getGuestName() {
+        return guestName;
+    }
+
+    public void setGuestName(String guestName) {
+        this.guestName = guestName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public LocalDateTime getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public void setRegistrationDate(LocalDateTime registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
+    public InterestStatus getInterestStatus() {
+        return interestStatus;
+    }
+
+    public void setInterestStatus(InterestStatus interestStatus) {
+        this.interestStatus = interestStatus;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 }
+
+
 
