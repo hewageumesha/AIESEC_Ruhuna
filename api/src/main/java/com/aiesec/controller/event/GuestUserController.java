@@ -2,8 +2,7 @@ package com.aiesec.controller.event;
 
 
 import com.aiesec.dto.GuestUserDTO; 
-import com.aiesec.service.interfaces.GuestUserService;  
-import lombok.RequiredArgsConstructor;
+import com.aiesec.service.interfaces.GuestUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

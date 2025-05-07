@@ -1,9 +1,8 @@
 package com.aiesec.service;
 
 import com.aiesec.model.User;
-import com.aiesec.repository.UserRepo;
+import com.aiesec.repository.event.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -14,7 +13,7 @@ public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    private UserRepo userRepository;
+    private UserRepository userRepository;
 
 
     // Method to add a new user
