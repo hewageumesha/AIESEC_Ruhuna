@@ -38,9 +38,14 @@ public class EventServiceimpl implements EventService {
             event.setDescription(updatedEvent.getDescriptions());
             event.setStartDate(updatedEvent.getStartDate());
             event.setEventTime(updatedEvent.getEventTime());
+            event.setEndDate(updatedEvent.getEndDate());
+            event.setEndTime(updatedEvent.getEndTime());
             event.setLocation(updatedEvent.getLocation());
             event.setImageUrl(updatedEvent.getImageUrl());
             event.setIsPublic(updatedEvent.getIsPublic());
+            event.setIsVirtual(updatedEvent.getIsVirtual());
+            event.setVirtualLink(updatedEvent.getVirtualLink());
+
             return EventMapper.toDTO(eventRepository.save(event));
         }
         return null;

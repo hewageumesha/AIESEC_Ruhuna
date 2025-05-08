@@ -17,7 +17,11 @@ public class EventDTO {
     private String descriptions;
     private LocalDate startDate;
     private LocalTime eventTime;
+    private LocalTime endTime;
+    private LocalDate endDate;
     private String location;
     private String imageUrl;
     private Boolean isPublic;
+    private Boolean isVirtual;
+    private String virtualLink;
 }
