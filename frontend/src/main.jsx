@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import 'antd/dist/reset.css'; // for latest AntD version
 import App from './App.jsx'
 import { store, persistor } from './redux/store'
 import { Provider } from 'react-redux'
