@@ -10,13 +10,13 @@ const About = () => {
       "image-g-4.jpg",
       "image-g-5.jpg",
       "image-g-6.jpg",
-      "image-g-1.jpg", 
+      "image-g-7.jpg", 
+      "image-g-6.jpg",
       "image-g-2.jpg",
       "image-g-3.jpg",
-      "image-g-4.jpg",
+      "image-g-1.jpg",
       "image-g-5.jpg",
-      "image-g-6.jpg",
-      "image-g-1.jpg"
+      "image-g-4.jpg"
     ];
 
     const gridStyles = {
