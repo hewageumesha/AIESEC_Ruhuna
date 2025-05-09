@@ -3,9 +3,10 @@ import {
   Form, Input, DatePicker, TimePicker, Button, Switch, Upload, Radio, message,
 } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
-
 import axios from 'axios';
-import { supabase } from '../../service/supabaseClient'; // Adjust path based on your project
+import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../../service/supabaseClient';
 
 const { TextArea } = Input;
 const { Dragger } = Upload;
@@ -15,30 +16,50 @@ const AddEventForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [eventType, setEventType] = useState('in_person');
   const [imageUrl, setImageUrl] = useState('');
+  const navigate = useNavigate();
 
+  // Upload handler
   const handleImageUpload = async (file) => {
     const fileName = `${Date.now()}_${file.name}`;
+
     const { error } = await supabase.storage
-      .from('event-images') // Ensure this matches your Supabase bucket
-      .upload(fileName, file);
+      .from('eventimages')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type,
+      });
 
     if (error) {
+      console.error('Upload error:', error);
       message.error('Image upload failed.');
       return '';
     }
 
-    const { data: publicUrlData } = supabase
-      .storage
-      .from('event-images')
-      .getPublicUrl(fileName);
-
+    const { data: publicUrlData } = supabase.storage.from('eventimages').getPublicUrl(fileName);
     return publicUrlData?.publicUrl || '';
   };
 
+  // Main form submit
   const onFinish = async (values) => {
     try {
       setIsSubmitting(true);
+
       const { startDate, endDate, startTime, endTime, ...rest } = values;
+
+      // Validation
+      if (moment(endDate).isBefore(startDate, 'day')) {
+        message.error('End date must be the same or after start date.');
+        return;
+      }
+
+      if (
+        moment(startDate).isSame(endDate, 'day') &&
+        moment(endTime).isBefore(startTime)
+      ) {
+        message.error('End time must be after start time.');
+        return;
+      }
 
       const payload = {
         ...rest,
@@ -49,19 +70,31 @@ const AddEventForm = () => {
         imageUrl,
         isPublic: values.isPublic,
         isVirtual: eventType === 'virtual',
+        location: eventType === 'virtual' ? '' : values.location,
+        virtualLink: eventType === 'virtual' ? values.location : '',
       };
 
-      await axios.post('/api/events', payload); // Adjust your backend API endpoint
-      message.success('Event created successfully!');
+      const response = await axios.post('http://localhost:8080/api/events', payload);
+      const createdEvent = response.data;
+
+      message.success('🎉 Event created successfully!');
+
       form.resetFields();
       setImageUrl('');
+
+      // Redirect and pass event ID
+      setTimeout(() => {
+        navigate(`/event/${createdEvent.id}`); // adjust if your route is different
+      }, 1000);
     } catch (error) {
       console.error(error);
-      message.error('Failed to create event.');
+      message.error('❌ Failed to create event.');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const disabledDate = (current) => current && current < moment().startOf('day');
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md max-w-3xl mx-auto">
@@ -70,24 +103,22 @@ const AddEventForm = () => {
         form={form}
         layout="vertical"
         onFinish={onFinish}
-        initialValues={{
-          isPublic: false,
-        }}
+        initialValues={{ isPublic: false }}
       >
         <Form.Item name="eventName" label="Event Title" rules={[{ required: true }]}>
           <Input placeholder="Enter event title" />
         </Form.Item>
 
-        <Form.Item name="descriptions" label="Description" rules={[{ required: true }]}>
+        <Form.Item name="description" label="Description" rules={[{ required: true }]}>
           <TextArea rows={4} placeholder="Describe the event" />
         </Form.Item>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Form.Item name="startDate" label="Start Date" rules={[{ required: true }]}>
-            <DatePicker className="w-full" />
+            <DatePicker className="w-full" disabledDate={disabledDate} />
           </Form.Item>
           <Form.Item name="endDate" label="End Date" rules={[{ required: true }]}>
-            <DatePicker className="w-full" />
+            <DatePicker className="w-full" disabledDate={disabledDate} />
           </Form.Item>
         </div>
 
@@ -113,7 +144,7 @@ const AddEventForm = () => {
 
         <Form.Item
           name="location"
-          label={eventType === 'virtual' ? 'Meeting Link (Zoom/Google Meet)' : 'Location'}
+          label={eventType === 'virtual' ? 'Meeting Link' : 'Location'}
           rules={[{ required: true }]}
         >
           <Input placeholder={eventType === 'virtual' ? 'Enter meeting link' : 'Enter event location'} />

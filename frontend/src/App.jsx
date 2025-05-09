@@ -33,7 +33,8 @@ function App() {
         <Route path="/global-teacher" element={<GlobalTeacher />} />
         <Route path="/global-volunteer" element={<GlobalVolunteer />} />
         <Route path="/become-member" element={<BecomeMember />} />
-        
+        <Route path="/event/:id" element={<EventDetails />} />
+
       </Routes>
     <Footer/>
     </BrowserRouter>

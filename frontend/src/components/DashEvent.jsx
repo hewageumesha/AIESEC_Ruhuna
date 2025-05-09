@@ -1,54 +1,82 @@
-import React, { useState } from "react";
-import AddEventForm from "./event/AddEventForm";
-import EventCard from "./event/EventCard"; // You should create this component
-import { Button } from "antd"; // If you're using Ant Design
-// Or use DaisyUI button styling
+import React, { useEffect, useState } from 'react';
+import { Card, Spin, Button, message } from 'antd';
+import { PlusOutlined, CloseOutlined } from '@ant-design/icons';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import AddEventForm from './event/AddEventForm'; // ✅ Import your form component
 
 const DashEvent = () => {
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false); // ✅ Toggle state
+  const navigate = useNavigate();
 
-  // Dummy event data (replace with real data or fetch)
-  const events = [
-    {
-      id: 1,
-      title: "LDS 5.0",
-      date: "2025-05-20",
-      description: "Leadership Development Seminar",
-      imageUrl: "https://via.placeholder.com/300x150"
-    },
-    {
-      id: 2,
-      title: "Team Building",
-      date: "2025-06-01",
-      description: "Fun activities to bond the team",
-      imageUrl: "https://via.placeholder.com/300x150"
+  const fetchEvents = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/events');
+      setEvents(response.data);
+    } catch (error) {
+      console.error('Failed to fetch events:', error);
+      message.error('Failed to load events.');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const handleCardClick = (id) => {
+    navigate(`/event/${id}`);
+  };
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Event Management </h2>
+        <h2 className="text-2xl font-semibold">Event Management Dashboard</h2>
         <Button
           type="primary"
-          className="bg-blue-600"
+          icon={showAddForm ? <CloseOutlined /> : <PlusOutlined />}
           onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-blue-600 hover:bg-blue-700"
         >
-          {showAddForm ? "Close Form" : "Add Event"}
+          {showAddForm ? 'Close Form' : 'Add Event'}
         </Button>
       </div>
 
       {showAddForm && (
-        <div className="mb-6">
-          <AddEventForm />
+        <div className="mb-6 border p-4 rounded shadow">
+          <AddEventForm onEventAdded={fetchEvents} />
         </div>
       )}
 
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {events.map((event) => (
-          <EventCard key={event.id} event={event} />
-        ))}
-      </div>
+      {loading ? (
+        <Spin size="large" />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {events.map((event) => (
+            <Card
+              key={event.id}
+              hoverable
+              title={event.eventName}
+              cover={
+                <img
+                  alt={event.eventName}
+                  src={event.imageUrl}
+                  className="h-48 object-cover rounded-t"
+                />
+              }
+              onClick={() => handleCardClick(event.id)}
+            >
+              <p><strong>Date:</strong> {event.startDate} to {event.endDate}</p>
+              <p><strong>Time:</strong> {event.eventTime} - {event.endTime}</p>
+              <p><strong>Type:</strong> {event.isVirtual ? 'Virtual' : 'In Person'}</p>
+              <p><strong>Public:</strong> {event.isPublic ? 'Yes' : 'No'}</p>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

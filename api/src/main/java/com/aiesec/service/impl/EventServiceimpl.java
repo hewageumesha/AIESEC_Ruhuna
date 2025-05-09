@@ -35,7 +35,7 @@ public class EventServiceimpl implements EventService {
         if (existing.isPresent()) {
             Event event = existing.get();
             event.setEventName(updatedEvent.getEventName());
-            event.setDescription(updatedEvent.getDescriptions());
+            event.setDescription(updatedEvent.getDescription());
             event.setStartDate(updatedEvent.getStartDate());
             event.setEventTime(updatedEvent.getEventTime());
             event.setEndDate(updatedEvent.getEndDate());
