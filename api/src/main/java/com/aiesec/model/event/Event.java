@@ -2,6 +2,7 @@ package com.aiesec.model.event;
 
 
 
+import com.aiesec.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -66,26 +67,29 @@ public class Event {
     @Column(name = "Virtual_Link", length = 500)
     private String virtualLink;
 
+    private String visibility;
+    private boolean hasTshirtOrder;
+
      //Foreign Key Relations (assuming LCP and LCVP are users)
-    //@ManyToOne
-    //@JoinColumn(name = "LCP_ID")
-    //private User lcp;
+    @ManyToOne
+    @JoinColumn(name = "LCP_ID")
+    private User lcp;
 
-    //@ManyToOne
-   // @JoinColumn(name = "LCVP_ID")
-  // private User lcvp;
+        @ManyToOne
+       @JoinColumn(name = "LCVP_ID")
+        private User lcvp;
 
-   // @ManyToOne
-   //@JoinColumn(name = "Series_ID")
-   // private EventSeries series;
+        @ManyToOne
+       @JoinColumn(name = "Series_ID")
+       private EventSeries series;
 
-   //@ManyToOne
-  // @JoinColumn(name = "Created_By_LCP")
-  //  private User createdByLcp;
+       @ManyToOne
+       @JoinColumn(name = "Created_By_LCP")
+       private User createdByLcp;
 
-  //  @ManyToOne
-  // @JoinColumn(name = "Approved_By_LCVP")
-  // private User approvedByLcvp;
+       @ManyToOne
+         @JoinColumn(name = "Approved_By_LCVP")
+       private User approvedByLcvp;
 
     public Long getEventId() {
         return eventId;
@@ -183,5 +187,59 @@ public class Event {
         this.virtualLink = virtualLink;
     }
 
+    public String getVisibility() {
+        return visibility;
+    }
 
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
+    }
+
+    public boolean isHasTshirtOrder() {
+        return hasTshirtOrder;
+    }
+
+    public void setHasTshirtOrder(boolean hasTshirtOrder) {
+        this.hasTshirtOrder = hasTshirtOrder;
+    }
+
+    public User getLcp() {
+        return lcp;
+    }
+
+    public void setLcp(User lcp) {
+        this.lcp = lcp;
+    }
+
+    public User getLcvp() {
+        return lcvp;
+    }
+
+    public void setLcvp(User lcvp) {
+        this.lcvp = lcvp;
+    }
+
+    public EventSeries getSeries() {
+        return series;
+    }
+
+    public void setSeries(EventSeries series) {
+        this.series = series;
+    }
+
+    public User getCreatedByLcp() {
+        return createdByLcp;
+    }
+
+    public void setCreatedByLcp(User createdByLcp) {
+        this.createdByLcp = createdByLcp;
+    }
+
+    public User getApprovedByLcvp() {
+        return approvedByLcvp;
+    }
+
+    public void setApprovedByLcvp(User approvedByLcvp) {
+        this.approvedByLcvp = approvedByLcvp;
+    }
 }

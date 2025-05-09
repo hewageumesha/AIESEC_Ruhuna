@@ -19,6 +19,8 @@ public class EventMapper {
                 .isPublic(event.getIsPublic())
                 .isVirtual(event.getIsVirtual())
                 .virtualLink(event.getVirtualLink())
+                .hasTshirtOrder(event.isHasTshirtOrder())
+                .visibility(event.getVisibility())
                 .build();
     }
 
@@ -36,6 +38,8 @@ public class EventMapper {
                 .isPublic(dto.getIsPublic())
                 .isVirtual(dto.getIsVirtual())
                 .virtualLink(dto.getVirtualLink())
+                .hasTshirtOrder(dto.isHasTshirtOrder())
+                .visibility(dto.getVisibility())
                 .build();
     }
 }

@@ -1,29 +1,29 @@
 package com.aiesec.service.interfaces;
 
+
 import com.aiesec.dto.EventDTO;
+import com.aiesec.model.event.Event;
 import java.util.List;
 
 public interface EventService {
-
+    // Create new event
     EventDTO createEvent(EventDTO eventDTO);
 
+    // Update existing event
     EventDTO updateEvent(Long eventId, EventDTO eventDTO);
 
-    void deleteEvent(Long eventId);
-
+    // Get event by ID
     EventDTO getEventById(Long eventId);
 
+    // Get all events
     List<EventDTO> getAllEvents();
 
-    List<EventDTO> getUpcomingEvents();
+    // Delete event by ID
+    void deleteEvent(Long eventId);
 
-   // List<EventDTO> getEventsByOrganizer(Long userId);
+    // Method to update the T-shirt order availability (hasTshirtOrder)
+    void updateTshirtOrder(Long eventId, boolean hasTshirtOrder);
 
-    //List<EventDTO> getEventsByType(String type); // Optional if you categorize events
-
-   // List<EventDTO> searchEvents(String keyword); // For filter/search functionality
-
-    List<EventDTO> getPublicUpcomingEvents();
-
-   // List<EventDTO> getEventsByGroup(String groupName);
+    // Method to update visibility (Public or Private)
+    void updateEventVisibility(Long eventId, String visibility);
 }
