@@ -22,8 +22,12 @@ public interface EventService {
     void deleteEvent(Long eventId);
 
     // Method to update the T-shirt order availability (hasTshirtOrder)
-    void updateTshirtOrder(Long eventId, boolean hasTshirtOrder);
+    void updateTshirtOrder(Long eventId, Boolean hasTshirtOrder);
 
     // Method to update visibility (Public or Private)
     void updateEventVisibility(Long eventId, String visibility);
+
+    List<EventDTO> getUpcomingEvents();
+
+    List<EventDTO> getPublicUpcomingEvents();
 }

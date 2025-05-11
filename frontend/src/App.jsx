@@ -13,6 +13,7 @@ import GlobalIntern from "./pages/GlobalIntern";
 import GlobalVolunteer from "./pages/GlobalVolunteer";
 import GlobalTeacher from "./pages/GlobalTeacher";
 import BecomeMember from "./pages/BecomeMember";
+import EventDetails from "./pages/EventDetails";
 
 //import './index.css'
 

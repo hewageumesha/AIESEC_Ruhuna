@@ -38,7 +38,7 @@ public class EventMapper {
                 .isPublic(dto.getIsPublic())
                 .isVirtual(dto.getIsVirtual())
                 .virtualLink(dto.getVirtualLink())
-                .hasTshirtOrder(dto.isHasTshirtOrder())
+                .hasTshirtOrder(dto.getHasTshirtOrder())
                 .visibility(dto.getVisibility())
                 .build();
     }

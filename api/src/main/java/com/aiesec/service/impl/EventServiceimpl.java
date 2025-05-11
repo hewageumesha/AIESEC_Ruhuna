@@ -22,12 +22,27 @@ public class EventServiceimpl implements EventService {
     public EventServiceimpl(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
     }
-
     @Override
     public EventDTO createEvent(EventDTO eventDTO) {
         Event event = EventMapper.toEntity(eventDTO);
+
+        // Handle null value for hasTshirtOrder (if EventDTO uses Boolean)
+        if (eventDTO.getHasTshirtOrder() == null) {
+            event.setHasTshirtOrder(false); // default to false
+        } else {
+            event.setHasTshirtOrder(eventDTO.getHasTshirtOrder());
+        }
+
+        // Handle null or empty visibility
+        if (eventDTO.getVisibility() == null || eventDTO.getVisibility().isEmpty()) {
+            event.setVisibility("Private"); // default visibility
+        } else {
+            event.setVisibility(eventDTO.getVisibility());
+        }
+
         return EventMapper.toDTO(eventRepository.save(event));
     }
+
 
     @Override
     public EventDTO updateEvent(Long eventId, EventDTO updatedEvent) {
@@ -88,6 +103,31 @@ public class EventServiceimpl implements EventService {
                 .map(EventMapper::toDTO)
                 .collect(Collectors.toList());
     }
+    @Override
+    public void updateTshirtOrder(Long eventId, Boolean hasTshirtOrder) {
+        Optional<Event> optionalEvent = eventRepository.findById(eventId);
+        if (optionalEvent.isPresent()) {
+            Event event = optionalEvent.get();
+            event.setHasTshirtOrder(Boolean.TRUE.equals(hasTshirtOrder));
+            eventRepository.save(event);
+        } else {
+            throw new RuntimeException("Event not found with ID: " + eventId);
+        }
+    }
+
+    @Override
+    public void updateEventVisibility(Long eventId, String visibility) {
+        Optional<Event> optionalEvent = eventRepository.findById(eventId);
+        if (optionalEvent.isPresent()) {
+            Event event = optionalEvent.get();
+            event.setVisibility(visibility != null && !visibility.isEmpty() ? visibility : "Private");
+            eventRepository.save(event);
+        } else {
+            throw new RuntimeException("Event not found with ID: " + eventId);
+        }
+    }
+
+
 
     //@Override
     //public List<EventDTO> getEventsByGroup(String groupName) {

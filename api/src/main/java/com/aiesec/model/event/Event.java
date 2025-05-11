@@ -68,7 +68,7 @@ public class Event {
     private String virtualLink;
 
     private String visibility;
-    private boolean hasTshirtOrder;
+    private Boolean hasTshirtOrder;
 
      //Foreign Key Relations (assuming LCP and LCVP are users)
     @ManyToOne

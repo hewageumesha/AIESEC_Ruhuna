@@ -25,7 +25,7 @@ public class EventDTO {
     private Boolean isVirtual;
     private String virtualLink;
     private String visibility;
-    private boolean hasTshirtOrder;
+    private Boolean hasTshirtOrder;
 
 
 }
