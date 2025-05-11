@@ -12,7 +12,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.6.1",
     "@supabase/supabase-js": "^2.49.4",
-    "antd": "^5.25.0",
+    "antd": "^5.25.1",
     "axios": "^1.8.4",
     "bootstrap": "^5.3.5",
     "daisyui": "^5.0.35",

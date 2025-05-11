@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Form, Input, DatePicker, TimePicker, Button, Switch, Upload, Radio, message,
+  Form, Input, DatePicker, TimePicker, Button, Upload, Radio, message,
 } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -18,10 +18,8 @@ const AddEventForm = () => {
   const [imageUrl, setImageUrl] = useState('');
   const navigate = useNavigate();
 
-  // Upload handler
   const handleImageUpload = async (file) => {
     const fileName = `${Date.now()}_${file.name}`;
-
     const { error } = await supabase.storage
       .from('eventimages')
       .upload(fileName, file, {
@@ -40,16 +38,13 @@ const AddEventForm = () => {
     return publicUrlData?.publicUrl || '';
   };
 
-  // Main form submit
   const onFinish = async (values) => {
     try {
       setIsSubmitting(true);
-
       const { startDate, endDate, startTime, endTime, ...rest } = values;
 
-      // Validation
       if (moment(endDate).isBefore(startDate, 'day')) {
-        message.error('End date must be the same or after start date.');
+        message.error('End date must be same or after start date.');
         return;
       }
 
@@ -65,30 +60,26 @@ const AddEventForm = () => {
         ...rest,
         startDate: startDate.format('YYYY-MM-DD'),
         endDate: endDate.format('YYYY-MM-DD'),
-        eventTime: startTime.format('HH:mm:ss'),
-        endTime: endTime.format('HH:mm:ss'),
+        eventTime: startTime.format('hh:mm A'),
+        endTime: endTime.format('hh:mm A'),
         imageUrl,
-        isPublic: values.isPublic,
+        isPublic: values.visibility === 'public',
         isVirtual: eventType === 'virtual',
         location: eventType === 'virtual' ? '' : values.location,
         virtualLink: eventType === 'virtual' ? values.location : '',
+        hasTshirtOrder: values.hasTshirtOrder,
       };
 
       const response = await axios.post('http://localhost:8080/api/events', payload);
       const createdEvent = response.data;
 
-      message.success('🎉 Event created successfully!');
-
+      message.success('🎉 Event published successfully!');
       form.resetFields();
       setImageUrl('');
-
-      // Redirect and pass event ID
-      setTimeout(() => {
-        navigate(`/event/${createdEvent.id}`); // adjust if your route is different
-      }, 1000);
+      setTimeout(() => navigate(`/event/${createdEvent.id}`), 1000);
     } catch (error) {
       console.error(error);
-      message.error('❌ Failed to create event.');
+      message.error('❌ Failed to publish event.');
     } finally {
       setIsSubmitting(false);
     }
@@ -97,14 +88,14 @@ const AddEventForm = () => {
   const disabledDate = (current) => current && current < moment().startOf('day');
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md max-w-3xl mx-auto">
-      <h2 className="text-2xl font-semibold mb-6">Create New Event</h2>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        initialValues={{ isPublic: false }}
-      >
+    <div className="bg-white rounded-2xl shadow-lg w-full max-w-xl px-6 py-8 mx-auto mt-6 sm:mt-10">
+  <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">Create New Event</h2>
+  <Form
+    form={form}
+    layout="vertical"
+    onFinish={onFinish}
+    initialValues={{ isPublic: false, tshirtAvailable: false }}
+  >
         <Form.Item name="eventName" label="Event Title" rules={[{ required: true }]}>
           <Input placeholder="Enter event title" />
         </Form.Item>
@@ -124,10 +115,10 @@ const AddEventForm = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Form.Item name="startTime" label="Start Time" rules={[{ required: true }]}>
-            <TimePicker className="w-full" format="HH:mm" />
+            <TimePicker use12Hours format="h:mm A" className="w-full" />
           </Form.Item>
           <Form.Item name="endTime" label="End Time" rules={[{ required: true }]}>
-            <TimePicker className="w-full" format="HH:mm" />
+            <TimePicker use12Hours format="h:mm A" className="w-full" />
           </Form.Item>
         </div>
 
@@ -171,13 +162,28 @@ const AddEventForm = () => {
           )}
         </Form.Item>
 
-        <Form.Item name="isPublic" label="Public Event?" valuePropName="checked">
-          <Switch />
+        <Form.Item name="visibility" label="Who can see it?">
+          <Radio.Group>
+            <Radio value="public">Public</Radio>
+            <Radio value="private">Private</Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        <Form.Item name="hasTshirtOrder" label="T-shirt Order Available?">
+          <Radio.Group>
+            <Radio value={true}>Yes</Radio>
+            <Radio value={false}>No</Radio>
+          </Radio.Group>
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={isSubmitting}>
-            Create Event
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={isSubmitting}
+            className="hover:scale-105 transition-all duration-200"
+          >
+            Publish Event
           </Button>
         </Form.Item>
       </Form>
