@@ -12,9 +12,9 @@ const About = () => {
       "image-g-6.jpg",
       "image-g-7.jpg", 
       "image-g-6.jpg",
-      "image-g-2.jpg",
-      "image-g-3.jpg",
       "image-g-1.jpg",
+      "image-g-3.jpg",
+      "image-g-2.jpg",
       "image-g-5.jpg",
       "image-g-4.jpg"
     ];
@@ -178,7 +178,7 @@ const About = () => {
                     <div className="md:flex gap-8">
                       <div className="md:w-1/3 mb-6 md:mb-0">
                         <img 
-                          src="/1948.webp" 
+                          src="/history/1948.webp" 
                           alt="AIESEC founders in 1948"
                           className="w-full h-48 object-cover rounded-lg"
                         />
@@ -207,7 +207,7 @@ const About = () => {
                     <div className="md:flex gap-8">
                       <div className="md:w-1/3 mb-6 md:mb-0">
                         <img 
-                          src="/1977.webp" 
+                          src="/history/1977.webp" 
                           alt="AIESEC global expansion in 1977"
                           className="w-full h-48 object-cover rounded-lg"
                         />
@@ -236,7 +236,7 @@ const About = () => {
                     <div className="md:flex gap-8">
                       <div className="md:w-1/3 mb-6 md:mb-0">
                         <img 
-                          src="/2010.webp" 
+                          src="/history/2010.webp" 
                           alt="AIESEC experiences in 2010"
                           className="w-full h-48 object-cover rounded-lg"
                         />
@@ -265,7 +265,7 @@ const About = () => {
                     <div className="md:flex gap-8">
                       <div className="md:w-1/3 mb-6 md:mb-0">
                         <img 
-                          src="/2015.webp" 
+                          src="/history/2015.webp" 
                           alt="AIESEC's youth leaders in 2015"
                           className="w-full h-48 object-cover rounded-lg"
                         />
@@ -294,7 +294,7 @@ const About = () => {
                     <div className="md:flex gap-8">
                       <div className="md:w-1/3 mb-6 md:mb-0">
                         <img 
-                          src="/2025.webp" 
+                          src="/history/2025.webp" 
                           alt="AIESEC global network in 2025"
                           className="w-full h-48 object-cover rounded-lg"
                         />

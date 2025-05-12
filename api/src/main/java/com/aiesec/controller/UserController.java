@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -36,4 +37,20 @@ public class UserController {
         return userService.getUserByAiesecEmail(aiesecEmail);
     }
 
+    @GetMapping("/profile/{aiesecEmail}")
+    public User getUserProfile(@PathVariable String aiesecEmail) {
+        return userService.getUserByAiesecEmail(aiesecEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    /* 
+    @PutMapping(value = "/profile/update/{aiesecEmail}", consumes = {"multipart/form-data"})
+    public User updateUserProfile(
+            @PathVariable String aiesecEmail,
+            @RequestPart User userDetails,
+            @RequestPart(required = false) MultipartFile profilePhoto) throws Exception {
+        
+        return userService.updateUserProfile(aiesecEmail, userDetails, profilePhoto);
+    }
+    */
 }

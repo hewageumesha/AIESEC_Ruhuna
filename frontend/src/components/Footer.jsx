@@ -26,7 +26,7 @@ export default function FooterComponent() {
                             <Footer.Title title=" " />
                             <Footer.LinkGroup col>
                                 <Footer.Link> <Link to="about"> About us </Link></Footer.Link>
-                                <Footer.Link>Press</Footer.Link>
+                                <Footer.Link href='https://blog.aiesec.org/category/press/'>Press</Footer.Link>
                                 <Footer.Link href="https://aiesec-alumni.org/">Alumni</Footer.Link>
                                 
                             </Footer.LinkGroup>

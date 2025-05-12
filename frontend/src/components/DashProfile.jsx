@@ -1,39 +1,21 @@
-import { Alert, Button, Modal, ModalBody, TextInput } from 'flowbite-react';
-import { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from 'firebase/storage';
-import { app } from '../firebase';
-import { CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
-import {
-  updateStart,
-  updateSuccess,
-  updateFailure,
-  signoutSuccess,
-} from '../redux/user/userSlice';
-import { useDispatch } from 'react-redux';
+import { useState, useRef, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Alert, Button, TextInput, Modal } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
-import { Link } from 'react-router-dom';
+import { updateStart, updateSuccess, updateFailure, deleteUserStart, deleteUserFailure, deleteUserSuccess, signoutSuccess } from '../redux/user/userSlice';
+import { useNavigate } from 'react-router-dom';
 
 export default function UserProfile() {
   const { currentUser, error, loading } = useSelector((state) => state.user);
+  const [formData, setFormData] = useState({});
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
-  const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
-  const [imageFileUploadError, setImageFileUploadError] = useState(null);
-  const [imageFileUploading, setImageFileUploading] = useState(false);
   const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
   const [updateUserError, setUpdateUserError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({});
   const filePickerRef = useRef();
   const dispatch = useDispatch();
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -43,84 +25,15 @@ export default function UserProfile() {
     }
   };
 
-  useEffect(() => {
-    if (imageFile) {
-      uploadImage();
-    }
-  }, [imageFile]);
-
-  useEffect(() => {
-    const aiesecEmail = currentUser.aiesecEmail; 
-    const fetchUserData = async () => {
-        try {
-            
-            const response = await fetch(`/api/users/${aiesecEmail}`);
-            const data = await response.json();
-            setCurrentUser(data); // Store user details including functionName
-        } catch (error) {
-            console.error("Error fetching user data:", error);
-        }
-    };
-
-    if (!aiesecEmail) fetchUserData();
-});
-
-  const uploadImage = async () => {
-    setImageFileUploading(true);
-    setImageFileUploadError(null);
-  
-    if (!imageFile) {
-      setImageFileUploadError("Please select an image file.");
-      setImageFileUploading(false);
-      return;
-    }
-  
-    const formData = new FormData();
-    formData.append("image", imageFile);
-  
-    try {
-      const response = await fetch("http://localhost:5173/upload", {
-        method: "POST",
-        body: formData,
-      });
-  
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Image upload failed");
-      }
-  
-      setImageFileUrl(data.imageUrl); // Store the image URL
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        profilePicture: data.imageUrl
-      })); // Save in form
-      setImageFileUploading(false);
-    } catch (error) {
-      setImageFileUploadError(error.message);
-      setImageFileUploading(false);
-    }
-  };  
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUpdateUserError(null);
     setUpdateUserSuccess(null);
-    if (Object.keys(formData).length === 0) {
-      setUpdateUserError('No changes made');
-      return;
-    }
-    if (imageFileUploading) {
-      setUpdateUserError('Please wait for image to upload');
-      return;
-    }
+    
     try {
       dispatch(updateStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
@@ -136,7 +49,7 @@ export default function UserProfile() {
         setUpdateUserError(data.message);
       } else {
         dispatch(updateSuccess(data));
-        setUpdateUserSuccess("User's profile updated successfully");
+        setUpdateUserSuccess("Profile updated successfully");
       }
     } catch (error) {
       dispatch(updateFailure(error.message));
@@ -144,25 +57,20 @@ export default function UserProfile() {
     }
   };
 
-  const handlePasswordSubmit = async (e) => {
-    e.preventDefault();
+  const handleSignout = async () => {
     try {
-      const res = await fetch(`/api/user/updatePassword/${currentUser.aiesecEmail}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ password }),
+      const res = await fetch('/api/user/signout', {
+        method: 'POST',
       });
       const data = await res.json();
       if (!res.ok) {
-        setUpdateUserError(data.message);
+        console.log(data.message);
       } else {
-        setUpdateUserSuccess('Password updated successfully');
-        setPassword('');
+        dispatch(signoutSuccess());
+        navigate('/');
       }
     } catch (error) {
-      setUpdateUserError(error.message);
+      console.log(error.message);
     }
   };
 
@@ -178,167 +86,186 @@ export default function UserProfile() {
         dispatch(deleteUserFailure(data.message));
       } else {
         dispatch(deleteUserSuccess(data));
+        navigate('/');
       }
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
     }
   };
 
-  const handleSignout = async () => {
-    try {
-      dispatch(signoutSuccess());
-      navigate('/sign-in');
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  useEffect(() => {
-    const fetchDepartmentAndFunction = async () => {
-      try {
-        const departmentRes = await fetch(`/api/department/${currentUser.departmentId}`);
-        const functionRes = await fetch(`/api/function/${currentUser.functionId}`);
-        const departmentData = await departmentRes.json();
-        const functionData = await functionRes.json();
-
-        if (departmentRes.ok && functionRes.ok) {
-          setFormData({
-            ...formData,
-            departmentName: departmentData.departmentName,
-            functionName: functionData.functionName,
-          });
-        } else {
-          console.error('Failed to fetch department or function details');
-        }
-      } catch (error) {
-        console.error('Error fetching department or function details:', error);
-      }
-    };
-
-    if (currentUser.departmentId && currentUser.functionId) {
-      fetchDepartmentAndFunction();
-    }
-  }, [currentUser.departmentId, currentUser.functionId]);
-
   return (
-    <div className='max-w-lg mx-auto p-3 w-full'>
-      <h1 className='my-7 text-center font-semibold text-3xl'>Profile</h1>
-      <div className='flex flex-col gap-4'>
-        <div
-          className='relative w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full'
-          onClick={() => filePickerRef.current.click()}
-        >
-          <input
-            type='file'
-            accept='image/*'
-            onChange={handleImageChange}
-            ref={filePickerRef}
-            hidden
-          />
-          {imageFileUploadProgress && (
-            <CircularProgressbar
-              value={imageFileUploadProgress || 0}
-              text={`${imageFileUploadProgress}%`}
-              strokeWidth={5}
-              styles={{
-                root: {
-                  width: '100%',
-                  height: '100%',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                },
-                path: {
-                  stroke: `rgba(62, 152, 199, ${
-                    imageFileUploadProgress / 100
-                  })`,
-                },
-              }}
-            />
-          )}
-          <img
-            src="{imageFileUrl || currentUser.profilePicture}"
-            alt='user'
-            className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${
-              imageFileUploadProgress &&
-              imageFileUploadProgress < 100 &&
-              'opacity-60'
-            }`}
-          />
-        </div>
-        {imageFileUploadError && (
-          <Alert color='failure'>{imageFileUploadError}</Alert>
-        )}
-        </div>
-        {(currentUser.role === 'LCP')} 
-          <div>
-          <p><strong>First Name:</strong> Krishanthi</p>
-          <p><strong>Last Name:</strong> Christina</p>
-          <p><strong>Role:</strong> LCP</p>
-          <p><strong>Department:</strong> Others</p>
-          <p><strong>Function:</strong> President</p>
-          <p><strong>Joined Date:</strong> 2023-01-05</p>
-        </div>
-        
-        
+    <div className="max-w-4xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-6">Profile</h1>
 
-      {/* <form onSubmit={handlePasswordSubmit} className='flex flex-col gap-4 mt-5'>
-        <TextInput
-          type='password'
-          id='password'
-          placeholder='New Password'
-          value={password}
-          onChange={handlePasswordChange}
-        />
-        <Button
-          type='submit'
-          gradientDuoTone='purpleToBlue'
-          outline
-          disabled={loading}
-        >
-          Update Password
-        </Button>
-      </form> */}
-      {/* <div className='text-red-500 flex justify-between mt-5'>
-        <span onClick={handleSignout} className='cursor-pointer'>
-          Sign Out
-        </span>
-      </div> */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-lg font-medium text-gray-900">Profile Information</h2>
+        <p className="text-sm text-gray-600 mb-8">This information will be displayed publicly so be careful what you share.</p>
+
+          <div className="mb-8">
+            <label className="block text-sm font-medium text-gray-700 mb-1">AIESEC Email</label>
+            <p className="text-sm text-gray-600">workcation.com/johndoe</p>
+          </div>
+
+          <div className="mb-8">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+            <p className="text-sm text-gray-600">workcation.com/johndoe</p>
+          </div>
+
+          <div className="mb-8">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Function</label>
+            <p className="text-sm text-gray-600">workcation.com/johndoe</p>
+          </div>
+
+          <div className="mb-8">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+            <p className="text-sm text-gray-600">workcation.com/johndoe</p>
+          </div>
+
+          <div className="mb-8">
+            <label htmlFor="about" className="block text-sm font-medium text-gray-700 mb-1">About</label>
+            <textarea
+              id="about"
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Write something about you..."
+              onChange={handleChange}
+            />
+            <p className="text-sm text-gray-600 mb-2">Write a few sentences about yourself.</p>
+          </div>
+
+          <div className="mb-8">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Photo</label>
+            <div className="flex items-center">
+              <div className="mr-4">
+                <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden">
+                  {imageFileUrl ? (
+                    <img src={imageFileUrl} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gray-300"></div>
+                  )}
+                </div>
+              </div>
+              <Button color="light" onClick={() => filePickerRef.current.click()}>
+                Change
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  ref={filePickerRef}
+                  hidden
+                />
+              </Button>
+            </div>
+          </div>
+      </div>
+      
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-lg font-medium text-gray-900">Personal Information</h2>
+        <p className="text-sm text-gray-600 mb-8">Use a permanent address where you can receive mail.</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">First name</label>
+            <TextInput
+              id="firstName"
+              type="text"
+              onChange={handleChange}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">Last name</label>
+            <TextInput
+              id="lastName"
+              type="text"
+              onChange={handleChange}
+              className="w-full"
+            />
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+          <TextInput
+            id="email"
+            type="email"
+            onChange={handleChange}
+            className="w-full"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="streetAddress" className="block text-sm font-medium text-gray-700 mb-1">Street address</label>
+          <TextInput
+            id="streetAddress"
+            type="text"
+            onChange={handleChange}
+            className="w-full"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div>
+            <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">City</label>
+            <TextInput
+              id="city"
+              type="text"
+              onChange={handleChange}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">State / Province</label>
+            <TextInput
+              id="state"
+              type="text"
+              onChange={handleChange}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-1">ZIP / Postal code</label>
+            <TextInput
+              id="zipCode"
+              type="text"
+              onChange={handleChange}
+              className="w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-3">
+          <Button color="light">Cancel</Button>
+          <Button type="submit" onClick={handleSubmit} disabled={loading}>
+            {loading ? 'Saving...' : 'Save'}
+          </Button>
+      </div>
 
       {updateUserSuccess && (
-        <Alert color='success' className='mt-5'>
+        <Alert color="success" className="mt-4">
           {updateUserSuccess}
         </Alert>
       )}
       {updateUserError && (
-        <Alert color='failure' className='mt-5'>
+        <Alert color="failure" className="mt-4">
           {updateUserError}
         </Alert>
       )}
-      {error && (
-        <Alert color='failure' className='mt-5'>
-          {error}
-        </Alert>
-      )}
 
-      <Modal
-        show={showModal}
-        onClose={() => setShowModal(false)}
-        popup
-        size='md'
-      >
+      <Modal show={showModal} onClose={() => setShowModal(false)} popup size="md">
         <Modal.Header />
         <Modal.Body>
-          <div className='text-center'>
-            <HiOutlineExclamationCircle className='h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto' />
-            <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-400'>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
+            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
               Are you sure you want to delete your account?
             </h3>
-            <div className='flex justify-center gap-4'>
-              <Button color='failure' onClick={handleDeleteUser}>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={handleDeleteUser}>
                 Yes, I'm sure
               </Button>
-              <Button color='gray' onClick={() => setShowModal(false)}>
+              <Button color="gray" onClick={() => setShowModal(false)}>
                 No, cancel
               </Button>
             </div>
