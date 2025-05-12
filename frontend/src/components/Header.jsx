@@ -16,7 +16,7 @@ export default function Header() {
     const handleSignout = async () => {
         try {
             dispatch(signoutSuccess());
-            navigate('/sign-in');
+            navigate('');
         } catch (error) {
           console.log(error.message);
         }
@@ -75,7 +75,7 @@ export default function Header() {
             </Navbar.Link>
             <Navbar.Link active={path === '/about'} as={'div'}>
                 <Link to="/about" className='font-semibold'>
-                    About
+                    About us
                 </Link>
             </Navbar.Link >
             <Navbar.Link active={path === '/gallery'} as={'div'}>

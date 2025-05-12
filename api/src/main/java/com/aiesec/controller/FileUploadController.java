@@ -11,18 +11,18 @@ import java.io.IOException;
 @RequestMapping("/api/uploads")
 public class FileUploadController {
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
-
-    @PostMapping("/profile-photo")
-    public String uploadProfilePhoto(@RequestParam("file") MultipartFile file) {
-        String fileName = System.currentTimeMillis() + file.getOriginalFilename();
-        try {
-            file.transferTo(new File(uploadDir + fileName));
-            return "Profile photo uploaded successfully: " + fileName;
-        } catch (IOException e) {
-            return "Error uploading file: " + e.getMessage();
-        }
-    }
+//    @Value("${file.upload-dir}")
+//    private String uploadDir;
+//
+//    @PostMapping("/profile-photo")
+//    public String uploadProfilePhoto(@RequestParam("file") MultipartFile file) {
+//        String fileName = System.currentTimeMillis() + file.getOriginalFilename();
+//        try {
+//            file.transferTo(new File(uploadDir + fileName));
+//            return "Profile photo uploaded successfully: " + fileName;
+//        } catch (IOException e) {
+//            return "Error uploading file: " + e.getMessage();
+//        }
+//    }
 }
 

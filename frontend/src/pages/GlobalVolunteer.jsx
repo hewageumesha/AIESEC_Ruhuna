@@ -33,12 +33,12 @@ const GlobalVolunteer = () => {
       </section>
 
         {/* Global Client Section */}
-        <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+        <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white  dark:bg-gray-900">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
           {/* Left side - Image */}
           <div className="md:w-1/2">
-            <div className="relative aspect-video rounded-lg overflow-hidden max-w-xxl mx-auto">
+            <div className="relative rounded-lg overflow-hidden max-w-xxl mx-auto dark:bg-gray-900">
               {/* Replace with your actual image */}
               <img
                 src="/globalVolunteer.png"
@@ -50,29 +50,29 @@ const GlobalVolunteer = () => {
 
           {/* Right side - Content cards */}
           <div className="md:w-1/2 space-y-8">
-            <div className="p-6 bg-gray-50 rounded-lg">
-              <h2 className="text-2xl font-semibold text-[#F85A40] mb-3">
+            <div className="p-6 bg-gray-50 rounded-lg  dark:bg-gray-800">
+              <h2 className="text-2xl font-semibold text-[#F85A40] mb-3 ">
                 Experience new cultures
               </h2>
-              <p className="text-black">
+              <p className="text-black dark:text-gray-300">
                 There's nothing like being in a foreign Country/Territory, living and volunteering with people from all around the world, being exposed to different points of view and ways of living.
               </p>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-lg">
+            <div className="p-6 bg-gray-50 rounded-lg  dark:bg-gray-800">
               <h3 className="text-xl font-semibold text-[#F85A40] mb-3">
                 Make in impact 
               </h3>
-              <p className="text-black">
+              <p className="text-black dark:text-gray-300">
                 On a Global Volunteer project with AIESEC, you work towards tackling the issues you're most passionate about with one of the Sustainable Development Goals of the United Nations.
               </p>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-lg">
-              <h3 className="text-xl font-semibold text-[#F85A40] mb-3">
+            <div className="p-6 bg-gray-50 rounded-lg  dark:bg-gray-800">
+              <h3 className="text-xl font-semibold text-[#F85A40] mb-3 ">
                 Challenge yourself
               </h3>
-              <p className="text-black">
+              <p className="text-black dark:text-gray-300">
                 Our projects are packed with opportunities to try something new, push you out of your comfort zone and discover the best version of yourself - becaause growth happens beyond your comfort zone!
               </p>
             </div>

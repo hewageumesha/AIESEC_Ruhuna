@@ -33,15 +33,15 @@ const GlobalTeacher = () => {
       </section>
 
         {/* Global Client Section */}
-        <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+        <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white  dark:bg-gray-900">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
           {/* Left side - Image */}
           <div className="md:w-1/2">
-            <div className="relative aspect-video rounded-lg overflow-hidden max-w-xxl mx-auto">
+            <div className="relative rounded-lg overflow-hidden max-w-xxl mx-auto">
               {/* Replace with your actual image */}
               <img
-                src="/globalTeacher.png"
+                src="/globalTeacher.webp"
                 alt="Global talent working together"
                 className="w-full h-full object-cover"
               />
@@ -50,29 +50,29 @@ const GlobalTeacher = () => {
 
           {/* Right side - Content cards */}
           <div className="md:w-1/2 space-y-8">
-            <div className="p-6 bg-gray-50 rounded-lg">
+            <div className="p-6 bg-gray-50 rounded-lg  dark:bg-gray-800">
               <h2 className="text-2xl font-semibold text-[#F48924] mb-3">
                 Experience cross-cultural environment
               </h2>
-              <p className="text-black">
+              <p className="text-black dark:text-gray-300">
                 You can gain experience in new cross-cultural settings, equip yourself with new skills and add value to the school or institution you will work in
               </p>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-lg">
+            <div className="p-6 bg-gray-50 rounded-lg  dark:bg-gray-800">
               <h3 className="text-xl font-semibold text-[#F48924] mb-3">
                 Try somthing new or refine your skills
               </h3>
-              <p className="text-black">
+              <p className="text-black dark:text-gray-300">
                 Our teaching opportunities are very diverse - whether looking to teach for the first time or your're already an experienced teacher, you will find an opportunity looking for someone like you!
               </p>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-lg">
+            <div className="p-6 bg-gray-50 rounded-lg  dark:bg-gray-800">
               <h3 className="text-xl font-semibold text-[#F48924] mb-3">
                 Gain a professional edge
               </h3>
-              <p className="text-black">
+              <p className="text-black dark:text-gray-300">
                 Our partners are dedicated to providing you with an enriching leadership experience sure to put you ahead of your peers.
               </p>
             </div>
