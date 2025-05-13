@@ -18,8 +18,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private FileUploadService fileUploadService;
+
 
     // Method to add a new user
     public User addUser(User user) {
