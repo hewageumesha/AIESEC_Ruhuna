@@ -60,9 +60,10 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-2 border-solid border-gray-300;
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background); /* Correct way to apply custom background */
+    color: var(--foreground); /* Correct way to apply custom foreground */
   }
 }

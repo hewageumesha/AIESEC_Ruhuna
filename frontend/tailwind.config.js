@@ -12,5 +12,5 @@ export default {
       scrollBehavior: ['smooth'],
     },
   },
-  plugins: [require("flowbite/plugin")],
+  plugins: [import("flowbite/plugin")],
 };
