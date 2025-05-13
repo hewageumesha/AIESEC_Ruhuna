@@ -45,10 +45,20 @@ public class EventController {
 
     // Get Event by ID
     @GetMapping("/{eventId}")
-    public ResponseEntity<EventDTO> getEventById(@PathVariable Long eventId) {
-        EventDTO event = eventService.getEventById(eventId);
-        return (event != null) ? new ResponseEntity<>(event, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<EventDTO> getEventById(@PathVariable String eventId) {
+        try {
+            // Ensure the eventId is a valid Long
+            Long id = Long.valueOf(eventId);  // Try converting the string to Long
+            EventDTO event = eventService.getEventById(id);
+            return (event != null) ? new ResponseEntity<>(event, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (NumberFormatException e) {
+            // Log the error and return a bad request if the ID is invalid
+            System.err.println("Invalid eventId: " + eventId);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Return bad request for invalid ID
+        }
     }
+
+
 
     // Delete Event
     @DeleteMapping("/{eventId}")

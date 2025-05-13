@@ -28,13 +28,14 @@ function App() {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+         <Route path="/event/:id" element={<EventDetails />} />
         <Route element={<PrivateRoute/>}/>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/global-intern" element={<GlobalIntern />} />
         <Route path="/global-teacher" element={<GlobalTeacher />} />
         <Route path="/global-volunteer" element={<GlobalVolunteer />} />
         <Route path="/become-member" element={<BecomeMember />} />
-        <Route path="/event/:id" element={<EventDetails />} />
+       
 
       </Routes>
     <Footer/>

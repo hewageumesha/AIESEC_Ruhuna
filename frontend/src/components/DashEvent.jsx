@@ -3,12 +3,12 @@ import { Card, Spin, Button, message } from 'antd';
 import { PlusOutlined, CloseOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import AddEventForm from './event/AddEventForm'; // ✅ Import your form component
+import AddEventForm from './event/AddEventForm';
 
 const DashEvent = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAddForm, setShowAddForm] = useState(false); // ✅ Toggle state
+  const [showAddForm, setShowAddForm] = useState(false);
   const navigate = useNavigate();
 
   const fetchEvents = async () => {
@@ -27,14 +27,14 @@ const DashEvent = () => {
     fetchEvents();
   }, []);
 
-  const handleCardClick = (id) => {
-    navigate(`/event/${id}`);
+  const handleCardClick = (eventId) => {
+    navigate(`/event/${eventId}`);
   };
 
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Event Management </h2>
+        <h2 className="text-2xl font-bold">Event Management</h2>
         <Button
           type="primary"
           icon={showAddForm ? <CloseOutlined /> : <PlusOutlined />}
@@ -57,7 +57,7 @@ const DashEvent = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {events.map((event) => (
             <Card
-              key={event.id}
+              key={event.eventId}
               hoverable
               title={event.eventName}
               cover={
@@ -67,7 +67,7 @@ const DashEvent = () => {
                   className="h-48 object-cover rounded-t"
                 />
               }
-              onClick={() => handleCardClick(event.id)}
+              onClick={() => handleCardClick(event.eventId)}
             >
               <p><strong>Date:</strong> {event.startDate} to {event.endDate}</p>
               <p><strong>Time:</strong> {event.eventTime} - {event.endTime}</p>

@@ -73,10 +73,10 @@ const AddEventForm = () => {
       const response = await axios.post('http://localhost:8080/api/events', payload);
       const createdEvent = response.data;
 
-      message.success('🎉 Event published successfully!');
+      message.success('Event published successfully!');
       form.resetFields();
       setImageUrl('');
-      setTimeout(() => navigate(`/event/${createdEvent.id}`), 1000);
+      navigate(`/event/${createdEvent.eventId}`);
     } catch (error) {
       console.error(error);
       message.error('❌ Failed to publish event.');
@@ -89,13 +89,16 @@ const AddEventForm = () => {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg w-full max-w-xl px-6 py-8 mx-auto mt-6 sm:mt-10">
-  <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">Create New Event</h2>
-  <Form
-    form={form}
-    layout="vertical"
-    onFinish={onFinish}
-    initialValues={{ isPublic: false, tshirtAvailable: false }}
-  >
+      <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">Create New Event</h2>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        initialValues={{
+          visibility: 'private',
+          hasTshirtOrder: false,
+        }}
+      >
         <Form.Item name="eventName" label="Event Title" rules={[{ required: true }]}>
           <Input placeholder="Enter event title" />
         </Form.Item>
