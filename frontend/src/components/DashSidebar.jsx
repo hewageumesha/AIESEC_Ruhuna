@@ -8,7 +8,7 @@ import {
     HiChartPie,
     HiUserGroup,
 } from 'react-icons/hi';
-import { HiRectangleStack } from "react-icons/hi2";
+import { HiRectangleStack  , HiChatBubbleLeftEllipsis} from "react-icons/hi2";
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { signoutSuccess } from '../redux/user/userSlice';
@@ -33,35 +33,34 @@ export default function DashSidebar() {
     try {
       const res = await fetch('/api/auth/signout', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-      const data = await res.json();
+
       if (!res.ok) {
-        console.log(data.message);
+        const errorText = await res.text(); // try to read any error
+        console.error('Signout error:', errorText);
       } else {
+        const data = await res.json();
+        console.log(data.message); // optional: show toast or log
         dispatch(signoutSuccess());
-         console.log('User signed out successfully:', data.message);
-        navigate('/sign-in');
+        navigate('/');
       }
     } catch (error) {
-      console.log(error.message);
+      console.error('Fetch failed:', error.message);
     }
   };
-
-  
-  // If no currentUser, render nothing or a loading spinner.
 
   const getUserRoleLabel = () => {
     if (currentUser != null) {
       if (currentUser.role === 'LCP') return true;  
       if (currentUser.role === 'LCVP') return 'LCVP';
-      if (currentUser.role === 'Team Leader') return 'Team Leader';
+      if (currentUser.role === 'Team_Leader') return 'Team_Leader';
     }
     return 'Member';
   }; // You can replace this with a loading spinner if needed
  
-
-  
-
   return (
     <Sidebar className='w-full md:w-56'>
       <Sidebar.Items>
@@ -91,6 +90,16 @@ export default function DashSidebar() {
                     as='div'
                 >
                 Manage Committee
+                </Sidebar.Item>
+                </Link>
+
+                <Link to='/dashboard?tab=comments'>
+                <Sidebar.Item
+                    active={tab === 'comments'}
+                    icon={ HiChatBubbleLeftEllipsis }
+                    as='div'
+                >
+                Comments
                 </Sidebar.Item>
                 </Link>
 
@@ -147,13 +156,16 @@ export default function DashSidebar() {
               Profile 
             </Sidebar.Item>
           </Link>
-          <Sidebar.Item
-            icon={HiArrowSmRight}
-            className='cursor-pointer'
-            onClick={handleSignout}
-          >
-            Sign Out
-          </Sidebar.Item>
+          
+          <div onClick={handleSignout}>
+            <Sidebar.Item
+              icon={HiArrowSmRight}
+              className='cursor-pointer'
+              as='div'
+            >
+              Sign Out
+            </Sidebar.Item>
+          </div>
         </Sidebar.ItemGroup>
       </Sidebar.Items>
     </Sidebar>

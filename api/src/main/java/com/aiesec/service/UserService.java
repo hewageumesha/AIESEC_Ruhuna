@@ -4,6 +4,9 @@ import com.aiesec.model.User;
 import com.aiesec.repository.event.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +18,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private FileUploadService fileUploadService;
 
     // Method to add a new user
     public User addUser(User user) {
@@ -52,4 +57,22 @@ public class UserService {
             throw new RuntimeException("Error retrieving user by email");
         }
     }
+
+//    public User updateUserProfile(String aiesecEmail, User userDetails, MultipartFile profilePhoto) throws IOException {
+//        User user = userRepository.findByAiesecEmail(aiesecEmail)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        // Update allowed fields
+//        user.setFirstName(userDetails.getFirstName());
+//        user.setLastName(userDetails.getLastName());
+//        user.setEmail(userDetails.getEmail());
+//
+//        // Handle profile photo upload
+//        if (profilePhoto != null && !profilePhoto.isEmpty()) {
+//            String photoUrl = fileUploadService.uploadProfilePhoto(profilePhoto, aiesecEmail);
+//            user.setProfilePicture(photoUrl);
+//        }
+//
+//        return userRepository.save(user);
+//    }
 }

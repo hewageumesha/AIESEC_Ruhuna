@@ -4,6 +4,8 @@ import com.aiesec.model.User;
 import com.aiesec.security.JwtUtil;
 import com.aiesec.service.UserService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -67,8 +69,10 @@ public class AuthController {
     }
 
     @PostMapping("/signout")
-    public String signOut() {
-        return "Logged out successfully";
+    public ResponseEntity<Map<String, String>> signOut() {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Logged out successfully");
+        return ResponseEntity.ok(response);
     }
 }
 

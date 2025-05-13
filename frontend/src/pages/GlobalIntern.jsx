@@ -2,9 +2,9 @@ import React from "react";
 
 const GlobalIntern = () => {
   return (
-    <div className="font-sans">
+    <div className="font-sans dark:bg-gray-900">
       {/* Full-screen Hero Section */}
-      <section className="relative h-screen w-full overflow-hidden">
+      <section className="relative h-screen w-full overflow-hidden dark:bg-gray-900">
         {/* Background Image with Gradient Overlay */}
         <div className="absolute inset-0">
           <img
@@ -33,15 +33,15 @@ const GlobalIntern = () => {
       </section>
 
         {/* Global Client Section */}
-        <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+        <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
           {/* Left side - Image */}
           <div className="md:w-1/2">
-            <div className="relative aspect-video rounded-lg overflow-hidden max-w-xxl mx-auto">
+            <div className="relative rounded-lg overflow-hidden max-w-xxl mx-auto ">
               {/* Replace with your actual image */}
               <img
-                src="/globalTalent.png"
+                src="/globalTalent.webp"
                 alt="Global talent working together"
                 className="w-full h-full object-cover"
               />
@@ -50,29 +50,29 @@ const GlobalIntern = () => {
 
           {/* Right side - Content cards */}
           <div className="md:w-1/2 space-y-8">
-            <div className="p-6 bg-gray-50 rounded-lg">
+            <div className="p-6 bg-gray-50 rounded-lg dark:bg-gray-800">
               <h2 className="text-2xl font-semibold text-[#0CB9C1] mb-3">
                 Get the multi-cultural work experience
               </h2>
-              <p className="text-black">
+              <p className="text-black dark:text-gray-300">
                 You can gain experience in new cross-cultural settings, equip yourself with new skills and add value to your workplace.
               </p>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-lg">
+            <div className="p-6 bg-gray-50 rounded-lg dark:bg-gray-800">
               <h3 className="text-xl font-semibold text-[#0CB9C1] mb-3">
                 Find the industry for you
               </h3>
-              <p className="text-black">
+              <p className="text-black dark:text-gray-300">
                 Our pool of opportunities are growing across fields - we're sure you'll find one best fitting your background and experiences.
               </p>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-lg">
+            <div className="p-6 bg-gray-50 rounded-lg dark:bg-gray-800">
               <h3 className="text-xl font-semibold text-[#0CB9C1] mb-3">
                 Gain a professional edge
               </h3>
-              <p className="text-black">
+              <p className="text-black dark:text-gray-300">
                 Our partners are dedicated to providing you with an enriching leadership experience sure to put you ahead of your peers.
               </p>
             </div>

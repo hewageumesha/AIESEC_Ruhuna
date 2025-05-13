@@ -8,6 +8,7 @@ import DashEvent from '../components/DashEvent';
 import DashFinance from '../components/DashFinance';
 import DashBirthday from '../components/DashBirthday';
 import DashboardComp from '../components/DashboardComp';
+import DashComments from '../components/DashComments';
 
 export default function Dashboard() {
   const location = useLocation();
@@ -25,6 +26,7 @@ export default function Dashboard() {
   const tabComponents = {
     profile: <DashProfile />,
     manageCommittee: <DashManageCommitee />,
+    comments: <DashComments />,
     task: <DashTask />,
     event: <DashEvent />,
     finance: <DashFinance />,
