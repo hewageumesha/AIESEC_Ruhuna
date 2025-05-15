@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Spin, Button, message } from 'antd';
+import { Card, Spin, Button, message, Tag } from 'antd';
 import { PlusOutlined, CloseOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AddEventForm from './event/AddEventForm';
+
+const { Meta } = Card;
 
 const DashEvent = () => {
   const [events, setEvents] = useState([]);
@@ -32,9 +34,9 @@ const DashEvent = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-8 min-h-screen bg-gray-50">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Event Management</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Event Management</h2>
         <Button
           type="primary"
           icon={showAddForm ? <CloseOutlined /> : <PlusOutlined />}
@@ -46,32 +48,53 @@ const DashEvent = () => {
       </div>
 
       {showAddForm && (
-        <div className="mb-6 border p-4 rounded shadow">
+        <div className="mb-6 border p-4 rounded shadow bg-white">
           <AddEventForm onEventAdded={fetchEvents} />
         </div>
       )}
 
       {loading ? (
-        <Spin size="large" />
+        <div className="flex justify-center items-center min-h-[200px]">
+          <Spin size="large" />
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {events.map((event) => (
             <Card
               key={event.eventId}
               hoverable
-              title={event.eventName}
+              onClick={() => handleCardClick(event.eventId)}
+              className="transition-transform transform hover:scale-105 shadow-md hover:shadow-xl border border-gray-200 cursor-pointer relative"
               cover={
                 <img
                   alt={event.eventName}
-                  src={event.imageUrl}
+                  src={event.imageUrl || '/default-event.jpg'}
+                  onError={(e) => (e.target.src = '/default-event.jpg')}
                   className="h-48 object-cover rounded-t"
                 />
               }
-              onClick={() => handleCardClick(event.eventId)}
             >
-              <p><strong>Date:</strong> {event.startDate} to {event.endDate}</p>
-              <p><strong>Time:</strong> {event.eventTime} - {event.endTime}</p>
-             
+              {/* Optional badge for event type or status */}
+              {event.eventType && (
+                <Tag color="blue" className="absolute top-2 right-2 z-10">
+                  {event.eventType}
+                </Tag>
+              )}
+
+              <Meta
+                title={<span className="font-semibold text-lg text-gray-800">{event.eventName}</span>}
+                description={
+                  <div className="text-gray-600 mt-2 space-y-1 text-sm">
+                    <p><strong>Date:</strong> {event.startDate} to {event.endDate}</p>
+                    <p><strong>Time:</strong> {event.eventTime} - {event.endTime}</p>
+                    {event.totalRegistrations !== undefined && (
+                      <p className="text-green-600 font-medium">
+                        {event.totalRegistrations} registered
+                      </p>
+                    )}
+                  </div>
+                }
+              />
             </Card>
           ))}
         </div>
