@@ -6,16 +6,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class GuestEventRegistrationDTO {
+    private Long guestUserId;
     private Long eventId;
     private String name;
     private String email;
     private String phone;
     private InterestStatus interestStatus;
     private String comment;
+    private LocalDateTime registeredAt;
 }
 

@@ -71,8 +71,7 @@ const DashEvent = () => {
             >
               <p><strong>Date:</strong> {event.startDate} to {event.endDate}</p>
               <p><strong>Time:</strong> {event.eventTime} - {event.endTime}</p>
-              <p><strong>Type:</strong> {event.isVirtual ? 'Virtual' : 'In Person'}</p>
-              <p><strong>Public:</strong> {event.isPublic ? 'Yes' : 'No'}</p>
+             
             </Card>
           ))}
         </div>

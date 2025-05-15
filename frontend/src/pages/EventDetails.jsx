@@ -90,9 +90,7 @@ const EventDetails = () => {
         <div className="p-4 border rounded-lg bg-gray-50">
           <strong>📍 Type:</strong> {event.isVirtual ? 'Virtual' : 'In Person'}
         </div>
-        <div className="p-4 border rounded-lg bg-gray-50">
-          <strong>🌐 Public:</strong> {event.isPublic ? 'Yes' : 'No'}
-        </div>
+        
         {event.eventHighlights && (
           <div className="p-4 border rounded-lg bg-gray-50 col-span-full">
             <strong>✨ Highlights:</strong> {event.eventHighlights}
