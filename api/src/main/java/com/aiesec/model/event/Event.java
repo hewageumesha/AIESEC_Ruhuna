@@ -49,9 +49,9 @@ public class Event {
     @Column(name = "End_Time")
     private LocalTime endTime;
 
-    @NotBlank(message = "Location is required")
-    @Column(name = "Location", nullable = false, length = 255)
+    @Column(name = "Location", length = 255)  // Remove nullable=false
     private String location;
+
 
     @Column(name = "Image_URL", length = 255)
     private String imageUrl;

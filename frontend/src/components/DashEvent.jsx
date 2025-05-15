@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Spin, Button, message, Tag } from 'antd';
-import { PlusOutlined, CloseOutlined } from '@ant-design/icons';
+import { Card, Spin, Button, message, Tag, Popconfirm } from 'antd';
+import { PlusOutlined, CloseOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AddEventForm from './event/AddEventForm';
@@ -31,6 +31,23 @@ const DashEvent = () => {
 
   const handleCardClick = (eventId) => {
     navigate(`/event/${eventId}`);
+  };
+
+  const handleEdit = (eventId, e) => {
+    e.stopPropagation(); // Prevent triggering card click
+    navigate(`/edit-event/${eventId}`);
+  };
+
+  const handleDelete = async (eventId, e) => {
+    e.stopPropagation();
+    try {
+      await axios.delete(`http://localhost:8080/api/events/${eventId}`);
+      message.success('Event deleted successfully');
+      setEvents((prev) => prev.filter((event) => event.eventId !== eventId));
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+      message.error('Failed to delete event');
+    }
   };
 
   return (
@@ -64,7 +81,7 @@ const DashEvent = () => {
               key={event.eventId}
               hoverable
               onClick={() => handleCardClick(event.eventId)}
-              className="transition-transform transform hover:scale-105 shadow-md hover:shadow-xl border border-gray-200 cursor-pointer relative"
+              className="relative group transition-transform transform hover:scale-105 shadow-md hover:shadow-xl border border-gray-200 cursor-pointer"
               cover={
                 <img
                   alt={event.eventName}
@@ -74,12 +91,33 @@ const DashEvent = () => {
                 />
               }
             >
-              {/* Optional badge for event type or status */}
               {event.eventType && (
                 <Tag color="blue" className="absolute top-2 right-2 z-10">
                   {event.eventType}
                 </Tag>
               )}
+
+              <div className="absolute top-2 left-2 z-10 hidden group-hover:flex gap-2">
+                <Button
+                  icon={<EditOutlined />}
+                  size="small"
+                  onClick={(e) => handleEdit(event.eventId, e)}
+                />
+                <Popconfirm
+                  title="Are you sure you want to delete this event?"
+                  onConfirm={(e) => handleDelete(event.eventId, e)}
+                  okText="Yes"
+                  cancelText="No"
+                  onCancel={(e) => e.stopPropagation()}
+                >
+                  <Button
+                    icon={<DeleteOutlined />}
+                    size="small"
+                    danger
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </Popconfirm>
+              </div>
 
               <Meta
                 title={<span className="font-semibold text-lg text-gray-800">{event.eventName}</span>}

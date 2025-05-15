@@ -14,6 +14,7 @@ import GlobalVolunteer from "./pages/GlobalVolunteer";
 import GlobalTeacher from "./pages/GlobalTeacher";
 import BecomeMember from "./pages/BecomeMember";
 import EventDetails from "./pages/EventDetails";
+import EditEvent from "./components/event/EditEvent";
 
 //import './index.css'
 
@@ -35,6 +36,8 @@ function App() {
         <Route path="/global-teacher" element={<GlobalTeacher />} />
         <Route path="/global-volunteer" element={<GlobalVolunteer />} />
         <Route path="/become-member" element={<BecomeMember />} />
+        <Route path="/edit-event/:id" element={<EditEvent />} />
+
        
 
       </Routes>
