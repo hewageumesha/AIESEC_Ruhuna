@@ -1,40 +1,35 @@
 package com.aiesec.model.event;
 
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
-@Table(name = "event_merchandise")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class Merchandise {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Merchandise_ID")
     private Long id;
 
+    private boolean available; // Is T-shirt order available?
+
+    private String description; // Small description about the T-shirt
+
+    @ElementCollection
+    @CollectionTable(name = "merchandise_images", joinColumns = @JoinColumn(name = "merchandise_id"))
+    @Column(name = "image_url")
+    private List<String> imageUrls;
+
     @ManyToOne
-    @JoinColumn(name = "Event_ID", nullable = false)
-    private Event event;  // Reference to the Event entity
+    @JoinColumn(name = "event_id", nullable = false)
+    private Event event;
 
-    @Column(name = "Item_Name", nullable = false, length = 100)
-    private String itemName;
 
-    @Column(name = "Description", columnDefinition = "TEXT")
-    private String description;
-
-    @Column(name = "Image_URL", length = 255)
-    private String imageUrl;
-
-    @Column(name = "Price", precision = 10, scale = 2)
-    private BigDecimal price;
 }
-

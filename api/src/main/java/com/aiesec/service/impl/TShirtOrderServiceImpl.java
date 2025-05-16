@@ -36,9 +36,9 @@ public class TShirtOrderServiceImpl implements TShirtOrderService {
     public TshirtOrderDTO createTShirtOrder(TshirtOrderDTO dto) {
         Merchandise merchandise = merchandiseRepository.findById(dto.getMerchandiseId()).orElseThrow();
         User user = dto.getUserId() != null ? userRepository.findById(dto.getUserId()).orElse(null) : null;
-        GuestUser guest = dto.getGuestUserId() != null ? guestUserRepository.findById(dto.getGuestUserId()).orElse(null) : null;
+        //GuestUser guest = dto.getGuestUserId() != null ? guestUserRepository.findById(dto.getGuestUserId()).orElse(null) : null;
 
-        TShirtOrder order = TShirtOrderMapper.toEntity(dto, merchandise, user, guest);
+        TShirtOrder order = TShirtOrderMapper.toEntity(dto, merchandise);
         return TShirtOrderMapper.toDTO(tshirtOrderRepository.save(order));
     }
 
@@ -48,13 +48,13 @@ public class TShirtOrderServiceImpl implements TShirtOrderService {
 
         Merchandise merchandise = merchandiseRepository.findById(dto.getMerchandiseId()).orElseThrow();
         User user = dto.getUserId() != null ? userRepository.findById(dto.getUserId()).orElse(null) : null;
-        GuestUser guest = dto.getGuestUserId() != null ? guestUserRepository.findById(dto.getGuestUserId()).orElse(null) : null;
+        //GuestUser guest = dto.getGuestUserId() != null ? guestUserRepository.findById(dto.getGuestUserId()).orElse(null) : null;
 
         existingOrder.setMerchandise(merchandise);
         existingOrder.setQuantity(dto.getQuantity());
         existingOrder.setSize(Enum.valueOf(com.aiesec.enums.TshirtSize.class, dto.getSize()));
         existingOrder.setUser(user);
-        existingOrder.setGuestUser(guest);
+      //  existingOrder.setGuestUser(guest);
 
         return TShirtOrderMapper.toDTO(tshirtOrderRepository.save(existingOrder));
     }

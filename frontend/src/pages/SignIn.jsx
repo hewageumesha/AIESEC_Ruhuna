@@ -45,9 +45,9 @@ export default function SignIn() {
         navigate('/dashboard');
       } else if (data.role === 'LCVP') {
         navigate('/dashboard');
-      } else if (data.role === 'Team_Leader') {
+      } else if (data.role === 'TEAM_LEADER') {
         navigate('/dashboard');
-      } else if(data.role === 'Member'){
+      } else if(data.role === 'MEMBER'){
         navigate('/dashboard');
       }
     } catch (error) {

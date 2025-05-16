@@ -91,6 +91,11 @@ public class Event {
          @JoinColumn(name = "Approved_By_LCVP")
        private User approvedByLcvp;
 
+    @OneToOne
+    @JoinColumn(name = "merchandise_id")
+    private Merchandise merchandise;
+
+
     public Long getEventId() {
         return eventId;
     }

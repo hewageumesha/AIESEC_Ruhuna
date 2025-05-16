@@ -15,7 +15,7 @@ public class TShirtOrderMapper {
                 .quantity(order.getQuantity())
                 .size(order.getSize().name())
                 .userId(order.getUser() != null ? order.getUser().getUserId() : null)
-                .guestUserId(order.getGuestUser() != null ? order.getGuestUser().getGuestUserId() : null)
+                //.guestUserId(order.getGuestUser() != null ? order.getGuestUser().getGuestUserId() : null)
                 .build();
     }
 
@@ -28,8 +28,12 @@ public class TShirtOrderMapper {
                 .quantity(dto.getQuantity())
                 .size(Enum.valueOf(com.aiesec.enums.TshirtSize.class, dto.getSize()))
                 .user(user)
-                .guestUser(guestUser)
+                //.guestUser(guestUser)
                 .build();
+    }
+
+    public static TShirtOrder toEntity(TshirtOrderDTO dto, Merchandise merchandise) {
+        return TShirtOrderMapper.toEntity(dto, merchandise, null, null);
     }
 }
 

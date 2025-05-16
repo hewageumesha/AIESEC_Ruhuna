@@ -35,9 +35,9 @@ public class TShirtOrder {
     @JoinColumn(name = "User_ID")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "Guest_ID")
-    private GuestUser guestUser;
+    //@ManyToOne
+    //@JoinColumn(name = "Guest_ID")
+    //private GuestUser guestUser;
 
 
 }

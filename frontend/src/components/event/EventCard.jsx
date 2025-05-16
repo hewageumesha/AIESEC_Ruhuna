@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { message } from 'antd';
 
 const EventCard = ({ event, onDeleteSuccess }) => {
   const { currentUser } = useSelector((state) => state.user);
@@ -19,20 +20,21 @@ const EventCard = ({ event, onDeleteSuccess }) => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          // Add Authorization header here if needed
+          // 'Authorization': `Bearer ${currentUser.token}`, // uncomment if you use token auth
         },
       });
 
       if (response.ok) {
-        alert('Event deleted successfully.');
-        onDeleteSuccess?.(event.id); // optional callback to update UI
+        message.success('Event deleted successfully.');
+        if (onDeleteSuccess) onDeleteSuccess(event.id);
       } else {
+        // Try to parse error message from response body
         const data = await response.json();
-        alert(data.message || 'Failed to delete event.');
+        message.error(data.message || 'Failed to delete event.');
       }
     } catch (error) {
       console.error('Error deleting event:', error);
-      alert('An error occurred while deleting the event.');
+      message.error('An error occurred while deleting the event.');
     }
   };
 
@@ -42,13 +44,13 @@ const EventCard = ({ event, onDeleteSuccess }) => {
     <div className="bg-white shadow-md rounded-xl p-4 w-full max-w-md mx-auto mb-4">
       <img
         src={event.imageUrl || 'https://via.placeholder.com/400x200'}
-        alt={event.title}
+        alt={event.title || event.eventName}
         className="w-full h-48 object-cover rounded-md mb-4"
       />
-      <h2 className="text-xl font-semibold mb-1">{event.title}</h2>
+      <h2 className="text-xl font-semibold mb-1">{event.title || event.eventName}</h2>
       <p className="text-gray-600 mb-2">{event.description}</p>
       <p className="text-sm text-gray-500">
-        📅 {new Date(event.date).toLocaleString()}
+        📅 {new Date(event.date || event.startDate).toLocaleString()}
       </p>
 
       {canEditOrDelete && (
