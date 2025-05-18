@@ -1,6 +1,6 @@
 # AIESEC Ruhuna Web Application (Management Information System)
 
-A fully-featured Management Information System (MIS) developed for AIESEC in Ruhuna to streamline and manage internal processes including event management, user registration, task tracking, finances, and merchandise.
+A fully-featured Management Information System (MIS) developed for AIESEC in Ruhuna to streamline and manage internal processes, including event management, user registration, task tracking, finances, and merchandise.
 
 ## 🌐 Project Overview
 
