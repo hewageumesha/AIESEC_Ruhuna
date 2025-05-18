@@ -39,8 +39,6 @@ This web-based system allows AIESEC members and guests to interact with the orga
 - GitHub (Version Control)
 - Render / Vercel / Firebase (Deployment options)
 
----
-
 ## 🚀 Getting Started
 
 ### Backend and Frontend Setup
