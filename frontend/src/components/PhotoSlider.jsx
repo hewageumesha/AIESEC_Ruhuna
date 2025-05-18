@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import React from 'react';
+
 
 const PhotoSlider = ({ photos }) => {
   const [currentIndex, setCurrentIndex] = useState(0);

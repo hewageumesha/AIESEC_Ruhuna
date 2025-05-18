@@ -4,10 +4,13 @@ import { Alert, Button, TextInput, Modal } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { updateStart, updateSuccess, updateFailure, deleteUserStart, deleteUserFailure, deleteUserSuccess, signoutSuccess } from '../redux/user/userSlice';
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import axios from 'axios';
 
 export default function UserProfile() {
   const { currentUser, error, loading } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({});
+  const [profileData, setProfileData] = useState({});
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
@@ -16,6 +19,22 @@ export default function UserProfile() {
   const filePickerRef = useRef();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+      fetchProfileData();
+    },[currentUser, navigate ]);
+
+  const fetchProfileData = async () => {
+    try {
+      const profile = await axios.get(`http://localhost:8080/api/users/profile/${currentUser.email}`, {
+        headers: { Authorization: `Bearer ${currentUser.token}` }
+      });
+      setProfileData(profile.data);
+      return profile.data;
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -36,12 +55,12 @@ export default function UserProfile() {
     
     try {
       dispatch(updateStart());
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+      const res = await fetch(`/api/user/update/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(updatedData),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -78,7 +97,7 @@ export default function UserProfile() {
     setShowModal(false);
     try {
       dispatch(deleteUserStart());
-      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+      const res = await fetch(`/api/user/delete/${userId}`, {
         method: 'DELETE',
       });
       const data = await res.json();
@@ -103,22 +122,22 @@ export default function UserProfile() {
 
           <div className="mb-8">
             <label className="block text-sm font-medium text-gray-700 mb-1">AIESEC Email</label>
-            <p className="text-sm text-gray-600">workcation.com/johndoe</p>
+            <p className="text-sm text-gray-600">{profileData.aiesecEmail}</p>
           </div>
 
           <div className="mb-8">
             <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-            <p className="text-sm text-gray-600">workcation.com/johndoe</p>
+            <p className="text-sm text-gray-600">{profileData.department?.name}</p>
           </div>
 
           <div className="mb-8">
             <label className="block text-sm font-medium text-gray-700 mb-1">Function</label>
-            <p className="text-sm text-gray-600">workcation.com/johndoe</p>
+            <p className="text-sm text-gray-600">{profileData.function?.name}</p>
           </div>
 
           <div className="mb-8">
             <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-            <p className="text-sm text-gray-600">workcation.com/johndoe</p>
+            <p className="text-sm text-gray-600">{profileData.role}</p>
           </div>
 
           <div className="mb-8">
@@ -140,6 +159,8 @@ export default function UserProfile() {
                 <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden">
                   {imageFileUrl ? (
                     <img src={imageFileUrl} alt="Profile" className="w-full h-full object-cover" />
+                  ) : profileData.profilePicture ? (
+                    <img src={profileData.profilePicture} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-gray-300"></div>
                   )}
@@ -169,6 +190,7 @@ export default function UserProfile() {
             <TextInput
               id="firstName"
               type="text"
+              value={profileData.firstName || formData.firstName ||''}
               onChange={handleChange}
               className="w-full"
             />
@@ -178,6 +200,7 @@ export default function UserProfile() {
             <TextInput
               id="lastName"
               type="text"
+              value={profileData.lastName || formData.lastName ||''}
               onChange={handleChange}
               className="w-full"
             />
@@ -189,6 +212,7 @@ export default function UserProfile() {
           <TextInput
             id="email"
             type="email"
+            value={profileData.email || formData.email ||''}
             onChange={handleChange}
             className="w-full"
           />
@@ -199,6 +223,7 @@ export default function UserProfile() {
           <TextInput
             id="streetAddress"
             type="text"
+            value={profileData.streetAddress || formData.streetAddress ||''}
             onChange={handleChange}
             className="w-full"
           />
@@ -210,6 +235,7 @@ export default function UserProfile() {
             <TextInput
               id="city"
               type="text"
+              value={profileData.city || formData.city ||''}
               onChange={handleChange}
               className="w-full"
             />
@@ -219,6 +245,7 @@ export default function UserProfile() {
             <TextInput
               id="state"
               type="text"
+              value={profileData.stateORProvince || formData.stateORProvince ||''}
               onChange={handleChange}
               className="w-full"
             />
@@ -228,6 +255,7 @@ export default function UserProfile() {
             <TextInput
               id="zipCode"
               type="text"
+              value={profileData.ziporpostalCode || formData.ziporpostalCode ||''}
               onChange={handleChange}
               className="w-full"
             />

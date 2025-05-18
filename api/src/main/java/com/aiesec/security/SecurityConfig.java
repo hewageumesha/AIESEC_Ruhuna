@@ -25,6 +25,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/functions/**").permitAll()
                                 .requestMatchers("/api/users/**").permitAll()
                                 .requestMatchers("/api/uploads/**").permitAll()
+                                .requestMatchers("/api/comments/**").permitAll()
                                 .anyRequest().authenticated()
                 );
 
