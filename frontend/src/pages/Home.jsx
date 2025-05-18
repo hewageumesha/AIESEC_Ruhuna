@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import PostCard from '../components/PostCard';
 import PhotoSlider from "../components/PhotoSlider";
+import React from 'react';
 
 export default function Home() {
   const [events, setEvents] = useState([]);
@@ -67,25 +68,25 @@ export default function Home() {
     {
       id: 1,
       quote: "Volunteering for the global classroom project in Vietnam was a life-changing experience that allowed me to connect with students across cultures and contribute meaningfully to their education.",
-      author: "Manodya",
-      location: "Vietnam",
-      program: "Global Volunteer",
+      author: "Manodya Jayathunga",
+      location: "FHCMC - Vietnam",
+      program: "Global Classroom",
       photo: "/testimonial/testimonial1.jpg"
     },
     {
       id: 2,
-      quote: "AIESEC helped me develop leadership skills I never knew I had. The international network I built continues to benefit me years later.",
-      author: "Omal",
-      location: "Brazil",
-      program: "Global Volunteer",
+      quote: "Life isn’t counted in years, but in the places you’ve explored, the people you’ve met, and the influence you leave behind.",
+      author: "Dilkahashi Omal Randilina",
+      location: "Navi Mumbai - India",
+      program: "On The Map",
       photo: "/testimonial/testimonial2.jpg"
     },
     {
       id: 3,
       quote: "My time volunteering in India was filled with new challenges and meaningful experiences. It taught me how to adjust, stay strong, and build important skills that will help me in the future.",
       author: "Navidi Omasha",
-      location: "India",
-      program: "Global Volunteer",
+      location: "Dehradun - India",
+      program: "On The Map",
       photo: "/testimonial/testimonial3.jpg"
     }
   ];

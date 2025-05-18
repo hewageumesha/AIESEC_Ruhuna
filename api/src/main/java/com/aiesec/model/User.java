@@ -5,9 +5,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -22,6 +26,7 @@ public class User {
     @NotEmpty
     private String lastName;
 
+    @Email
     @NotEmpty
     private String email;
 
@@ -40,6 +45,16 @@ public class User {
 
     private String profilePicture;
 
+    private String streetAddress;
+
+    private String city;
+
+    private String stateORProvince;
+
+    private String ZIPORPostalCode;
+
+    private Long teamLeaderId;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -53,6 +68,13 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
+
+
+    @OneToMany(mappedBy = "member")
+    private List<Comment> commentsForUser;
+
+    @OneToMany(mappedBy = "createdBy")
+    private List<Comment> commentsCreated;
 
     @PrePersist
     public void prePersist() {
@@ -172,4 +194,59 @@ public class User {
         this.joinedDate = joinedDate;
     }
 
+    public List<Comment> getCommentsForUser() {
+        return commentsForUser;
+    }
+
+    public void setCommentsForUser(List<Comment> commentsForUser) {
+        this.commentsForUser = commentsForUser;
+    }
+
+    public List<Comment> getCommentsCreated() {
+        return commentsCreated;
+    }
+
+    public void setCommentsCreated(List<Comment> commentsCreated) {
+        this.commentsCreated = commentsCreated;
+    }
+
+    public String getStreetAddress() {
+        return streetAddress;
+    }
+
+    public void setStreetAddress(String streetAddress) {
+        this.streetAddress = streetAddress;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getStateORProvince() {
+        return stateORProvince;
+    }
+
+    public void setStateORProvince(String stateORProvince) {
+        this.stateORProvince = stateORProvince;
+    }
+
+    public String getZIPORPostalCode() {
+        return ZIPORPostalCode;
+    }
+
+    public void setZIPORPostalCode(String zIPORPostalCode) {
+        ZIPORPostalCode = zIPORPostalCode;
+    }
+
+    public Long getTeamLeaderId() {
+        return teamLeaderId;
+    }
+
+    public void setTeamLeaderId(Long teamLeaderid) {
+        teamLeaderId = teamLeaderid;
+    }
 }

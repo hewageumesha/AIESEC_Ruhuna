@@ -9,6 +9,8 @@ import DashFinance from '../components/DashFinance';
 import DashBirthday from '../components/DashBirthday';
 import DashboardComp from '../components/DashboardComp';
 import DashComments from '../components/DashComments';
+import React from 'react';
+
 
 export default function Dashboard() {
   const location = useLocation();

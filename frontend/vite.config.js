@@ -16,7 +16,13 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api/, ''),
           secure: false,
         },
+        '/users': {
+          target: env.VITE_API_URL || 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
+        },
       },
+
     },
     resolve: {
       alias: {
@@ -24,13 +30,6 @@ export default defineConfig(({ mode }) => {
         // Add other aliases if needed
       },
     },
-    plugins: [
-      react(),
-      checker({
-        typescript: true,
-        
-      }),
-    ],
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
