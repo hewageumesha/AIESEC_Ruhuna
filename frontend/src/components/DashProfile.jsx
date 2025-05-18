@@ -16,8 +16,7 @@ export default function UserProfile() {
   const filePickerRef = useRef();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [showMore, setShowMore] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
