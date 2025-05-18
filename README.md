@@ -71,7 +71,7 @@ This web-based system allows AIESEC members and guests to interact with the orga
 ### 👕 Merchandise
 - Event-specific T-shirt orders
 - Role-based access to manage orders
-- Images and descriptions displayed on event details
+- Images and descriptions are displayed on event details
 
 ### 🎂 Birthday & Finance
 - Track member birthdays
@@ -81,7 +81,7 @@ This web-based system allows AIESEC members and guests to interact with the orga
 
 ## 🚀 Getting Started
 
-### Backend Setup (Spring Boot)
+### Backend and Frontendd Setup
 
 ```bash
 cd backend
