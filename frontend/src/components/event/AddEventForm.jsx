@@ -15,68 +15,132 @@ const AddEventForm = () => {
   const [form] = Form.useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [eventType, setEventType] = useState('in_person');
-  const [imageUrl, setImageUrl] = useState('');
+  const [eventImageUrl, setEventImageUrl] = useState('');
+  const [tshirtAvailable, setTshirtAvailable] = useState(false);
+  const [merchDesc, setMerchDesc] = useState('');
+  const [merchImages, setMerchImages] = useState([]);
+
   const navigate = useNavigate();
 
-  const handleImageUpload = async (file) => {
-    const fileName = `${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage
-      .from('eventimages')
-      .upload(fileName, file, {
-        cacheControl: '3600',
-        upsert: false,
-        contentType: file.type,
-      });
+  const uploadFile = async (file, folder = 'eventimages') => {
+    try {
+      const fileName = `${Date.now()}_${file.name}`;
+      const { error } = await supabase.storage
+        .from(folder)
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type,
+        });
 
-    if (error) {
-      console.error('Upload error:', error);
-      message.error('Image upload failed.');
+      if (error) {
+        message.error(`Upload failed: ${error.message}`);
+        return '';
+      }
+
+      const { data } = supabase.storage.from(folder).getPublicUrl(fileName);
+      return data.publicUrl;
+    } catch (err) {
+      message.error('Unexpected upload error');
+      console.error(err);
       return '';
     }
-
-    const { data: publicUrlData } = supabase.storage.from('eventimages').getPublicUrl(fileName);
-    return publicUrlData?.publicUrl || '';
   };
+
+  const handleEventImageUpload = async (file) => {
+    const url = await uploadFile(file, 'eventimages');
+    if (url) setEventImageUrl(url);
+    return false;
+  };
+
+  const handleMerchImagesUpload = async ({ file }) => {
+    if (file.status === 'removed') {
+      setMerchImages((prev) => prev.filter((img) => img.uid !== file.uid));
+      return;
+    }
+    if (file.originFileObj) {
+      const url = await uploadFile(file.originFileObj, 'eventimages');
+      if (url) {
+        setMerchImages((prev) => [...prev, { url, uid: file.uid }]);
+      }
+    }
+  };
+
+  const disabledDate = (current) => current && current < moment().startOf('day');
 
   const onFinish = async (values) => {
     try {
       setIsSubmitting(true);
-      const { startDate, endDate, startTime, endTime, ...rest } = values;
 
-      if (moment(endDate).isBefore(startDate, 'day')) {
+      if (moment(values.endDate).isBefore(values.startDate, 'day')) {
         message.error('End date must be same or after start date.');
+        setIsSubmitting(false);
+        return;
+      }
+      if (
+        moment(values.startDate).isSame(values.endDate, 'day') &&
+        moment(values.endTime).isBefore(values.startTime)
+      ) {
+        message.error('End time must be after start time.');
+        setIsSubmitting(false);
         return;
       }
 
-      if (
-        moment(startDate).isSame(endDate, 'day') &&
-        moment(endTime).isBefore(startTime)
-      ) {
-        message.error('End time must be after start time.');
-        return;
+      let merchandise = null;
+      if (tshirtAvailable) {
+        if (!merchDesc.trim()) {
+          message.error('Please enter merchandise description.');
+          setIsSubmitting(false);
+          return;
+        }
+        if (merchImages.length < 3) {
+          message.error('Please upload at least three merchandise images.');
+          setIsSubmitting(false);
+          return;
+        }
+        merchandise = {
+          available: true,
+          description: merchDesc.trim(),
+          images: merchImages.map((img) => img.url),
+        };
       }
 
       const payload = {
-        ...rest,
-        startDate: startDate.format('YYYY-MM-DD'),
-        endDate: endDate.format('YYYY-MM-DD'),
-        eventTime: startTime.format('hh:mm A'),
-        endTime: endTime.format('hh:mm A'),
-        imageUrl,
+        eventName: values.eventName,
+        description: values.description,
+        startDate: values.startDate.format('YYYY-MM-DD'),
+        endDate: values.endDate.format('YYYY-MM-DD'),
+        eventTime: values.startTime.format('hh:mm A'),
+        endTime: values.endTime.format('hh:mm A'),
+        imageUrl: eventImageUrl,
         isPublic: values.visibility === 'public',
         isVirtual: eventType === 'virtual',
-        location: eventType === 'virtual' ? '' : values.location,
+        location: eventType === 'virtual' ? values.location : values.location,
         virtualLink: eventType === 'virtual' ? values.location : '',
-        hasTshirtOrder: values.hasTshirtOrder,
+        hasTshirtOrder: tshirtAvailable,
+   
       };
 
       const response = await axios.post('http://localhost:8080/api/events', payload);
-      const createdEvent = response.data;
+      const eventId = response.data.eventId;
+
+      if (tshirtAvailable) {
+        const merchPayload = {
+          eventId,
+          description: merchDesc.trim(),
+          images: merchImages.map((img) => img.url),
+          available: true,
+        };
+        await axios.post('http://localhost:8080/api/merchandise', merchPayload);
+      }
 
       message.success('Event published successfully!');
       form.resetFields();
-      setImageUrl('');
-      navigate(`/event/${createdEvent.eventId}`);
+      setEventImageUrl('');
+      setTshirtAvailable(false);
+      setMerchDesc('');
+      setMerchImages([]);
+      navigate(`/event/${eventId}`);
     } catch (error) {
       console.error(error);
       message.error('❌ Failed to publish event.');
@@ -84,8 +148,6 @@ const AddEventForm = () => {
       setIsSubmitting(false);
     }
   };
-
-  const disabledDate = (current) => current && current < moment().startOf('day');
 
   return (
     <div className="bg-white rounded-2xl shadow-lg w-full max-w-xl px-6 py-8 mx-auto mt-6 sm:mt-10">
@@ -96,7 +158,7 @@ const AddEventForm = () => {
         onFinish={onFinish}
         initialValues={{
           visibility: 'private',
-          hasTshirtOrder: false,
+          eventType: 'in_person',
         }}
       >
         <Form.Item name="eventName" label="Event Title" rules={[{ required: true }]}>
@@ -144,49 +206,69 @@ const AddEventForm = () => {
           <Input placeholder={eventType === 'virtual' ? 'Enter meeting link' : 'Enter event location'} />
         </Form.Item>
 
-        <Form.Item label="Event Image">
+        <Form.Item label="Event Image" required>
           <Dragger
             multiple={false}
             maxCount={1}
-            beforeUpload={async (file) => {
-              const url = await handleImageUpload(file);
-              if (url) setImageUrl(url);
-              return false;
-            }}
+            beforeUpload={handleEventImageUpload}
             showUploadList={false}
+            accept="image/*"
           >
             <p className="ant-upload-drag-icon">
               <InboxOutlined />
             </p>
             <p className="ant-upload-text">Click or drag image to upload</p>
           </Dragger>
-          {imageUrl && (
-            <img src={imageUrl} alt="Uploaded preview" className="mt-4 w-48 rounded shadow" />
+          {eventImageUrl && (
+            <img src={eventImageUrl} alt="Uploaded preview" className="mt-4 w-48 rounded shadow" />
           )}
         </Form.Item>
 
-        <Form.Item name="visibility" label="Who can see it?">
-          <Radio.Group>
-            <Radio value="public">Public</Radio>
-            <Radio value="private">Private</Radio>
+       
+
+        <Form.Item label="T-shirt Order Available?">
+          <Radio.Group
+            onChange={(e) => setTshirtAvailable(e.target.value === 'yes')}
+            value={tshirtAvailable ? 'yes' : 'no'}
+            className="flex gap-8"
+          >
+            <Radio value="yes">Yes</Radio>
+            <Radio value="no">No</Radio>
           </Radio.Group>
         </Form.Item>
 
-        <Form.Item name="hasTshirtOrder" label="T-shirt Order Available?">
-          <Radio.Group>
-            <Radio value={true}>Yes</Radio>
-            <Radio value={false}>No</Radio>
-          </Radio.Group>
-        </Form.Item>
+        {tshirtAvailable && (
+          <>
+            <Form.Item label="Merchandise Description">
+              <TextArea
+                rows={3}
+                value={merchDesc}
+                onChange={(e) => setMerchDesc(e.target.value)}
+                placeholder="Enter merchandise details"
+              />
+            </Form.Item>
+
+            <Form.Item label="Upload Merchandise Images (Min: 3)">
+              <Upload
+                listType="picture"
+                onChange={handleMerchImagesUpload}
+                multiple
+                accept="image/*"
+              >
+                <Button icon={<InboxOutlined />}>Upload Images</Button>
+              </Upload>
+            </Form.Item>
+          </>
+        )}
 
         <Form.Item>
           <Button
             type="primary"
             htmlType="submit"
             loading={isSubmitting}
-            className="hover:scale-105 transition-all duration-200"
+            className="w-full bg-blue-600"
           >
-            Publish Event
+            Create Event
           </Button>
         </Form.Item>
       </Form>
