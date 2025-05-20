@@ -151,7 +151,7 @@ const AddEventForm = () => {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg w-full max-w-xl px-6 py-8 mx-auto mt-6 sm:mt-10">
-      <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">Create New Event</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">Add New Event</h2>
       <Form
         form={form}
         layout="vertical"

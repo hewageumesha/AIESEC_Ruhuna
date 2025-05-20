@@ -1,7 +1,4 @@
 package com.aiesec.model.event;
-
-
-
 import jakarta.persistence.*;
 import lombok.*;
 
