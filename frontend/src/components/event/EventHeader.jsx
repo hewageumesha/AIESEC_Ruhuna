@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-const EventHeader = ({ imageUrl, eventName, startDate, location }) => {
+const EventHeader = ({ imageUrl, eventName, location }) => {
   const generateMapLink = (loc) =>
     `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`;
 
@@ -16,7 +16,7 @@ const EventHeader = ({ imageUrl, eventName, startDate, location }) => {
       <div className="absolute inset-0 bg-black bg-opacity-40 rounded-lg flex flex-col justify-end p-4 text-white">
         <h2 className="text-2xl font-bold">{eventName || 'Untitled Event'}</h2>
         <p className="text-sm">
-          {startDate || 'Date N/A'} —{' '}
+    
           {location ? (
             <a
               href={generateMapLink(location)}
