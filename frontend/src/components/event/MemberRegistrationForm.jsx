@@ -9,16 +9,19 @@ const MemberRegistrationForm = ({ userId, eventId, onClose }) => {
 
   const onFinish = async (values) => {
     setLoading(true);
+    const now = new Date().toISOString();
     try {
-      await axios.post('/api/member-event-registrations/register', {
+      await axios.post('http://localhost:8080/api/member-event-registrations/register', {
         userId,
         eventId,
         interestStatus: values.interestStatus,
         comment: values.comment,
+        registeredAt: now, // ✅ Corrected spelling
       });
       message.success('Member registration successful!');
       onClose();
-    } catch {
+    } catch (error) {
+      console.error('❌ Registration error:', error.response?.data || error.message);
       message.error('Failed to register member. Please try again.');
     } finally {
       setLoading(false);
