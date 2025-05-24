@@ -86,7 +86,6 @@ const AddEventForm = () => {
         return;
       }
 
-      let merchandise = null;
       if (tshirtAvailable) {
         if (!merchDesc.trim()) {
           message.error('Please enter merchandise description.');
@@ -98,11 +97,7 @@ const AddEventForm = () => {
           setIsSubmitting(false);
           return;
         }
-        merchandise = {
-          available: true,
-          description: merchDesc.trim(),
-          images: merchImages.map((img) => img.url),
-        };
+        // Merchandise details will be sent in the merchPayload below
       }
 
       const payload = {

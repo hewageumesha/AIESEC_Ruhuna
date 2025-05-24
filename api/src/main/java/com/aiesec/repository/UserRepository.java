@@ -1,4 +1,4 @@
-package com.aiesec.repository.event;
+package com.aiesec.repository;
 
 
 

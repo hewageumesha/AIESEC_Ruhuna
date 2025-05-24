@@ -16,9 +16,7 @@ const TshirtSizes = [
 
 const TShirtOrderForm = ({
   merchandise,
-  eventId,
   user,
-  guestUser,
   onOrderSuccess,
   onCancel,
 }) => {
