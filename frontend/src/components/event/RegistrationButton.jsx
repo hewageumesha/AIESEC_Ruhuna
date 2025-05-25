@@ -13,12 +13,12 @@ const RegistrationButton = ({ event, user }) => {
         Register Now
       </button>
       <EventRegistrationModal
-        visible={open}
-        onClose={() => setOpen(false)}
-        event={event}
-        user={user}
-        
-      />
+  open={open}
+  onClose={() => setOpen(false)}
+  event={event}
+  user={user}
+/>
+
     </>
   );
 };

@@ -5,25 +5,25 @@ import GuestRegistrationForm from './GuestRegistrationForm';
 
 const { TabPane } = Tabs;
 
-const EventRegistrationModal = ({ isModalOpen, setIsModalOpen }) => {
+const EventRegistrationModal = ({ isModalOpen, setIsModalOpen, eventId, userId }) => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
   return (
     <Modal
-      open={isModalOpen} // ✅ replaces deprecated "visible"
-      destroyOnHidden={true} // ✅ replaces deprecated "destroyOnClose"
+      open={isModalOpen}
+      destroyOnHidden={true}
       onCancel={handleCancel}
       footer={null}
       centered
     >
       <Tabs defaultActiveKey="1" centered>
         <TabPane tab="AIESEC Member" key="1">
-          <MemberRegistrationForm closeModal={handleCancel} />
+          <MemberRegistrationForm userId={userId} eventId={eventId} onClose={handleCancel} />
         </TabPane>
         <TabPane tab="Guest" key="2">
-          <GuestRegistrationForm closeModal={handleCancel} />
+          <GuestRegistrationForm eventId={eventId} onClose={handleCancel} />
         </TabPane>
       </Tabs>
     </Modal>

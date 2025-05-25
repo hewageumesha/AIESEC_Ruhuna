@@ -5,6 +5,8 @@ import com.aiesec.service.interfaces.AiesecMemberEventRegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -17,8 +19,12 @@ public class AiesecMemberEventRegistrationController {
 
     @PostMapping("/register")
     public ResponseEntity<AiesecMemberEventRegistrationDTO> register(@RequestBody AiesecMemberEventRegistrationDTO dto) {
-        AiesecMemberEventRegistrationDTO registered = registrationService.register(dto);
-        return ResponseEntity.ok(registered);
+        try {
+            AiesecMemberEventRegistrationDTO registered = registrationService.register(dto);
+            return ResponseEntity.ok(registered);
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
     }
 
     @GetMapping("/user/{userId}/event/{eventId}")

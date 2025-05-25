@@ -1,22 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { Spin, message, Button } from 'antd';
 import axios from 'axios';
 import { motion as Motion } from 'framer-motion';
+
+import { AuthContext } from '../context/AuthContext';
+
 import EventHeader from '../components/event/EventHeader';
 import EventInfo from '../components/event/EventInfo';
 import EventMeta from '../components/event/EventMeta';
 import EventRegistrationModal from '../components/event/EventRegistrationModal';
 
-// import EventRegistrations from './components/EventRegistrations'; // later
-
 const EventDetails = () => {
   const { id } = useParams();
+  const { user } = useContext(AuthContext);
+
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
+    if (!id) return;
+
     const fetchEvent = async () => {
       setLoading(true);
       try {
@@ -30,8 +35,12 @@ const EventDetails = () => {
       }
     };
 
-    if (id) fetchEvent();
+    fetchEvent();
   }, [id]);
+
+  const openRegistrationModal = () => {
+    setIsModalVisible(true);
+  };
 
   if (loading) {
     return (
@@ -43,19 +52,11 @@ const EventDetails = () => {
 
   if (!event) {
     return (
-      <p className="text-center text-red-600 font-semibold">
+      <div className="text-center mt-20 text-red-600 font-semibold text-lg">
         Event not found or unable to load event details.
-      </p>
+      </div>
     );
   }
-
-  const openRegistrationModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const closeRegistrationModal = () => {
-    setIsModalVisible(false);
-  };
 
   return (
     <Motion.div
@@ -70,7 +71,12 @@ const EventDetails = () => {
         startDate={event.startDate}
         location={event.location}
       />
-      <EventInfo eventName={event.eventName} description={event.description} />
+
+      <EventInfo
+        eventName={event.eventName}
+        description={event.description}
+      />
+
       <EventMeta
         startDate={event.startDate}
         endDate={event.endDate}
@@ -78,21 +84,18 @@ const EventDetails = () => {
         endTime={event.endTime}
       />
 
-      {/* Register button to open the registration modal */}
       <div className="mt-6 text-center">
         <Button type="primary" size="large" onClick={openRegistrationModal}>
           Register Now
         </Button>
       </div>
 
-      {/* Event registration modal */}
       <EventRegistrationModal
-  isModalOpen={isModalVisible}
-  setIsModalOpen={setIsModalVisible}
-  event={event}
-/>
-
-      {/* <EventRegistrations registrations={event.registrations} /> */}
+        isModalOpen={isModalVisible}
+        setIsModalOpen={setIsModalVisible}
+        eventId={event.eventId || id}
+        userId={user?.id || null}
+      />
     </Motion.div>
   );
 };

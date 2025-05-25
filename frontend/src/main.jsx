@@ -7,12 +7,15 @@ import { store, persistor } from './redux/store'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react';
 import ThemeProvider from './components/ThemeProvider.jsx';
+import { AuthProvider } from './context/AuthContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <PersistGate persistor = {persistor}>
     <Provider store={store}>
       <ThemeProvider>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
         </ThemeProvider>
     </Provider>
   </PersistGate>

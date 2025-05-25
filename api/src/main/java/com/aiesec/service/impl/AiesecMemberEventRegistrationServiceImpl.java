@@ -19,9 +19,8 @@ public class AiesecMemberEventRegistrationServiceImpl implements AiesecMemberEve
 
     @Override
     public AiesecMemberEventRegistrationDTO register(AiesecMemberEventRegistrationDTO dto) {
-        // Optional: prevent duplicate registration
         if (registrationRepository.existsByUserIdAndEventId(dto.getUserId(), dto.getEventId())) {
-            throw new IllegalStateException("User already registered for this event");
+            throw new IllegalStateException("User with ID " + dto.getUserId() + " is already registered for event ID " + dto.getEventId());
         }
 
         AiesecMemberEventRegistration entity = AiesecMemberEventRegistrationMapper.toEntity(dto);
