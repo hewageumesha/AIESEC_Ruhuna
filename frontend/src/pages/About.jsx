@@ -100,16 +100,71 @@ const About = () => {
     
   return (
     <div className="font-sans text-gray-800 dark:text-white">
-      {/* Hero Section */}
-      <section className="py-20 px-6 dark:bg-[rgb(16,23,42)]">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-[#037EF3]">By youth, for youth</h1>
-          <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 dark:text-gray-300">
-            AIESEC is a community of young people, passionately driven by one cause: peace and fulfilment of humankind's potential.
-          </p>
+      {/* Hero Section - Modified to be left-aligned with photo album on right */}
+      <section className="py-16 px-6 dark:bg-[rgb(16,23,42)]">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-12 items-center">
+          {/* Left Section - Your Original Content */}
+          <div className="md:w-1/2 text-center md:text-left">
+            <div className="relative inline-block md:block">
+              {/* Decorative elements */}
+              <div className="absolute -top-4 -left-4 w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/20 opacity-70"></div>
+              <div className="absolute -bottom-4 -right-4 w-12 h-12 rounded-lg bg-yellow-100 dark:bg-yellow-900/20 opacity-70 rotate-12"></div>
+              
+              {/* Content container with subtle border */}
+              <div className="relative p-8 md:p-10 bg-white/80 dark:bg-gray-800/80 rounded-xl backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
+                {/* Main heading with gradient text */}
+                <h1 className="text-6xl md:text-5xl font-bold mb-10 bg-clip-text text-transparent bg-gradient-to-r from-[#037EF3] to-[#0CB9C1]">
+                  By youth, for youth
+                </h1>
+                
+                {/* Paragraph with improved readability */}
+                <p className="text-xl md:text-2xl mb-8 dark:text-gray-300 leading-relaxed">
+                  AIESEC is a community of young people, passionately driven by one cause: <span className="font-semibold text-[#037EF3] dark:text-blue-400">peace</span> and <span className="font-semibold text-[#0CB9C1] dark:text-teal-400">fulfilment of humankind's potential</span>.
+                </p>
+                
+                {/* Decorative divider */}
+                <div className="w-20 h-1 bg-gradient-to-r from-[#037EF3] to-[#0CB9C1] rounded-full mx-auto md:mx-0 mb-6"></div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Right Section - Photo Album */}
+          <div className="md:w-1/2">
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+              {/* President Photo (Highlighted) */}
+              <div className="col-span-3 md:col-span-4 flex justify-center mb-6">
+                <div className="relative">
+                  <div className="w-32 h-32 rounded-full border-4 border-[#037EF3] overflow-hidden">
+                    <img 
+                      src="/committee/LCP.png" 
+                      alt="LCP" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -bottom-4 left-0 right-0 text-center">
+                    <span className="bg-[#037EF3] text-white px-2 py-1 rounded-md text-sm font-medium">
+                      LCP
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Team Members (14 photos) */}
+              {[...Array(14)].map((_, i) => (
+                <div key={i} className="w-20 h-20 rounded-full border-2 border-gray-300 overflow-hidden mx-auto">
+                  <img 
+                    src={`/committee/LCVP${i+1}.png`} 
+                    alt={`LCVP ${i+1}`} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
+      {/* Rest of your existing sections remain unchanged */}
       {/* Quick Stats */}
       <section className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-6xl mx-auto px-6">
