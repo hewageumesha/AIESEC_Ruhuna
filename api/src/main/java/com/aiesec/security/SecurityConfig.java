@@ -28,7 +28,6 @@ public class SecurityConfig {
                                 .requestMatchers("/api/comments/**").permitAll()
                                 .anyRequest().authenticated()
                 );
-
         return http.build();
     }
 

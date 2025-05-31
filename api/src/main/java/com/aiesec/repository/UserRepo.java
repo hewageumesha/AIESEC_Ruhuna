@@ -14,7 +14,7 @@ public interface UserRepo extends JpaRepository<User, Long>{
     Optional<User> findByAiesecEmailAndPassword(String aiesecEmail, String password);
     void deleteByAiesecEmail(String aieseEmail);
     List<User> findByRole(Role role);
-    List<User> findByTeamLeaderId(Long teamLeaderId);
+    List<User> findByTeamLeaderAiesecEmail(String teamLeaderAiesecEmail);
     List<User> findByDepartmentId(Long departmentId);
     List<User> findByFunctionId(Long functionId);
 

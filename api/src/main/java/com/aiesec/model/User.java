@@ -40,10 +40,16 @@ public class User {
     @Temporal(TemporalType.DATE)
     private Date birthday;
 
+    private Gender gender;
+
     @Temporal(TemporalType.DATE)
     private Date joinedDate;
 
     private String profilePicture;
+
+    private String about;
+
+    private String phone;
 
     private String streetAddress;
 
@@ -53,7 +59,7 @@ public class User {
 
     private String ZIPORPostalCode;
 
-    private Long teamLeaderId;
+    private String teamLeaderAiesecEmail;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -242,11 +248,33 @@ public class User {
         ZIPORPostalCode = zIPORPostalCode;
     }
 
-    public Long getTeamLeaderId() {
-        return teamLeaderId;
+    public String getTeamLeaderAiesecEmail() {
+        return teamLeaderAiesecEmail;
     }
 
-    public void setTeamLeaderId(Long teamLeaderid) {
-        teamLeaderId = teamLeaderid;
+    public void setTeamLeaderAiesecEmail(String teamLeaderAiesecEmail) {
+        teamLeaderAiesecEmail = teamLeaderAiesecEmail;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+        public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
     }
 }

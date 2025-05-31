@@ -13,7 +13,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,11 +45,17 @@ public class UserService {
     }
 
     // Method to update user details
-    public User updateUser(String aiesecEmail, User userDetails) {
+    public User updateUser(String aiesecEmail, UserDTO userDetails) {
         User user = userRepository.findByAiesecEmail(aiesecEmail)
             .orElseThrow(() -> new RuntimeException("User not found with email: " + aiesecEmail));
         user.setFirstName(userDetails.getFirstName());
         user.setLastName(userDetails.getLastName());
+        user.setStateORProvince(userDetails.getStateORProvince());
+        user.setCity(userDetails.getCity());
+        user.setStreetAddress(userDetails.getStreetAddress());
+        user.setZIPORPostalCode(userDetails.getZIPORPostalCode());
+        user.setPhone(userDetails.getPhone());
+        user.setAbout(userDetails.getAbout());
         return userRepository.save(user);
     }
 
@@ -98,23 +106,46 @@ public class UserService {
         return response;
     }
 
-//    public User updateUserProfile(String aiesecEmail, User userDetails, MultipartFile profilePhoto) throws IOException {
-//        User user = userRepository.findByAiesecEmail(aiesecEmail)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        // Update allowed fields
-//        user.setFirstName(userDetails.getFirstName());
-//        user.setLastName(userDetails.getLastName());
-//        user.setEmail(userDetails.getEmail());
-//
-//        // Handle profile photo upload
-//        if (profilePhoto != null && !profilePhoto.isEmpty()) {
-//            String photoUrl = fileUploadService.uploadProfilePhoto(profilePhoto, aiesecEmail);
-//            user.setProfilePicture(photoUrl);
-//        }
-//
-//        return userRepository.save(user);
-//    }
+    public User updateUserProfile(String aiesecEmail, User userDetails, MultipartFile profilePhoto) throws IOException {
+        User user = userRepository.findByAiesecEmail(aiesecEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        //Update allowed fields
+        if (userDetails.getFirstName() != null) {
+            user.setAiesecEmail(userDetails.getAiesecEmail());
+        }
+        if (userDetails.getLastName() != null) {
+            user.setLastName(userDetails.getLastName());
+        }
+        if (userDetails.getBirthday() != null) {
+            user.setBirthday(userDetails.getBirthday());
+        }
+        if (userDetails.getGender() != null) {
+            user.setGender(userDetails.getGender());
+        }
+        if (userDetails.getEmail() != null) {
+            user.setEmail(userDetails.getEmail());
+        }
+        if (userDetails.getStateORProvince() != null) {
+            user.setStateORProvince(userDetails.getStateORProvince());
+        }
+        if (userDetails.getCity() != null) {
+            user.setCity(userDetails.getCity());
+        }
+        if (userDetails.getStreetAddress() != null) {
+            user.setStreetAddress(userDetails.getStreetAddress());
+        }
+        if (userDetails.getZIPORPostalCode() != null) {
+            user.setZIPORPostalCode(userDetails.getZIPORPostalCode());
+        }
+
+        return userRepository.save(user);
+   }
+
+    public User getUserProfile(String aiesecEmail) {
+        return userRepository.findByAiesecEmail(aiesecEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 
     /* 
     public List<UserHierarchyDTO> getCommitteeHierarchy() {
