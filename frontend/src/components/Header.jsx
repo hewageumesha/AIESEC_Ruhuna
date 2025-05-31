@@ -79,6 +79,16 @@ export default function Header() {
                     About us
                 </Link>
             </Navbar.Link >
+            <Navbar.Link active={path === '/funcion'} as={'div'}>
+                <Link to="/function" className='font-semibold'>
+                    Function
+                </Link>
+            </Navbar.Link >
+            <Navbar.Link active={path === '/event'} as={'div'}>
+                <Link to="event" className='font-semibold'>
+                    Event
+                </Link>
+            </Navbar.Link>
             <Navbar.Link active={path === '/gallery'} as={'div'}>
                 <Link to="/gallery" className='font-semibold'>
                     Gallery

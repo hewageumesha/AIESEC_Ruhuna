@@ -130,35 +130,63 @@ const About = () => {
           
           {/* Right Section - Photo Album */}
           <div className="md:w-1/2">
-            <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
-              {/* President Photo (Highlighted) */}
-              <div className="col-span-3 md:col-span-4 flex justify-center mb-6">
-                <div className="relative">
-                  <div className="w-32 h-32 rounded-full border-4 border-[#037EF3] overflow-hidden">
+            <div className="flex flex-col items-center">
+              {/* President Photo */}
+              <div className="mb-10 text-center">
+                <div className="mx-auto w-40 h-40 rounded-full border-4 border-white shadow-xl overflow-hidden relative">
+                  <div className="absolute inset-0 rounded-full border-[3px] border-transparent bg-gradient-to-r from-[#037EF3] to-[#04BEFE] p-1 -m-1">
                     <img 
                       src="/committee/LCP.png" 
-                      alt="LCP" 
-                      className="w-full h-full object-cover"
+                      alt="Local Committee President" 
+                      className="w-full h-full object-cover rounded-full"
+                      loading="lazy"
                     />
                   </div>
-                  <div className="absolute -bottom-4 left-0 right-0 text-center">
-                    <span className="bg-[#037EF3] text-white px-2 py-1 rounded-md text-sm font-medium">
-                      LCP
-                    </span>
-                  </div>
+                </div>
+                <div className="mt-5">
+                  <span className="inline-block bg-[#037EF3] text-white px-5 py-2 rounded-full text-sm font-semibold shadow-md">
+                    Local Committee President
+                  </span>
                 </div>
               </div>
               
-              {/* Team Members (14 photos) */}
-              {[...Array(14)].map((_, i) => (
-                <div key={i} className="w-20 h-20 rounded-full border-2 border-gray-300 overflow-hidden mx-auto">
-                  <img 
-                    src={`/committee/LCVP${i+1}.png`} 
-                    alt={`LCVP ${i+1}`} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
+              {/* Team Members Grid with Actual Names */}
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-5">
+                {[
+                  { name: "Nadith", role: "LCVP iGV B2B & VD", img: "LCVP1.png" },
+                  { name: "Tiyanie", role: "LCVP iGV M & IR", img: "LCVP2.png" },
+                  { name: "Gangul", role: "LCVP iGT B2B & VD", img: "LCVP3.png" },
+                  { name: "Rukshi", role: "LCVP iGT M & IR", img: "LCVP4.png" },
+                  { name: "Navodha", role: "LCVP oGV B2C", img: "LCVP5.png" },
+                  { name: "Thisari", role: "LCVP oGV PS", img: "LCVP6.png" },
+                  { name: "Dilma", role: "LCVP oGT B2C", img: "LCVP7.png" },
+                  { name: "Ranudi", role: "LCVP oGT PS", img: "LCVP8.png" },
+                  { name: "Gagana", role: "LCVP MKT", img: "LCVP9.png" },
+                  { name: "Lakshitha", role: "LCVP TM", img: "LCVP10.png" },
+                  { name: "Parami", role: "LCVP BD", img: "LCVP11.png" },
+                  { name: "Akila", role: "LCVP ED", img: "LCVP12.png" },
+                  { name: "Thisura", role: "LCVP FnL", img: "LCVP13.png" },
+                  { name: "Nithma", role: "LCVP PR", img: "LCVP14.png" },
+                ].map((member, i) => (
+                  <div key={i} className="flex justify-center">
+                    <div className="relative group">
+                      <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full border-2 border-gray-200 overflow-hidden transition-all duration-300 group-hover:border-[#037EF3]">
+                        <img 
+                          src={`/committee/${member.img}`} 
+                          alt={member.name} 
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-max max-w-xs text-center">
+                        <div className="mt-1 bg-gray-800 text-white text-[0.65rem] px-2 py-1 rounded whitespace-nowrap">
+                          {member.role}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -168,27 +196,34 @@ const About = () => {
       {/* Quick Stats */}
       <section className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             
             <div className="p-6">
               <div className="text-5xl font-bold text-[#037EF3] mb-2">
-                <CountUp end={100} duration={2} />+
+                <CountUp end={9} duration={1} />
               </div>
-              <div className="text-xl text-gray-600 dark:text-gray-300">Countries & Territories</div>
+              <div className="text-xl text-gray-600 dark:text-gray-300">Faculties</div>
             </div>
 
             <div className="p-6">
               <div className="text-5xl font-bold text-[#037EF3] mb-2">
-                <CountUp end={5000} duration={3} separator="," />+
+                <CountUp end={200} duration={2} separator="," />+
               </div>
-              <div className="text-xl text-gray-600 dark:text-gray-300">Partner Organizations</div>
+              <div className="text-xl text-gray-600 dark:text-gray-300">Active Members</div>
             </div>
 
             <div className="p-6">
               <div className="text-5xl font-bold text-[#037EF3] mb-2">
-                <CountUp end={30000} duration={4} separator="," />+
+                <CountUp end={12} duration={1} separator="," />+
               </div>
-              <div className="text-xl text-gray-600 dark:text-gray-300">Experiences Every Year</div>
+              <div className="text-xl text-gray-600 dark:text-gray-300">Annually Projects</div>
+            </div>
+
+            <div className="p-6">
+              <div className="text-5xl font-bold text-[#037EF3] mb-2">
+                <CountUp end={1200} duration={4} separator="," />+
+              </div>
+              <div className="text-xl text-gray-600 dark:text-gray-300">Life Changing Experiences</div>
             </div>
 
           </div>

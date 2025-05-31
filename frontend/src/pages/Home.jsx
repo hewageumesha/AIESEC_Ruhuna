@@ -269,30 +269,50 @@ export default function Home() {
         </div>
       </section>
 
-      {/*Our Partners*/}
+      {/* Our Partners */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Main Heading */}
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Our premium partners from across the world
+            <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+              Our Valued Partners
             </h2>
           </div>
 
-          {/* Logo Grid - 3 rows x 5 columns */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8">
-            {customerLogos.map((customer) => (
-              <div 
-                key={customer.id}
-                className="flex items-center justify-center p-4 rounded-lg hover:shadow-md transition-all"
-              >
-                <img
-                  src={customer.logo}
-                  alt={customer.alt}
-                  className="h-14 object-contain hover:grayscale-0 transition-all"
-                  loading="lazy"
-                />
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* National Partners Section - Left Side */}
+            <div className="md:w-1/2">
+              <div className=""> 
+                <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-8 text-center">
+                  Our National Partners
+                </h3>
+                <div className="flex justify-center items-center h-full dark:bg-[rgb(16,23,42)]">
+                  <img
+                    src="/logos/all-national-partners-logo.png"
+                    alt="Our National Partners"
+                    className="h-45 object-contain"
+                    loading="lazy"
+                  />
+                </div>
               </div>
-            ))}
+            </div>
+
+            {/* Previous Partners Section - Right Side */}
+            <div className="md:w-1/2">
+              <div className="">
+                <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-10 text-center">
+                  Our Previous Partners
+                </h3>
+                <div className="py-6 flex justify-center items-center h-full dark:bg-[rgb(16,23,42)]">
+                  <img
+                    src="/logos/all-previous-partners-logo.png"
+                    alt="Our Previous Partners"
+                    className="h-100 object-contain"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

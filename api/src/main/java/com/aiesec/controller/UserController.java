@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -42,9 +43,9 @@ public class UserController {
         return userService.addUser(user);
     }
 
-    @PutMapping("/update/{id}")
-    public User updateUser(@PathVariable String aiesecEmail, @RequestBody User userDetails) {
-        return userService.updateUser(aiesecEmail, userDetails);
+    @PostMapping("/update")
+    public Optional<User> updateUser(@RequestBody UserDTO userDetails) {
+        return Optional.ofNullable(userService.updateUser(userDetails.getAiesecEmail(), userDetails));
     }
 
     @DeleteMapping("/delete/{id}")
@@ -59,9 +60,9 @@ public class UserController {
     }
 
     @GetMapping("/profile/{aiesecEmail}")
-    public User getUserProfile(@PathVariable String aiesecEmail) {
-        return userService.getUserByAiesecEmail(aiesecEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public ResponseEntity<User> getProfile(@PathVariable String aiesecEmail) {
+        User user = userService.getUserProfile(aiesecEmail);
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/getusers")
@@ -77,8 +78,8 @@ public class UserController {
         return members;
     }
 
-    /* 
-    @PutMapping(value = "/profile/update/{aiesecEmail}", consumes = {"multipart/form-data"})
+
+    @PutMapping(value = "/profile/update/{aiesecEmail}")
     public User updateUserProfile(
             @PathVariable String aiesecEmail,
             @RequestPart User userDetails,
@@ -87,7 +88,7 @@ public class UserController {
         return userService.updateUserProfile(aiesecEmail, userDetails, profilePhoto);
     }
     
-
+    /* 
     @GetMapping("/hierarchy")
     public ResponseEntity<List<UserHierarchyDTO>> getCommitteeHierarchy() {
         return ResponseEntity.ok(userService.getCommitteeHierarchy());

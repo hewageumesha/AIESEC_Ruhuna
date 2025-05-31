@@ -65,7 +65,7 @@ public class AuthController {
         // Create a JSON object to return as the response
         JSONObject json = new JSONObject();
         json.put("role", existingUser.get().getRole());
-        json.put("email", existingUser.get().getAiesecEmail());
+        json.put("aiesecEmail", existingUser.get().getAiesecEmail());
         json.put("token", token);
 
         // Return the token and user details with a 200 OK status
