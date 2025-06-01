@@ -3,6 +3,7 @@ import { Card, Spin, Button, message, Tag, Popconfirm } from 'antd';
 import { PlusOutlined, CloseOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import AddEventForm from './event/AddEventForm';
 
 const { Meta } = Card;
@@ -12,6 +13,8 @@ const DashEvent = () => {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const navigate = useNavigate();
+
+  const currentUser = useSelector((state) => state.user.currentUser);
 
   const fetchEvents = async () => {
     try {
@@ -50,21 +53,28 @@ const DashEvent = () => {
     }
   };
 
+  // Helper function to check if user can edit/delete
+  const canEditOrDelete = () => {
+    return currentUser && (currentUser.role === 'LCP' || currentUser.role === 'LCVP');
+  };
+
   return (
     <div className="p-8 min-h-screen bg-gray-50">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Event Management</h2>
-        <Button
-          type="primary"
-          icon={showAddForm ? <CloseOutlined /> : <PlusOutlined />}
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          {showAddForm ? 'Close Form' : 'Add Event'}
-        </Button>
+        {canEditOrDelete() && (
+          <Button
+            type="primary"
+            icon={showAddForm ? <CloseOutlined /> : <PlusOutlined />}
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {showAddForm ? 'Close Form' : 'Add Event'}
+          </Button>
+        )}
       </div>
 
-      {showAddForm && (
+      {showAddForm && canEditOrDelete() && (
         <div className="mb-6 border p-4 rounded shadow bg-white">
           <AddEventForm onEventAdded={fetchEvents} />
         </div>
@@ -97,27 +107,29 @@ const DashEvent = () => {
                 </Tag>
               )}
 
-              <div className="absolute top-2 left-2 z-10 hidden group-hover:flex gap-2">
-                <Button
-                  icon={<EditOutlined />}
-                  size="small"
-                  onClick={(e) => handleEdit(event.eventId, e)}
-                />
-                <Popconfirm
-                  title="Are you sure you want to delete this event?"
-                  onConfirm={(e) => handleDelete(event.eventId, e)}
-                  okText="Yes"
-                  cancelText="No"
-                  onCancel={(e) => e.stopPropagation()}
-                >
+              {canEditOrDelete() && (
+                <div className="absolute top-2 left-2 z-10 hidden group-hover:flex gap-2">
                   <Button
-                    icon={<DeleteOutlined />}
+                    icon={<EditOutlined />}
                     size="small"
-                    danger
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => handleEdit(event.eventId, e)}
                   />
-                </Popconfirm>
-              </div>
+                  <Popconfirm
+                    title="Are you sure you want to delete this event?"
+                    onConfirm={(e) => handleDelete(event.eventId, e)}
+                    okText="Yes"
+                    cancelText="No"
+                    onCancel={(e) => e.stopPropagation()}
+                  >
+                    <Button
+                      icon={<DeleteOutlined />}
+                      size="small"
+                      danger
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </Popconfirm>
+                </div>
+              )}
 
               <Meta
                 title={<span className="font-semibold text-lg text-gray-800">{event.eventName}</span>}

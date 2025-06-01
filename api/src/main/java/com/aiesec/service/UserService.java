@@ -1,12 +1,10 @@
 package com.aiesec.service;
 
 import com.aiesec.model.User;
-import com.aiesec.repository.event.UserRepository;
+import com.aiesec.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

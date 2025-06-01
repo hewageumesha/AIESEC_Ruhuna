@@ -11,26 +11,29 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
+public class GuestEventRegistrationServiceImpl implements GuestEventRegistrationService {
 
-    @Service
-    @RequiredArgsConstructor
-    public class GuestEventRegistrationServiceImpl implements GuestEventRegistrationService {
+    private final GuestEventRegistrationRepository registrationRepository;
 
-        private final GuestEventRegistrationRepository registrationRepository;
-
-        @Override
-        public GuestEventRegistrationDTO register(GuestEventRegistrationDTO dto) {
-            GuestEventRegistration entity = GuestEventRegistrationMapper.toEntity(dto);
-            GuestEventRegistration saved = registrationRepository.save(entity);
-            return GuestEventRegistrationMapper.toDTO(saved);
+    @Override
+    public GuestEventRegistrationDTO register(GuestEventRegistrationDTO dto) {
+        boolean exists = registrationRepository.existsByEventIdAndEmail(dto.getEventId(), dto.getEmail());
+        if (exists) {
+            throw new IllegalStateException("You have already registered for this event with this email.");
         }
 
-        @Override
-        public List<GuestEventRegistrationDTO> getAllByEventId(Long eventId) {
-            return registrationRepository.findByEventId(eventId)
-                    .stream()
-                    .map(GuestEventRegistrationMapper::toDTO)
-                    .collect(Collectors.toList());
-        }
+        GuestEventRegistration entity = GuestEventRegistrationMapper.toEntity(dto);
+        GuestEventRegistration saved = registrationRepository.save(entity);
+        return GuestEventRegistrationMapper.toDTO(saved);
     }
 
+    @Override
+    public List<GuestEventRegistrationDTO> getAllByEventId(Long eventId) {
+        return registrationRepository.findByEventId(eventId)
+                .stream()
+                .map(GuestEventRegistrationMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+}

@@ -24,7 +24,7 @@ public class GuestEventRegistration {
     private String name;
     private String email;
     private String phone;
-    private LocalDateTime registrationDate;
+    //private LocalDateTime registrationDate;
     @Enumerated(EnumType.STRING)
     private InterestStatus interestStatus;
     private String comment;

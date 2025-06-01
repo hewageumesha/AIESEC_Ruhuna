@@ -8,6 +8,7 @@ import com.aiesec.mapper.TShirtOrderMapper;
 import com.aiesec.model.event.GuestUser;
 import com.aiesec.model.event.Merchandise;
 import com.aiesec.model.event.TShirtOrder;
+import com.aiesec.repository.UserRepository;
 import com.aiesec.repository.event.*;
 import com.aiesec.service.interfaces.TShirtOrderService;
 import org.springframework.beans.factory.annotation.Autowired;

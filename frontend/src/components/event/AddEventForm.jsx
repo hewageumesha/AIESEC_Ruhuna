@@ -86,23 +86,18 @@ const AddEventForm = () => {
         return;
       }
 
-      let merchandise = null;
       if (tshirtAvailable) {
         if (!merchDesc.trim()) {
           message.error('Please enter merchandise description.');
           setIsSubmitting(false);
           return;
         }
-        if (merchImages.length < 3) {
-          message.error('Please upload at least three merchandise images.');
+        if (merchImages.length < 1) {
+          message.error('Please upload at least one merchandise images.');
           setIsSubmitting(false);
           return;
         }
-        merchandise = {
-          available: true,
-          description: merchDesc.trim(),
-          images: merchImages.map((img) => img.url),
-        };
+        // Merchandise details are handled below when posting to /api/merchandise
       }
 
       const payload = {
@@ -260,6 +255,17 @@ const AddEventForm = () => {
             </Form.Item>
           </>
         )}
+
+        <Form.Item name="visibility"
+    label="Event Visibility"
+    rules={[{ required: true, message: 'Please select event visibility' }]}
+>
+  <Radio.Group className="flex gap-6">
+    <Radio value="private">Private (AIESEC members only)</Radio>
+    <Radio value="public">Public (Guests can register)</Radio>
+  </Radio.Group>
+</Form.Item>
+
 
         <Form.Item>
           <Button
