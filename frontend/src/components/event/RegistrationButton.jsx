@@ -1,26 +1,37 @@
 import { useState } from 'react';
-import EventRegistrationModal from './EventRegistrationModal';
+import MemberRegistrationModal from './MemberRegistrationModal';
+import GuestRegistrationModal from './GuestRegistrationModal';
 
 const RegistrationButton = ({ event, user }) => {
-  const [open, setOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  const isMember = user && ['LCP', 'LCVP', 'TEAM_LEADER', 'MEMBER'].includes(user.role);
 
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => setVisible(true)}
         className="bg-blue-600 text-white px-4 py-2 rounded"
       >
         Register Now
       </button>
-      <EventRegistrationModal
-  open={open}
-  onClose={() => setOpen(false)}
-  event={event}
-  user={user}
-/>
 
+      {isMember ? (
+        <MemberRegistrationModal
+          visible={visible}
+          onClose={() => setVisible(false)}
+          eventId={event.eventId}
+        />
+      ) : (
+        <GuestRegistrationModal
+          visible={visible}
+          onClose={() => setVisible(false)}
+          eventId={event.eventId}
+        />
+      )}
     </>
   );
 };
+
 
 export default RegistrationButton;

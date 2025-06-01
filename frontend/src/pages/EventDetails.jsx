@@ -1,27 +1,27 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Spin, message, Button } from 'antd';
 import axios from 'axios';
 import { motion as Motion } from 'framer-motion';
-
-import { AuthContext } from '../context/AuthContext';
+import { useSelector } from 'react-redux';
 
 import EventHeader from '../components/event/EventHeader';
 import EventInfo from '../components/event/EventInfo';
 import EventMeta from '../components/event/EventMeta';
-import EventRegistrationModal from '../components/event/EventRegistrationModal';
+import MemberRegistrationModal from '../components/event/MemberRegistrationModal';
+import GuestRegistrationModal from '../components/event/GuestRegistrationModal';
 
 const EventDetails = () => {
   const { id } = useParams();
-  const { user } = useContext(AuthContext);
+  const { currentUser, loading: userLoading } = useSelector((state) => state.user);
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  useEffect(() => {
-    if (!id) return;
+  const isMember = currentUser && ['LCP', 'LCVP', 'TEAM_LEADER', 'MEMBER'].includes(currentUser.role);
 
+  useEffect(() => {
     const fetchEvent = async () => {
       setLoading(true);
       try {
@@ -35,14 +35,22 @@ const EventDetails = () => {
       }
     };
 
-    fetchEvent();
+    if (id) fetchEvent();
   }, [id]);
 
   const openRegistrationModal = () => {
+    if (!event) return;
+
+    // Guest trying to register for private event
+    if (!event.isPublic && !currentUser) {
+      message.error("This is a private event. Please log in to register.");
+      return;
+    }
+
     setIsModalVisible(true);
   };
 
-  if (loading) {
+  if (loading || userLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
@@ -90,12 +98,28 @@ const EventDetails = () => {
         </Button>
       </div>
 
-      <EventRegistrationModal
-        isModalOpen={isModalVisible}
-        setIsModalOpen={setIsModalVisible}
-        eventId={event.eventId || id}
-        userId={user?.id || null}
-      />
+      {/* Registration Modals */}
+      {isMember ? (
+        <MemberRegistrationModal
+          visible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          eventId={event.eventId || id}
+          onRegister={() => {
+            message.success("Registration successful!");
+            setIsModalVisible(false);
+          }}
+        />
+      ) : (
+        <GuestRegistrationModal
+          visible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          eventId={event.eventId || id}
+          onRegister={() => {
+            message.success("Guest registration successful!");
+            setIsModalVisible(false);
+          }}
+        />
+      )}
     </Motion.div>
   );
 };

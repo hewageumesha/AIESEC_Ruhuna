@@ -92,12 +92,12 @@ const AddEventForm = () => {
           setIsSubmitting(false);
           return;
         }
-        if (merchImages.length < 3) {
-          message.error('Please upload at least three merchandise images.');
+        if (merchImages.length < 1) {
+          message.error('Please upload at least one merchandise images.');
           setIsSubmitting(false);
           return;
         }
-        // Merchandise details will be sent in the merchPayload below
+        // Merchandise details are handled below when posting to /api/merchandise
       }
 
       const payload = {
@@ -146,7 +146,7 @@ const AddEventForm = () => {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg w-full max-w-xl px-6 py-8 mx-auto mt-6 sm:mt-10">
-      <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">Add New Event</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">Create New Event</h2>
       <Form
         form={form}
         layout="vertical"
@@ -255,6 +255,17 @@ const AddEventForm = () => {
             </Form.Item>
           </>
         )}
+
+        <Form.Item name="visibility"
+    label="Event Visibility"
+    rules={[{ required: true, message: 'Please select event visibility' }]}
+>
+  <Radio.Group className="flex gap-6">
+    <Radio value="private">Private (AIESEC members only)</Radio>
+    <Radio value="public">Public (Guests can register)</Radio>
+  </Radio.Group>
+</Form.Item>
+
 
         <Form.Item>
           <Button
