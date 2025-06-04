@@ -85,33 +85,33 @@ export default function DashSidebar() {
             <>
               
                 <Link to='/dashboard?tab=manageCommittee'>
-                <Sidebar.Item
-                    active={tab === 'manageCommittee'}
-                    icon={HiUserGroup}
-                    as='div'
-                >
-                Manage Committee
-                </Sidebar.Item>
+                  <Sidebar.Item
+                      active={tab === 'manageCommittee'}
+                      icon={HiUserGroup}
+                      as='div'
+                  >
+                  Manage Committee
+                  </Sidebar.Item>
                 </Link>
 
                 <Link to='/dashboard?tab=comments'>
-                <Sidebar.Item
-                    active={tab === 'comments'}
-                    icon={ HiChatBubbleLeftEllipsis }
-                    as='div'
-                >
-                Comments
-                </Sidebar.Item>
+                  <Sidebar.Item
+                      active={tab === 'comments'}
+                      icon={ HiChatBubbleLeftEllipsis }
+                      as='div'
+                  >
+                  Comments
+                  </Sidebar.Item>
                 </Link>
 
                 <Link to='/dashboard?tab=finance'>
-                <Sidebar.Item
-                active={tab === 'finance'}
-                icon={ HiCreditCard}
-                as='div'
-                >
-                Finance
-                </Sidebar.Item>
+                  <Sidebar.Item
+                  active={tab === 'finance'}
+                  icon={ HiCreditCard}
+                  as='div'
+                  >
+                  Finance
+                  </Sidebar.Item>
                 </Link>
             </>
           )}
