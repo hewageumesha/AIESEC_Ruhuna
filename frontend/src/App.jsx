@@ -13,7 +13,9 @@ import GlobalIntern from "./pages/GlobalIntern";
 import GlobalVolunteer from "./pages/GlobalVolunteer";
 import GlobalTeacher from "./pages/GlobalTeacher";
 import BecomeMember from "./pages/BecomeMember";
-import React from 'react';
+import EventDetails from "./pages/EventDetails";
+import EditEvent from "./components/event/EditEvent";
+
 //import './index.css'
 
 function App() {
@@ -27,12 +29,17 @@ function App() {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+         <Route path="/event/:id" element={<EventDetails />} />
         <Route element={<PrivateRoute/>}/>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/global-intern" element={<GlobalIntern />} />
         <Route path="/global-teacher" element={<GlobalTeacher />} />
         <Route path="/global-volunteer" element={<GlobalVolunteer />} />
         <Route path="/become-member" element={<BecomeMember />} />
+        <Route path="/edit-event/:id" element={<EditEvent />} />
+
+       
+
       </Routes>
     <Footer/>
     </BrowserRouter>
