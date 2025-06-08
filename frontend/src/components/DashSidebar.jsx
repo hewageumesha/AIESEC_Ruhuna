@@ -57,7 +57,7 @@ export default function DashSidebar() {
     if (currentUser != null) {
       if (currentUser.role === 'LCP') return true;  
       if (currentUser.role === 'LCVP') return 'LCVP';
-      if (currentUser.role === 'Team_Leader') return 'Team_Leader';
+      if (currentUser.role === 'TEAM_LEADER') return 'TEAM_LEADER';
     }
     return 'Member';
   }; // You can replace this with a loading spinner if needed
@@ -67,7 +67,7 @@ export default function DashSidebar() {
       <Sidebar.Items>
         <Sidebar.ItemGroup className='flex flex-col gap-1'>
          
-          { (currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
+          { (currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'TEAM_LEADER') && (
             <>
               <Link to='/dashboard?tab=dash'>
                 <Sidebar.Item
@@ -115,7 +115,7 @@ export default function DashSidebar() {
                 </Link>
             </>
           )}
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' ) && (
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'TEAM_LEADER' ) && (
             <>
               <Link to='/dashboard?tab=task'>
                 <Sidebar.Item
@@ -126,15 +126,7 @@ export default function DashSidebar() {
                   Tasks
                 </Sidebar.Item>
               </Link>
-              <Link to='/dashboard?tab=event'>
-                <Sidebar.Item
-                  active={tab === 'event'}
-                  icon={HiRectangleStack}
-                  as='div'
-                >
-                  Events
-                </Sidebar.Item>
-              </Link>
+              
               <Link to='/dashboard?tab=birthday'>
                 <Sidebar.Item
                   active={tab === 'birthday'}
@@ -146,6 +138,15 @@ export default function DashSidebar() {
               </Link>
             </>
           )}
+          <Link to='/dashboard?tab=event'>
+                <Sidebar.Item
+                  active={tab === 'event'}
+                  icon={HiRectangleStack}
+                  as='div'
+                >
+                  Events
+                </Sidebar.Item>
+              </Link>
           <Link to='/dashboard?tab=profile'>
             <Sidebar.Item
               active={tab === 'profile'}

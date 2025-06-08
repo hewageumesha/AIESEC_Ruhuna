@@ -27,6 +27,8 @@ public class AuthController {
 
     // Injecting the UserService to handle user-related operations
     @Autowired
+
+
     private UserService userService;
 
     // Endpoint to sign in a user (Login)

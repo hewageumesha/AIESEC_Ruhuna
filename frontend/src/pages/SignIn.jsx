@@ -11,7 +11,7 @@ import {
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
-  const {loading, error: errorMessage} = useSelector(state => state.user);
+  const {loading} = useSelector(state => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -45,9 +45,9 @@ export default function SignIn() {
         navigate('/dashboard');
       } else if (data.role === 'LCVP') {
         navigate('/dashboard');
-      } else if (data.role === 'Team_Leader') {
+      } else if (data.role === 'TEAM_LEADER') {
         navigate('/dashboard');
-      } else if(data.role === 'Member'){
+      } else if(data.role === 'MEMBER'){
         navigate('/dashboard');
       }
     } catch (error) {
