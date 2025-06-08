@@ -96,7 +96,7 @@ const OrgTable = () => {
     setCurrentUser({
       id: 'user-m1-0',
       name: 'Member 1',
-      role: 'team_leader',
+      role: 'lcp',
       image: 'https://randomuser.me/api/portraits/men/3.jpg'
     });
     

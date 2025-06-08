@@ -32,7 +32,7 @@ export default function DashSidebar() {
   
   const handleSignout = async () => {
     try {
-      const res = await fetch('/api/auth/signout', {
+      const res = await fetch('http://localhost:5173/api/auth/signout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,14 +43,14 @@ export default function DashSidebar() {
         const errorText = await res.text(); // try to read any error
         console.error('Signout error:', errorText);
       } else {
-        const data = await res.json();
-        console.log(data.message); // optional: show toast or log
+        //const data = await res.json();
+        //console.log(data.message); // optional: show toast or log
         dispatch(signoutSuccess());
-        navigate('/');
+        navigate('');
       }
     } catch (error) {
       console.error('Fetch failed:', error.message);
-    }
+    }      
   };
 
   const getUserRoleLabel = () => {
