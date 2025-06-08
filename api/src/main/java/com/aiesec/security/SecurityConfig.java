@@ -28,9 +28,10 @@ public class SecurityConfig {
                                 .requestMatchers("/api/tshirts/**").permitAll()
                                 .requestMatchers("/**").permitAll() // TEMP: allow all for debugging
 
+                                .requestMatchers("/api/uploads/**").permitAll()
+                                .requestMatchers("/api/comments/**").permitAll()
                                 .anyRequest().authenticated()
                 );
-
         return http.build();
     }
 

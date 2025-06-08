@@ -1,6 +1,8 @@
 import { Footer } from 'flowbite-react';
 import { BsFacebook, BsInstagram, BsYoutube, BsTiktok } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
+import React from 'react';
+
 
 export default function FooterComponent() {
     return (

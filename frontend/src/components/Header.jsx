@@ -4,6 +4,7 @@ import { FaMoon, FaSun } from 'react-icons/fa';
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleTheme } from '../redux/theme/themeSlice';
 import { signoutSuccess } from '../redux/user/userSlice';
+import React from 'react';
 
 export default function Header() {
     const path = useLocation().pathname;
@@ -78,6 +79,16 @@ export default function Header() {
                     About us
                 </Link>
             </Navbar.Link >
+            <Navbar.Link active={path === '/funcion'} as={'div'}>
+                <Link to="/function" className='font-semibold'>
+                    Function
+                </Link>
+            </Navbar.Link >
+            <Navbar.Link active={path === '/event'} as={'div'}>
+                <Link to="event" className='font-semibold'>
+                    Event
+                </Link>
+            </Navbar.Link>
             <Navbar.Link active={path === '/gallery'} as={'div'}>
                 <Link to="/gallery" className='font-semibold'>
                     Gallery
