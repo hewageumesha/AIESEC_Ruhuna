@@ -235,7 +235,7 @@ export default function UserProfile() {
             <textarea
               id="about"
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-800 dark:focus:ring-gray-200 focus:border-gray-200 dark:bg-gray-800"
               placeholder="Write something about you..."
               onChange={handleChange}
             />
