@@ -183,14 +183,14 @@ const OrgTable = () => {
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-100">Role</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-100">Profile</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-100">Contact</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200 ">
+          <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-600">
             {/* LCP Row */}
-            <tr className="bg-blue-50 hover:bg-blue-100 ">
+            <tr className="bg-blue-50 hover:bg-blue-100 dark:bg-gray-800">
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
                   <div className="bg-blue-100 p-2 rounded-lg mr-3">
@@ -200,7 +200,7 @@ const OrgTable = () => {
                   </div>
                   <div>
                     <RoleBadge role={organization.lcp.role} />
-                    <div className="text-xs text-gray-500 mt-1">2023-2024 Term</div>
+                    <div className="text-xs text-gray-500 mt-1 dark:text-gray-200">2023-2024 Term</div>
                   </div>
                 </div>
               </td>
@@ -210,14 +210,14 @@ const OrgTable = () => {
                     <img className="h-10 w-10 rounded-full" src={organization.lcp.image} alt={organization.lcp.name} />
                   </div>
                   <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">{organization.lcp.name}</div>
-                    <div className="text-sm text-gray-500">Local Committee President</div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{organization.lcp.name}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-300">Local Committee President</div>
                   </div>
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{organization.lcp.email}</div>
-                <div className="text-sm text-gray-500">+1 (555) 123-4567</div>
+                <div className="text-sm text-gray-900 dark:text-gray-300">{organization.lcp.email}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">+1 (555) 123-4567</div>
               </td>
             </tr>
 
@@ -225,7 +225,7 @@ const OrgTable = () => {
             {organization.lcvps.map((lcvp, lcvpIndex) => (
               <React.Fragment key={lcvpIndex}>
                 <tr 
-                  className="bg-green-50 hover:bg-green-100 cursor-pointer"
+                  className="bg-green-50 hover:bg-green-100 cursor-pointer dark:bg-gray-700"
                   onClick={() => toggleLcvp(lcvpIndex)}
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -245,7 +245,7 @@ const OrgTable = () => {
                       </div>
                       <div>
                         <RoleBadge role={lcvp.role} />
-                        <div className="text-xs text-gray-500 mt-1">2023-2024 Term</div>
+                        <div className="text-xs text-gray-500 mt-1 dark:text-gray-200">2023-2024 Term</div>
                       </div>
                     </div>
                   </td>
@@ -255,14 +255,14 @@ const OrgTable = () => {
                         <img className="h-10 w-10 rounded-full" src={lcvp.image} alt={lcvp.name} />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{lcvp.name}</div>
-                        <div className="text-sm text-gray-500">Vice President</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-200">{lcvp.name}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-300">Vice President</div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{lcvp.email}</div>
-                    <div className="text-sm text-gray-500">+1 (555) 987-6543</div>
+                    <div className="text-sm text-gray-900 dark:text-gray-300">{lcvp.email}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">+1 (555) 987-6543</div>
                   </td>
                 </tr>
 
@@ -270,7 +270,7 @@ const OrgTable = () => {
                 {expandedRows.lcvps.includes(lcvpIndex) && lcvp.tls.map((tl, tlIndex) => (
                   <React.Fragment key={tlIndex}>
                     <tr 
-                      className="bg-purple-50 hover:bg-purple-100 cursor-pointer"
+                      className="bg-purple-50 hover:bg-purple-100 cursor-pointer dark:bg-gray-600"
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleTl(`${lcvpIndex}-${tlIndex}`);
@@ -293,7 +293,7 @@ const OrgTable = () => {
                           </div>
                           <div>
                             <RoleBadge role={tl.role} />
-                            <div className="text-xs text-gray-500 mt-1">Team Leader</div>
+                            <div className="text-xs text-gray-500 mt-1 dark:text-gray-200">Team Leader</div>
                           </div>
                         </div>
                       </td>
@@ -303,14 +303,14 @@ const OrgTable = () => {
                             <img className="h-10 w-10 rounded-full" src={tl.image} alt={tl.name} />
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{tl.name}</div>
-                            <div className="text-sm text-gray-500">Team Leader</div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-gray-200">{tl.name}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-300">Team Leader</div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{tl.email}</div>
-                        <div className="text-sm text-gray-500">+1 (555) 456-7890</div>
+                        <div className="text-sm text-gray-900 dark:text-gray-300">{tl.email}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">+1 (555) 456-7890</div>
                       </td>
                     </tr>
 
@@ -318,7 +318,7 @@ const OrgTable = () => {
                     {expandedRows.tls.includes(`${lcvpIndex}-${tlIndex}`) && tl.members.map((member, memberIndex) => (
                       <tr 
                         key={memberIndex} 
-                        className="bg-gray-50 hover:bg-gray-100"
+                        className="bg-gray-50 hover:bg-gray-100 dark:bg-gray-500"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <td className="px-20 py-4 whitespace-nowrap">
@@ -330,7 +330,7 @@ const OrgTable = () => {
                             </div>
                             <div>
                               <RoleBadge role={member.role} />
-                              <div className="text-xs text-gray-500 mt-1">Joined {member.joinDate}</div>
+                              <div className="text-xs text-gray-500 mt-1 dark:text-gray-200">Joined {member.joinDate}</div>
                             </div>
                           </div>
                         </td>
@@ -340,14 +340,13 @@ const OrgTable = () => {
                               <img className="h-10 w-10 rounded-full" src={member.image} alt={member.name} />
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">{member.name}</div>
-                              <div className="text-sm text-gray-500">Team Member</div>
+                              <div className="text-sm font-medium text-gray-900 dark:text-gray-200">{member.name}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-300">Member</div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{member.email}</div>
-                          <div className="text-sm text-gray-500">Member</div>
+                          <div className="text-sm text-gray-900 dark:text-gray-300">{member.email}</div>
                         </td>
                       </tr>
                     ))}
