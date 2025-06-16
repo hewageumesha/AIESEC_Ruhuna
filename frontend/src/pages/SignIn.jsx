@@ -1,4 +1,4 @@
-import { Button, Label, TextInput, Spinner } from 'flowbite-react';
+import { Button, Label, TextInput, Spinner, Alert } from 'flowbite-react';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -11,17 +11,51 @@ import {
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
+  const [fieldErrors, setFieldErrors] = useState({
+    aiesecEmail: '',
+    password: ''
+  });
   const {loading, error: errorMessage} = useSelector(state => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
+    // Clear error when user starts typing
+    if (fieldErrors[e.target.id]) {
+      setFieldErrors({...fieldErrors, [e.target.id]: ''});
+    }
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {...fieldErrors};
+
+    if (!formData.aiesecEmail) {
+      newErrors.aiesecEmail = 'AIESEC Email is required';
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.aiesecEmail)) {
+      newErrors.aiesecEmail = 'Please enter a valid email address';
+      isValid = false;
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+      isValid = false;
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+      isValid = false;
+    }
+
+    setFieldErrors(newErrors);
+    return isValid;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.aiesecEmail || !formData.password) {
-      return dispatch(signInFailure('Please fill all the fields'));
+    
+    if (!validateForm()) {
+      return;
     }
 
     try {
@@ -54,6 +88,7 @@ export default function SignIn() {
       dispatch(signInFailure(error.message));
     }
   };
+
   return (
     <div className='min-h-screen mt-20'>
       <div className='flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-5'>
@@ -71,14 +106,51 @@ export default function SignIn() {
           <form className='flex flex-col gap-4' onSubmit={handleSubmit}> 
             <div>
               <Label value='Your AIESEC Email' className='font-semibold'/>
-              <TextInput type='email' placeholder=' AIESEC Email' id='aiesecEmail' onChange={handleChange}/>
+              <TextInput 
+                type='email' 
+                placeholder='AIESEC Email' 
+                id='aiesecEmail' 
+                onChange={handleChange}
+                color={fieldErrors.aiesecEmail ? 'failure' : ''}
+                helperText={
+                  fieldErrors.aiesecEmail && (
+                    <span className="text-red-600 text-xs">
+                      {fieldErrors.aiesecEmail}
+                    </span>
+                  )
+                }
+              />
             </div>
             <div>
               <Label value='Your Password' className='font-semibold' />
-              <TextInput type='password' placeholder='⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤' id='password'  onChange={handleChange}/>
+              <TextInput 
+                type='password' 
+                placeholder='⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤' 
+                id='password'  
+                onChange={handleChange}
+                color={fieldErrors.password ? 'failure' : ''}
+                helperText={
+                  fieldErrors.password && (
+                    <span className="text-red-600 text-xs">
+                      {fieldErrors.password}
+                    </span>
+                  )
+                }
+              />
             </div>
-            {/* {errorMessage && <div className="text-red-500">{errorMessage}</div>} */}
-            <Button className="bg-gradient-to-r from-[#037ef3] via-[#5aa9f4] to-[#a3d4f7] text-white" type='submit'  disabled={loading}>
+            
+            {/* Display server error messages */}
+            {errorMessage && (
+              <Alert color="failure" className="mb-4">
+                {errorMessage}
+              </Alert>
+            )}
+            
+            <Button 
+              className="bg-gradient-to-r from-[#037ef3] via-[#5aa9f4] to-[#a3d4f7] text-white" 
+              type='submit'  
+              disabled={loading}
+            >
               {loading ? (
                 <>
                   <Spinner size='sm' />
@@ -88,7 +160,11 @@ export default function SignIn() {
                 'Sign In'
               )}
             </Button>
-           
+            <div className="flex justify-end text-sm ">
+              <Link to="/forgot-password" className="text-blue-600 hover:underline text-center">
+                Forgot Password?
+              </Link>
+            </div>
           </form>
         </div>
       </div>

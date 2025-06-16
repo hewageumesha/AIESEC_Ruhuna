@@ -303,7 +303,9 @@ export default function DashSidebar() {
                     className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'profile' && location.search.includes('subtab=password') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
                     onClick={() => isMobile && setIsProfileExpanded(false)}
                   >
+                  {/*<Link to="/change-password"> */}
                     Update Password
+                  {/*</Link> */}
                   </Sidebar.Item>
                 </Link>
               </div>

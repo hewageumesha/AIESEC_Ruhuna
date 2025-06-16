@@ -10,7 +10,6 @@ import DashBirthday from '../components/DashBirthday';
 import DashboardComp from '../components/DashboardComp';
 import DashComments from '../components/DashComments';
 import React from 'react';
-import PasswordResetLink from './PasswordResetLink';
 
 
 export default function Dashboard() {
@@ -28,7 +27,6 @@ export default function Dashboard() {
   // Object mapping for better readability
   const tabComponents = {
     profile: <DashProfile />,
-    asswordResetLink: <PasswordResetLink />,
     manageCommittee: <DashManageCommitee />,
     comments: <DashComments />,
     task: <DashTask />,

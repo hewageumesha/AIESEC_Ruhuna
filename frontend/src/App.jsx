@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignIn from "./pages/SignIn"
 import ForgetPassword from "./pages/ForgetPassword";
-import PasswordResetLink from "./pages/PasswordResetLink";
+import ChangePassword from "./pages/ChangePassword";
 import HomePage from "./pages/Home";
 import About from './pages/About';
 import Dashboard from './pages/Dashboard';
@@ -26,8 +26,8 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path='/gallery' element={<Gallery />} />
         <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/forget-password" element={<ForgetPassword />} />
-        <Route path="/update-password" element={<PasswordResetLink />} />
+        <Route path="/forgot-password" element={<ForgetPassword />} />
+        <Route path="/change-password" element={<ChangePassword />} />
         <Route element={<PrivateRoute/>}/>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/global-intern" element={<GlobalIntern />} />
