@@ -11,9 +11,7 @@ import io.jsonwebtoken.lang.Collections;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -32,7 +30,8 @@ public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    private UserRepo userRepository;
+    private UserRepository userRepository;
+
 
     // Method to add a new user
     public User addUser(User user) {

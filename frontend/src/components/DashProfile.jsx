@@ -24,6 +24,7 @@ export default function UserProfile() {
   const filePickerRef = useRef();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     fetchProfileData();
