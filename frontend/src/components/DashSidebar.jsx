@@ -240,6 +240,8 @@ export default function DashSidebar() {
                   <span className="font-medium">Tasks</span>
                 </Sidebar.Item>
               </Link>
+            </>
+          )}
               <Link to='/dashboard?tab=event'>
                 <Sidebar.Item
                   active={tab === 'event'}
@@ -254,6 +256,8 @@ export default function DashSidebar() {
                   <span className="font-medium">Events</span>
                 </Sidebar.Item>
               </Link>
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
+            <>
               <Link to='/dashboard?tab=birthday'>
                 <Sidebar.Item
                   active={tab === 'birthday'}
