@@ -34,6 +34,7 @@ export default function Dashboard() {
     finance: <DashFinance />,
     birthday: <DashBirthday />,
     dash: <DashboardComp />, // Default Dashboard
+
   };
 
   return (
