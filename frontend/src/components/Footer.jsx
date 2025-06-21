@@ -16,12 +16,11 @@ export default function FooterComponent() {
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center md:text-left">
                         <div>
-                            <Footer.Title title="Youth" />
+                            <Footer.Title title=" " />
                             <Footer.LinkGroup col>
                                 <Footer.Link> <Link to="global-intern">Global Talent</Link></Footer.Link>
                                 <Footer.Link> <Link to="global-teacher">Global Teacher</Link></Footer.Link>
                                 <Footer.Link> <Link to="global-volunteer">Global Volunteer</Link></Footer.Link>
-                                <Footer.Link> <Link to="become-member">Become a member</Link></Footer.Link>
                             </Footer.LinkGroup>
                         </div>
                         <div>
@@ -30,13 +29,12 @@ export default function FooterComponent() {
                                 <Footer.Link> <Link to="about"> About us </Link></Footer.Link>
                                 <Footer.Link href='https://blog.aiesec.org/category/press/'>Press</Footer.Link>
                                 <Footer.Link href="https://aiesec-alumni.org/">Alumni</Footer.Link>
-                                
                             </Footer.LinkGroup>
                         </div> 
                         <div>
                             <Footer.Title title=" " />
                             <Footer.LinkGroup col>
-                                <Footer.Link href="#" target='_blank' rel='noopener noreferrer'>Help</Footer.Link>
+                                <Footer.Link> <Link to="contact">Contact us </Link> </Footer.Link>
                                 <Footer.Link >Partner with us</Footer.Link>
                             </Footer.LinkGroup>
                         </div> 

@@ -145,28 +145,29 @@ const About = () => {
                 </div>
                 <div className="mt-5">
                   <span className="inline-block bg-[#037EF3] text-white px-5 py-2 rounded-full text-sm font-semibold shadow-md">
-                    Local Committee President
+                    <div>Aysha Ajward</div>
+                    <div>Local Committee President</div> 
                   </span>
                 </div>
               </div>
               
               {/* Team Members Grid with Actual Names */}
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-5">
+              <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-5 gap-10">
                 {[
-                  { name: "Nadith", role: "LCVP iGV B2B & VD", img: "LCVP1.png" },
-                  { name: "Tiyanie", role: "LCVP iGV M & IR", img: "LCVP2.png" },
-                  { name: "Gangul", role: "LCVP iGT B2B & VD", img: "LCVP3.png" },
-                  { name: "Rukshi", role: "LCVP iGT M & IR", img: "LCVP4.png" },
-                  { name: "Navodha", role: "LCVP oGV B2C", img: "LCVP5.png" },
-                  { name: "Thisari", role: "LCVP oGV PS", img: "LCVP6.png" },
-                  { name: "Dilma", role: "LCVP oGT B2C", img: "LCVP7.png" },
-                  { name: "Ranudi", role: "LCVP oGT PS", img: "LCVP8.png" },
-                  { name: "Gagana", role: "LCVP MKT", img: "LCVP9.png" },
-                  { name: "Lakshitha", role: "LCVP TM", img: "LCVP10.png" },
-                  { name: "Parami", role: "LCVP BD", img: "LCVP11.png" },
-                  { name: "Akila", role: "LCVP ED", img: "LCVP12.png" },
-                  { name: "Thisura", role: "LCVP FnL", img: "LCVP13.png" },
-                  { name: "Nithma", role: "LCVP PR", img: "LCVP14.png" },
+                  { name: "Nadith Jayasundara", role: "LCVP iGV B2B & VD", img: "LCVP1.png" },
+                  { name: "Tiyanie Sahabandu", role: "LCVP iGV M & IR", img: "LCVP2.png" },
+                  { name: "Sandaru Gangul", role: "LCVP iGT B2B & VD", img: "LCVP3.png" },
+                  { name: "Rukshi Withana", role: "LCVP iGT M & IR", img: "LCVP4.png" },
+                  { name: "Navodha Sandaru", role: "LCVP oGV B2C", img: "LCVP5.png" },
+                  { name: "Thisari Thamoda", role: "LCVP oGV PS", img: "LCVP6.png" },
+                  { name: "Dilma Salpadoru", role: "LCVP oGT B2C", img: "LCVP7.png" },
+                  { name: "Ranudi Uyangoda", role: "LCVP oGT PS", img: "LCVP8.png" },
+                  { name: "Gagana Tharupathi", role: "LCVP MKT", img: "LCVP9.png" },
+                  { name: "Thisura Daksina", role: "LCVP TM", img: "LCVP10.png" },
+                  { name: "Parami Sigera ", role: "LCVP BD", img: "LCVP11.png" },
+                  { name: "Akila Nissanka", role: "LCVP ED", img: "LCVP12.png" },
+                  { name: "Lakshitha Wijethunga", role: "LCVP FnL", img: "LCVP13.png" },
+                  { name: "Nethma Dewni", role: "LCVP PR", img: "LCVP14.png" },
                 ].map((member, i) => (
                   <div key={i} className="flex justify-center">
                     <div className="relative group">
@@ -174,12 +175,15 @@ const About = () => {
                         <img 
                           src={`/committee/${member.img}`} 
                           alt={member.name} 
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 object-center"
                           loading="lazy"
                         />
                       </div>
-                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-max max-w-xs text-center">
-                        <div className="mt-1 bg-gray-800 text-white text-[0.65rem] px-2 py-1 rounded whitespace-nowrap">
+                      <div className="text-center mt-2 space-y-1">
+                        <div className="text-xs font-semibold text-gray-800 px-2 py-0.5 dark:text-gray-50">
+                          {member.name}
+                        </div>
+                        <div className="text-[0.6rem] font-medium text-[#037EF3] bg-blue-50 rounded-full px-2 py-0.5">
                           {member.role}
                         </div>
                       </div>
