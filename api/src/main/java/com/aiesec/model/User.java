@@ -11,6 +11,9 @@ import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.aiesec.enums.Gender;
+import com.aiesec.enums.Role;
+import com.aiesec.enums.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity

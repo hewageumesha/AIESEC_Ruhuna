@@ -9,8 +9,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.aiesec.dto.CommentDTO;
+import com.aiesec.enums.Role;
 import com.aiesec.model.Comment;
-import com.aiesec.model.Role;
 import com.aiesec.model.User;
 import com.aiesec.repository.CommentRepository;
 import com.aiesec.repository.UserRepo;

@@ -4,11 +4,11 @@ package com.aiesec.dto;
 import java.sql.Date;
 import java.util.List;
 
+import com.aiesec.enums.Gender;
+import com.aiesec.enums.Role;
+import com.aiesec.enums.Status;
 import com.aiesec.model.Department;
 import com.aiesec.model.Function;
-import com.aiesec.model.Gender;
-import com.aiesec.model.Role;
-import com.aiesec.model.Status;
 
 public class UserDTO {
     private Long id;

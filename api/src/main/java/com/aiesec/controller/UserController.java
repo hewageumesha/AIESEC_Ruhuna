@@ -2,7 +2,7 @@ package com.aiesec.controller;
 import com.aiesec.dto.CommentDTO;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
-import com.aiesec.model.Role;
+import com.aiesec.enums.Role;
 import com.aiesec.model.User;
 import com.aiesec.repository.UserRepo;
 import com.aiesec.security.UserDetailsImpl;

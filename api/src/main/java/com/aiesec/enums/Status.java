@@ -1,4 +1,4 @@
-package com.aiesec.model;
+package com.aiesec.enums;
 
 public enum Status {
     ACTIVE, INACTIVE
