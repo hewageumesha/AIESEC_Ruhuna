@@ -9,11 +9,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.aiesec.dto.CommentDTO;
-import com.aiesec.enums.Role;
+import com.aiesec.enums.UserRole;
 import com.aiesec.model.Comment;
 import com.aiesec.model.User;
 import com.aiesec.repository.CommentRepository;
-import com.aiesec.repository.UserRepo;
+import com.aiesec.repository.UserRepository;
 
 @Service
 public class CommentService {
@@ -21,7 +21,7 @@ public class CommentService {
     private CommentRepository commentRepo;
 
     @Autowired
-    private UserRepo userRepo;
+    private UserRepository userRepo;
 
     public Comment addComment(String content, Long memberId, String creatorEmail) {
         User member = userRepo.findById(memberId)
@@ -31,7 +31,7 @@ public class CommentService {
             .orElseThrow(() -> new RuntimeException("Creator not found"));
 
 
-        if (!Role.LCVP.equals(creator.getRole())) {
+        if (!UserRole.LCVP.equals(creator.getRole())) {
             throw new AccessDeniedException("Only LCVP can add comments");
         }
 
@@ -44,9 +44,9 @@ public class CommentService {
         return commentRepo.save(comment);
     }
 
-    public List<CommentDTO> getCommentsForMember(Long memberId, Role requesterRole) {
+    public List<CommentDTO> getCommentsForMember(Long memberId, UserRole requesterRole) {
 
-          if (Role.LCVP.equals(requesterRole) || Role.LCP.equals(requesterRole)) {
+          if (UserRole.LCVP.equals(requesterRole) || UserRole.LCP.equals(requesterRole)) {
                     return commentRepo.findByMemberIdOrderByCreatedAtDesc(memberId)
                 .stream()
                 .map(c -> new CommentDTO(c.getId(), c.getContent(), 
@@ -82,7 +82,7 @@ public class CommentService {
             .orElseThrow(() -> new RuntimeException("User not found"));
         
         if (!comment.getCreatedBy().getAiesecEmail().equals(deleterEmail) && 
-            !Role.LCVP.equals(deleter.getRole())) {
+            !UserRole.LCVP.equals(deleter.getRole())) {
             throw new AccessDeniedException("Not authorized to delete this comment");
         }
         

@@ -2,13 +2,13 @@ package com.aiesec.dto;
 
 import java.util.List;
 
-import com.aiesec.enums.Role;
+import com.aiesec.enums.UserRole;
 
 public class UserHierarchyDTO {
     private Long id;
     private String name;
     private String aiesecEmail;
-    private Role role;
+    private UserRole role;
     private String departmentName;
     private String functionName;
     private String profilePicture;
@@ -31,10 +31,10 @@ public class UserHierarchyDTO {
     public void setAiesecEmail(String aiesecEmail) {
         this.aiesecEmail = aiesecEmail;
     }
-    public Role getRole() {
+    public UserRole getRole() {
         return role;
     }
-    public void setRole(Role role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
     public String getDepartmentName() {

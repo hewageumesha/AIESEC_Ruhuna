@@ -19,7 +19,7 @@ const EventDetails = () => {
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const isMember = currentUser && ['LCP', 'LCVP', 'TEAM_LEADER', 'MEMBER'].includes(currentUser.role);
+  const isMember = currentUser && ['LCP', 'LCVP', 'Team_Leader', 'Member'].includes(currentUser.role);
 
   useEffect(() => {
     const fetchEvent = async () => {

@@ -12,11 +12,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.aiesec.dto.CommentDTO;
-import com.aiesec.enums.Role;
+import com.aiesec.enums.UserRole;
 import com.aiesec.model.Comment;
 import com.aiesec.model.User;
 import com.aiesec.repository.CommentRepository;
-import com.aiesec.repository.UserRepo;
+import com.aiesec.repository.UserRepository;
 import com.aiesec.security.UserDetailsImpl;
 import com.aiesec.service.CommentService;
 
@@ -31,7 +31,7 @@ public class CommentController {
 
     // Injecting the UserRepo to access user-related DB operations
     @Autowired
-    private UserRepo userRepo;
+    private UserRepository userRepo;
 
      /**
      * Endpoint to add a new comment to a member profile
@@ -64,7 +64,7 @@ public class CommentController {
             @PathVariable String requesterRole // Role of the requester (to filter comments by access)
     ) {
         // Convert the role from String to Enum
-        List<CommentDTO> comments = commentService.getCommentsForMember(memberId, Role.valueOf(requesterRole));
+        List<CommentDTO> comments = commentService.getCommentsForMember(memberId, UserRole.valueOf(requesterRole));
         return ResponseEntity.ok(comments); // Return the filtered comment list
     }
 
@@ -74,7 +74,7 @@ public class CommentController {
      */
     @GetMapping("/members")
     public ResponseEntity<List<User>> getAllMembersWithComments() {
-        List<User> members = userRepo.findByRole(Role.Member); // Fetch users with Member role
+        List<User> members = userRepo.findByRole(UserRole.Member); // Fetch users with Member role
         return ResponseEntity.ok(members); // Return list of members
     }
 }

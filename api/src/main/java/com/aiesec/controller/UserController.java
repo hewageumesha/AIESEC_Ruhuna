@@ -2,9 +2,9 @@ package com.aiesec.controller;
 import com.aiesec.dto.CommentDTO;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
-import com.aiesec.enums.Role;
+import com.aiesec.enums.UserRole;
 import com.aiesec.model.User;
-import com.aiesec.repository.UserRepo;
+import com.aiesec.repository.UserRepository;
 import com.aiesec.security.UserDetailsImpl;
 import com.aiesec.service.CommentService;
 import com.aiesec.service.UserService;
@@ -30,7 +30,7 @@ public class UserController {
     private UserService userService;
 
     @Autowired 
-    private UserRepo userRepo;
+    private UserRepository userRepo;
 
 
     @GetMapping("/{id}")
@@ -73,7 +73,7 @@ public class UserController {
 
     @GetMapping("/members")
     public List<User> getAllMembers() {
-       List<User> members =  userRepo.findByRole(Role.Member);
+       List<User> members =  userRepo.findByRole(UserRole.Member);
        System.out.println(members.size());
         return members;
     }

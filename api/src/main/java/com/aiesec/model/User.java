@@ -15,8 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.aiesec.enums.Gender;
-import com.aiesec.enums.Role;
-import com.aiesec.enums.Status;
+import com.aiesec.enums.UserRole;
+import com.aiesec.enums.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -205,22 +205,6 @@ public class User {
 
     public void setDepartment(Department department) {
         this.department = department;
-    }
-
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
-
-    public Date getJoinedDate() {
-        return joinedDate;
-    }
-
-    public void setJoinedDate(Date joinedDate) {
-        this.joinedDate = joinedDate;
     }
 
     public List<Comment> getCommentsForUser() {
