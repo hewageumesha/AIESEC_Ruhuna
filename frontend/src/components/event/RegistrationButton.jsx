@@ -5,7 +5,7 @@ import GuestRegistrationModal from './GuestRegistrationModal';
 const RegistrationButton = ({ event, user }) => {
   const [visible, setVisible] = useState(false);
 
-  const isMember = user && ['LCP', 'LCVP', 'TEAM_LEADER', 'MEMBER'].includes(user.role);
+  const isMember = user && ['LCP', 'LCVP', 'Team_Leader', 'Member'].includes(user.role);
 
   return (
     <>
