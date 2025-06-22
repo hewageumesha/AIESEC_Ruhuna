@@ -46,7 +46,7 @@ const TShirtOrderForm = ({
       merchandiseId: merchandise.merchandiseId,
       quantity: values.quantity,
       size: values.size,
-      userId: user ? user.id : null,
+      id: user ? user.id : null,
       guestUser: user
         ? null
         : {
