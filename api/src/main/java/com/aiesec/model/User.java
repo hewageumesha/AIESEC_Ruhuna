@@ -6,7 +6,6 @@ import com.aiesec.enums.UserStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -201,21 +200,21 @@ public class User {
         this.department = department;
     }
 
-    public Date getBirthday() {
-        return birthday;
-    }
+    //public Date getBirthday() {
+      //  return birthday;
+    //}
 
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
+    //public void setBirthday(Date birthday) {
+       // this.birthday = birthday;
+   // }
 
-    public Date getJoinedDate() {
-        return joinedDate;
-    }
+    //public Date getJoinedDate() {
+    //    return joinedDate;
+   // }
 
-    public void setJoinedDate(Date joinedDate) {
-        this.joinedDate = joinedDate;
-    }
+    //public void setJoinedDate(Date joinedDate) {
+     //   this.joinedDate = joinedDate;
+   // }
 
     public List<Comment> getCommentsForUser() {
         return commentsForUser;
