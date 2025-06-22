@@ -56,7 +56,7 @@ public class CommentController {
             @PathVariable String requesterRole // Role of the requester (to filter comments by access)
     ) {
         // Convert the role from String to Enum
-        List<CommentDTO> comments = commentService.getCommentsForMember(memberId, Role.valueOf(requesterRole));
+        List<CommentDTO> comments = commentService.getCommentsForMember(memberId, UserRole.valueOf(requesterRole));
         return ResponseEntity.ok(comments); // Return the filtered comment list
     }
 

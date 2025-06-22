@@ -10,6 +10,6 @@ import java.util.List;
 public interface EventExperienceRepository extends JpaRepository<EventExperience, Long> {
 
     List<EventExperience> findByEvent_EventId(Long eventId);
-    List<EventExperience> findByUser_UserId(Long userId);
+    List<EventExperience> findByUser_Id(Long userId);
 }
 

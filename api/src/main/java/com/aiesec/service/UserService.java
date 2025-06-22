@@ -2,11 +2,12 @@ package com.aiesec.service;
 
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
-import com.aiesec.enums.Role;
+
 import com.aiesec.model.User;
 import com.aiesec.repository.DepartmentRepo;
-import com.aiesec.repository.UserRepo;
 
+
+import com.aiesec.repository.UserRepository;
 import io.jsonwebtoken.lang.Collections;
 import jakarta.transaction.Transactional;
 
@@ -32,7 +33,7 @@ public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    private UserRepo userRepository;
+    private UserRepository userRepository;
 
     // Method to add a new user
     public User addUser(User user) {

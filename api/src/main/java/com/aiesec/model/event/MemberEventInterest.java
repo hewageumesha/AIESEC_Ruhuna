@@ -26,7 +26,7 @@ public class MemberEventInterest {
     private Event event;
 
     @ManyToOne
-    @JoinColumn(name = "User_ID", nullable = false)
+    @JoinColumn( nullable = false)
     private User user;
 
     @Enumerated(EnumType.STRING)

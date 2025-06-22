@@ -32,7 +32,7 @@ public class TShirtOrder {
     private TshirtSize size;
 
     @ManyToOne
-    @JoinColumn(name = "User_ID")
+    @JoinColumn
     private User user;
 
     //@ManyToOne

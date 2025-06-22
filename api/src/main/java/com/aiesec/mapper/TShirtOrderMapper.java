@@ -14,7 +14,7 @@ public class TShirtOrderMapper {
                 .merchandiseId(order.getMerchandise() != null ? order.getMerchandise().getId() : null)
                 .quantity(order.getQuantity())
                 .size(order.getSize().name())
-                .userId(order.getUser() != null ? order.getUser().getUserId() : null)
+                .userId(order.getUser() != null ? order.getUser().getId() : null)
                 //.guestUserId(order.getGuestUser() != null ? order.getGuestUser().getGuestUserId() : null)
                 .build();
     }

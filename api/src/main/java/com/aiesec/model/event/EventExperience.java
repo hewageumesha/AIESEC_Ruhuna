@@ -24,7 +24,7 @@ public class EventExperience {
     private Event event;
 
     @ManyToOne
-    @JoinColumn(name = "User_ID", referencedColumnName = "User_ID")
+    @JoinColumn(name = "id", referencedColumnName = "id")
     private User user; // AIESEC member – nullable
 
     @ManyToOne

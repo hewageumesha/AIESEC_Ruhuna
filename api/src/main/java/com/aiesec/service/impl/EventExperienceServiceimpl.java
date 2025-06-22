@@ -72,7 +72,7 @@ public class EventExperienceServiceimpl implements EventExperienceService {
 
     @Override
     public List<EventExperienceDTO> getExperiencesByUserId(Long userId) {
-        return repository.findByUser_UserId(userId)
+        return repository.findByUser_Id(userId)
                 .stream()
                 .map(EventExperienceMapper::toDTO)
                 .collect(Collectors.toList());
