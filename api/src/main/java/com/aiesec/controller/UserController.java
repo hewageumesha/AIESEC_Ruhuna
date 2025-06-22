@@ -75,7 +75,7 @@ public class UserController {
 
     @GetMapping("/members")
     public List<User> getAllMembers() {
-       List<User> members =  userRepo.findByRole(UserRole.MEMBER);
+       List<User> members =  userRepo.findByRole(UserRole.Member);
        System.out.println(members.size());
         return members;
     }
