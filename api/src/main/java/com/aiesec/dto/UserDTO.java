@@ -4,11 +4,11 @@ package com.aiesec.dto;
 import java.sql.Date;
 import java.util.List;
 
-import com.aiesec.enums.Gender;
-import com.aiesec.enums.Role;
-import com.aiesec.enums.Status;
 import com.aiesec.model.Department;
 import com.aiesec.model.Function;
+import com.aiesec.enums.Gender;
+import com.aiesec.enums.UserRole;
+import com.aiesec.enums.UserStatus;
 
 public class UserDTO {
     private Long id;
@@ -26,8 +26,8 @@ public class UserDTO {
     private Gender gender;
     private Date joinedDate;
     private String profilePicture;
-    private Role role;  
-    private Status status;
+    private UserRole role;  
+    private UserStatus status;
     private Function functionId;  
     private String functionName; 
     private Department departmentId;  
@@ -149,19 +149,19 @@ public class UserDTO {
         this.profilePicture = profilePicture;
     }
 
-    public Role getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 
-    public Status getStatus() {
+    public UserStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(UserStatus status) {
         this.status = status;
     }
 

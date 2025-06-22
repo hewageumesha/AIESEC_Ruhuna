@@ -15,7 +15,8 @@ import GlobalTeacher from "./pages/GlobalTeacher";
 import BecomeMember from "./pages/BecomeMember";
 import React from 'react';
 import Contact from './pages/Contact';
-//import './index.css'
+import EventDetails from "./pages/EventDetails";
+import EditEvent from "./components/event/EditEvent";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/forgot-password" element={<ForgetPassword />} />
         <Route path="/change-password" element={<ChangePassword />} />
+        <Route path="/event/:id" element={<EventDetails />} />
         <Route element={<PrivateRoute/>}/>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/global-intern" element={<GlobalIntern />} />
@@ -35,6 +37,7 @@ function App() {
         <Route path="/global-volunteer" element={<GlobalVolunteer />} />
         <Route path="/become-member" element={<BecomeMember />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/edit-event/:id" element={<EditEvent />} />
       </Routes>
     <Footer/>
     </BrowserRouter>

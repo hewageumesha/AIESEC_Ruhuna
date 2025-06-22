@@ -1,10 +1,13 @@
 package com.aiesec.model;
 
+import com.aiesec.enums.UserRole;
+import com.aiesec.enums.UserStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,9 +22,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "user_id")
+    private Long userId;
 
     @NotEmpty
     private String firstName;
@@ -41,12 +46,12 @@ public class User {
     private String password;
 
     @Temporal(TemporalType.DATE)
-    private Date birthday;
+    private LocalDate birthday;
 
     private Gender gender;
 
     @Temporal(TemporalType.DATE)
-    private Date joinedDate;
+    private LocalDate joinedDate;
 
     private String profilePicture;
 
@@ -65,10 +70,10 @@ public class User {
     private String teamLeaderAiesecEmail;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private UserRole role;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private UserStatus status;
 
     @ManyToOne
     @JoinColumn(name = "function_id")
@@ -98,20 +103,12 @@ public class User {
         return passwordEncoder.encode(rawPassword);
     }
 
-    public Long getId() {
-        return id;
-    }
-   
-    public void setId(Long id) {
-        this.id = id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getEmail() {
-        return email;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getFirstName() {
@@ -130,6 +127,14 @@ public class User {
         this.lastName = lastName;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getAiesecEmail() {
         return aiesecEmail;
     }
@@ -145,7 +150,22 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-    
+
+    public LocalDate getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
+
+    public LocalDate getJoinedDate() {
+        return joinedDate;
+    }
+
+    public void setJoinedDate(LocalDate joinedDate) {
+        this.joinedDate = joinedDate;
+    }
 
     public String getProfilePicture() {
         return profilePicture;
@@ -155,19 +175,19 @@ public class User {
         this.profilePicture = profilePicture;
     }
 
-    public Role getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 
-    public Status getStatus() {
+    public UserStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(UserStatus status) {
         this.status = status;
     }
 
