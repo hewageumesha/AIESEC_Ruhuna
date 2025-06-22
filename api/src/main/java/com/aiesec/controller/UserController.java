@@ -45,10 +45,12 @@ public class UserController {
         return userService.addUser(user);
     }
 
+    {/*
     @PostMapping("/update")
     public Optional<User> updateUser(@RequestBody UserDTO userDetails) {
         return Optional.ofNullable(userService.updateUser(userDetails.getAiesecEmail(), userDetails));
     }
+    */}
 
     @DeleteMapping("/delete/{id}")
     public String deleteUser(@PathVariable String aiesecEmail) {
@@ -90,6 +92,12 @@ public class UserController {
         return userService.updateUserProfile(aiesecEmail, userDetails, profilePhoto);
     }
     
+
+    @GetMapping("/hierarchy")
+    public ResponseEntity<List<Map<String, Object>>> getCommitteeHierarchy() {
+        return ResponseEntity.ok(userService.getCommitteeHierarchy());
+    }
+
     /* 
     @GetMapping("/hierarchy")
     public ResponseEntity<List<UserHierarchyDTO>> getCommitteeHierarchy() {
