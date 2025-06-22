@@ -1,23 +1,15 @@
 package com.aiesec.controller;
-
-import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.aiesec.enums.UserRole;
+import com.aiesec.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import com.aiesec.dto.CommentDTO;
 import com.aiesec.model.Comment;
-import com.aiesec.model.Role;
 import com.aiesec.model.User;
-import com.aiesec.repository.CommentRepository;
-import com.aiesec.repository.UserRepo;
-import com.aiesec.security.UserDetailsImpl;
 import com.aiesec.service.CommentService;
 
 @CrossOrigin(origins = "*") // Allow cross-origin requests from any origin
@@ -31,7 +23,7 @@ public class CommentController {
 
     // Injecting the UserRepo to access user-related DB operations
     @Autowired
-    private UserRepo userRepo;
+    private UserRepository userRepo;
 
      /**
      * Endpoint to add a new comment to a member profile
@@ -74,7 +66,7 @@ public class CommentController {
      */
     @GetMapping("/members")
     public ResponseEntity<List<User>> getAllMembersWithComments() {
-        List<User> members = userRepo.findByRole(Role.Member); // Fetch users with Member role
+        List<User> members = userRepo.findByRole(UserRole.Member); // Fetch users with Member role
         return ResponseEntity.ok(members); // Return list of members
     }
 }
