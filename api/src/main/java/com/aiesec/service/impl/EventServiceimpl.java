@@ -6,6 +6,8 @@ import com.aiesec.mapper.EventMapper;
 import com.aiesec.repository.event.EventRepository;
 import com.aiesec.service.interfaces.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -103,6 +105,9 @@ public class EventServiceimpl implements EventService {
                 .map(EventMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+
+
     @Override
     public void updateTshirtOrder(Long eventId, Boolean hasTshirtOrder) {
         Optional<Event> optionalEvent = eventRepository.findById(eventId);
@@ -125,6 +130,14 @@ public class EventServiceimpl implements EventService {
         } else {
             throw new RuntimeException("Event not found with ID: " + eventId);
         }
+    }
+
+    //Search event
+    @Override
+    public Page<EventDTO> filterEvents(String search, String status, String dateStr, Pageable pageable) {
+        LocalDate date = (dateStr != null && !dateStr.isEmpty()) ? LocalDate.parse(dateStr) : null;
+        Page<Event> events = eventRepository.filterEvents(search, status, date, pageable);
+        return events.map(EventMapper::toDTO);
     }
 
 
