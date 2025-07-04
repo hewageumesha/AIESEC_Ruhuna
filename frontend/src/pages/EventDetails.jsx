@@ -36,7 +36,8 @@ const EventDetails = () => {
         const res = await axios.get(`http://localhost:8080/api/events/${id}`);
         setEvent(res.data);
 
-        if (res.data.hasTshirtOrder) {
+        // ✅ Corrected condition: check for hasMerchandise
+        if (res.data.hasMerchandise) {
           const merchRes = await axios.get(`http://localhost:8080/api/merchandise/event/${id}`);
           setMerchandise(merchRes.data);
 
@@ -137,10 +138,10 @@ const EventDetails = () => {
         </Motion.button>
       </div>
 
-      {/* Merchandise Section */}
+      {/* ✅ Merchandise Section */}
       {merchandise && (
         <div className="mt-10">
-          <h3 className="text-black xl font-semibold mb-2">T-Shirt Merchandise</h3>
+          <h3 className="text-black xl font-semibold mb-2">Official Merchandise</h3>
           <p className="text-gray-700 mb-3">{merchandise.description}</p>
           <div className="flex flex-wrap gap-4">
             {merchandise.imageUrls?.map((url, index) => (
@@ -222,6 +223,7 @@ const EventDetails = () => {
         )}
       </AnimatePresence>
 
+      {/* T-shirt Order Modal */}
       <Modal
         title="Order T-Shirt"
         open={isOrderModalVisible}

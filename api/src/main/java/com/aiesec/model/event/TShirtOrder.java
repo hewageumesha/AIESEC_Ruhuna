@@ -37,7 +37,7 @@ public class TShirtOrder {
 
     @ManyToOne
     @JoinColumn(name = "Guest_ID")
-    private GuestUser guestUser;
+    private GuestEventRegistration guest_event_id;
 
 
 }

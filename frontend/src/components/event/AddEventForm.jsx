@@ -16,7 +16,7 @@ const AddEventForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [eventType, setEventType] = useState('in_person');
   const [eventImageUrl, setEventImageUrl] = useState('');
-  const [tshirtAvailable, setTshirtAvailable] = useState(false);
+  const [hasMerchandise, setHasMerchandise] = useState(false);
   const [merchDesc, setMerchDesc] = useState('');
   const [merchImages, setMerchImages] = useState([]);
 
@@ -74,7 +74,6 @@ const AddEventForm = () => {
 
       if (moment(values.endDate).isBefore(values.startDate, 'day')) {
         message.error('End date must be same or after start date.');
-        setIsSubmitting(false);
         return;
       }
       if (
@@ -82,22 +81,18 @@ const AddEventForm = () => {
         moment(values.endTime).isBefore(values.startTime)
       ) {
         message.error('End time must be after start time.');
-        setIsSubmitting(false);
         return;
       }
 
-      if (tshirtAvailable) {
+      if (hasMerchandise) {
         if (!merchDesc.trim()) {
           message.error('Please enter merchandise description.');
-          setIsSubmitting(false);
           return;
         }
         if (merchImages.length < 1) {
-          message.error('Please upload at least one merchandise images.');
-          setIsSubmitting(false);
+          message.error('Please upload at least one merchandise image.');
           return;
         }
-        // Merchandise details are handled below when posting to /api/merchandise
       }
 
       const payload = {
@@ -110,16 +105,15 @@ const AddEventForm = () => {
         imageUrl: eventImageUrl,
         isPublic: values.visibility === 'public',
         isVirtual: eventType === 'virtual',
-        location: eventType === 'virtual' ? values.location : values.location,
+        location: values.location,
         virtualLink: eventType === 'virtual' ? values.location : '',
-        hasTshirtOrder: tshirtAvailable,
-   
+        hasMerchandise, // ✅ correct field name matching backend
       };
 
       const response = await axios.post('http://localhost:8080/api/events', payload);
       const eventId = response.data.eventId;
 
-      if (tshirtAvailable) {
+      if (hasMerchandise) {
         const merchPayload = {
           eventId,
           description: merchDesc.trim(),
@@ -129,10 +123,10 @@ const AddEventForm = () => {
         await axios.post('http://localhost:8080/api/merchandise', merchPayload);
       }
 
-      message.success('Event published successfully!');
+      message.success('🎉 Event published successfully!');
       form.resetFields();
       setEventImageUrl('');
-      setTshirtAvailable(false);
+      setHasMerchandise(false);
       setMerchDesc('');
       setMerchImages([]);
       navigate(`/event/${eventId}`);
@@ -209,9 +203,7 @@ const AddEventForm = () => {
             showUploadList={false}
             accept="image/*"
           >
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
+            <p className="ant-upload-drag-icon"><InboxOutlined /></p>
             <p className="ant-upload-text">Click or drag image to upload</p>
           </Dragger>
           {eventImageUrl && (
@@ -219,12 +211,10 @@ const AddEventForm = () => {
           )}
         </Form.Item>
 
-       
-
         <Form.Item label="T-shirt Order Available?">
           <Radio.Group
-            onChange={(e) => setTshirtAvailable(e.target.value === 'yes')}
-            value={tshirtAvailable ? 'yes' : 'no'}
+            onChange={(e) => setHasMerchandise(e.target.value === 'yes')}
+            value={hasMerchandise ? 'yes' : 'no'}
             className="flex gap-8"
           >
             <Radio value="yes">Yes</Radio>
@@ -232,7 +222,7 @@ const AddEventForm = () => {
           </Radio.Group>
         </Form.Item>
 
-        {tshirtAvailable && (
+        {hasMerchandise && (
           <>
             <Form.Item label="Merchandise Description">
               <TextArea
@@ -243,7 +233,7 @@ const AddEventForm = () => {
               />
             </Form.Item>
 
-            <Form.Item label="Upload Merchandise Images (Min: 3)">
+            <Form.Item label="Upload Merchandise Images (Min: 1)">
               <Upload
                 listType="picture"
                 onChange={handleMerchImagesUpload}
@@ -256,16 +246,16 @@ const AddEventForm = () => {
           </>
         )}
 
-        <Form.Item name="visibility"
-    label="Event Visibility"
-    rules={[{ required: true, message: 'Please select event visibility' }]}
->
-  <Radio.Group className="flex gap-6">
-    <Radio value="private">Private (AIESEC members only)</Radio>
-    <Radio value="public">Public (Guests can register)</Radio>
-  </Radio.Group>
-</Form.Item>
-
+        <Form.Item
+          name="visibility"
+          label="Event Visibility"
+          rules={[{ required: true, message: 'Please select event visibility' }]}
+        >
+          <Radio.Group className="flex gap-6">
+            <Radio value="private">Private (AIESEC members only)</Radio>
+            <Radio value="public">Public (Guests can register)</Radio>
+          </Radio.Group>
+        </Form.Item>
 
         <Form.Item>
           <Button

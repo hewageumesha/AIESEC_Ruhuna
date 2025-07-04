@@ -1,13 +1,11 @@
 package com.aiesec.model.event;
 
 
-
 import com.aiesec.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -68,7 +66,7 @@ public class Event {
     private String virtualLink;
 
     private String visibility;
-    private Boolean hasTshirtOrder=false;
+    private Boolean hasMerchandise=false;
 
      //Foreign Key Relations (assuming LCP and LCVP are users)
     @ManyToOne
@@ -200,14 +198,6 @@ public class Event {
         this.visibility = visibility;
     }
 
-    public boolean isHasTshirtOrder() {
-        return hasTshirtOrder;
-    }
-
-    public void setHasTshirtOrder(boolean hasTshirtOrder) {
-        this.hasTshirtOrder = hasTshirtOrder;
-    }
-
     public User getLcp() {
         return lcp;
     }
@@ -246,5 +236,21 @@ public class Event {
 
     public void setApprovedByLcvp(User approvedByLcvp) {
         this.approvedByLcvp = approvedByLcvp;
+    }
+
+    public Merchandise getMerchandise() {
+        return merchandise;
+    }
+
+    public void setMerchandise(Merchandise merchandise) {
+        this.merchandise = merchandise;
+    }
+
+    public Boolean getHasMerchandise() {
+        return hasMerchandise;
+    }
+
+    public void setHasMerchandise(Boolean hasMerchandise) {
+        this.hasMerchandise = hasMerchandise;
     }
 }

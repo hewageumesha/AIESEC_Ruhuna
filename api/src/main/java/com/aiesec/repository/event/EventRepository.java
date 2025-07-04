@@ -37,16 +37,16 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
 
     // Find events with a t-shirt order option, starting after a given date
-    List<Event> findByHasTshirtOrderTrueAndStartDateAfter(LocalDate date);
+    List<Event> findByHasMerchandiseTrueAndStartDateAfter(LocalDate date);
 
     // Find events based on visibility and starting date
     List<Event> findByVisibilityAndStartDateAfter(String visibility, LocalDate date);
 
     // Find events with t-shirt orders, based on visibility, and starting after a given date
-    List<Event> findByHasTshirtOrderTrueAndVisibilityAndStartDateAfter(String visibility, LocalDate date);
+    List<Event> findByHasMerchandiseTrueAndVisibilityAndStartDateAfter(String visibility, LocalDate date);
 
     // Optionally, find all events that have a t-shirt order regardless of the start date
-    List<Event> findByHasTshirtOrderTrue();
+    List<Event> findByHasMerchandiseTrue();
 
     // Optionally, find events with a specific visibility
     List<Event> findByVisibility(String visibility);
