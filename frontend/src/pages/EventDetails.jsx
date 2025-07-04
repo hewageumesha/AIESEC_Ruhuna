@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Spin, message, Button, Modal, Table } from 'antd';
+import { Spin, message, Modal, Table } from 'antd';
 import axios from 'axios';
-import { motion as Motion } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useSelector } from 'react-redux';
+import { UserPlus, ShoppingCart } from 'lucide-react';
 
+import GoogleMapEmbed from '../components/event/GoogleMapEmbed';
 import EventHeader from '../components/event/EventHeader';
 import EventInfo from '../components/event/EventInfo';
 import EventMeta from '../components/event/EventMeta';
 import MemberRegistrationModal from '../components/event/MemberRegistrationModal';
 import GuestRegistrationModal from '../components/event/GuestRegistrationModal';
 import TShirtOrderForm from '../components/event/TShirtOrderForm';
+
+const AIESEC_BLUE = '#0072C6';
 
 const EventDetails = () => {
   const { id } = useParams();
@@ -118,18 +122,22 @@ const EventDetails = () => {
         endTime={event.endTime}
       />
 
-      <div className="mt-6 flex justify-center gap-4">
-        <Button type="primary" size="large" onClick={openRegistrationModal}>
-          Register Now
-        </Button>
+      <GoogleMapEmbed location={event.location} />
 
-        {event.hasTshirtOrder && (
-          <Button size="large" onClick={openOrderModal} className="bg-blue-600 text-white">
-            Order T-Shirt
-          </Button>
-        )}
+      <div className="mt-6 flex justify-center">
+        <Motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={openRegistrationModal}
+          style={{ backgroundColor: AIESEC_BLUE }}
+          className="text-white px-6 py-2 rounded-full hover:bg-[#005a9e] transition-all shadow-md flex items-center gap-2"
+        >
+          <UserPlus className="w-5 h-5" />
+          Register Now
+        </Motion.button>
       </div>
 
+      {/* Merchandise Section */}
       {merchandise && (
         <div className="mt-10">
           <h3 className="text-black xl font-semibold mb-2">T-Shirt Merchandise</h3>
@@ -143,6 +151,18 @@ const EventDetails = () => {
                 className="w-32 h-32 object-cover rounded shadow"
               />
             ))}
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            <Motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={openOrderModal}
+              className="bg-gray-100 text-gray-800 px-6 py-2 rounded-full hover:bg-gray-200 transition-all shadow-md flex items-center gap-2 border border-gray-300"
+            >
+              <ShoppingCart className="w-5 h-5 text-blue-600" />
+              Order T-Shirt
+            </Motion.button>
           </div>
 
           {orders.length > 0 && (
@@ -169,27 +189,38 @@ const EventDetails = () => {
       )}
 
       {/* Registration Modals */}
-      {isMember ? (
-        <MemberRegistrationModal
-          visible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
-          eventId={event.eventId || id}
-          onRegister={() => {
-            message.success("Registration successful!");
-            setIsModalVisible(false);
-          }}
-        />
-      ) : (
-        <GuestRegistrationModal
-          visible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
-          eventId={event.eventId || id}
-          onRegister={() => {
-            message.success("Guest registration successful!");
-            setIsModalVisible(false);
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {isModalVisible && (
+          <Motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+          >
+            {isMember ? (
+              <MemberRegistrationModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                eventId={event.eventId || id}
+                onRegister={() => {
+                  message.success("Registration successful!");
+                  setIsModalVisible(false);
+                }}
+              />
+            ) : (
+              <GuestRegistrationModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                eventId={event.eventId || id}
+                onRegister={() => {
+                  message.success("Guest registration successful!");
+                  setIsModalVisible(false);
+                }}
+              />
+            )}
+          </Motion.div>
+        )}
+      </AnimatePresence>
 
       <Modal
         title="Order T-Shirt"
