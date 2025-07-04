@@ -17,7 +17,7 @@ public class TShirtOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_iD")
+    @Column(name = "order_id")
     private Long orderId;
 
     @ManyToOne
@@ -35,9 +35,9 @@ public class TShirtOrder {
     @JoinColumn
     private User user;
 
-    //@ManyToOne
-    //@JoinColumn(name = "Guest_ID")
-    //private GuestUser guestUser;
+    @ManyToOne
+    @JoinColumn(name = "Guest_ID")
+    private GuestUser guestUser;
 
 
 }

@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import AddEventForm from './event/AddEventForm';
+import EventFilterForm from './event/EventFilterForm';
 
 const { Meta } = Card;
 
@@ -12,14 +13,28 @@ const DashEvent = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [filters, setFilters] = useState({ search: '', status: '', date: '' });
   const navigate = useNavigate();
 
   const currentUser = useSelector((state) => state.user.currentUser);
 
-  const fetchEvents = async () => {
+  const canEditOrDelete = () => {
+    return currentUser && (currentUser.role === 'LCP' || currentUser.role === 'LCVP');
+  };
+
+  const fetchFilteredEvents = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8080/api/events');
-      setEvents(response.data);
+      const params = {};
+      if (filters.search) params.search = filters.search;
+      if (filters.status) params.status = filters.status;
+      if (filters.date) params.date = filters.date;
+
+      const response = await axios.get('http://localhost:8080/api/events/filter', {
+        params,
+      });
+
+      setEvents(response.data.content); // If it's a paginated response
     } catch (error) {
       console.error('Failed to fetch events:', error);
       message.error('Failed to load events.');
@@ -28,16 +43,10 @@ const DashEvent = () => {
     }
   };
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const handleCardClick = (eventId) => {
-    navigate(`/event/${eventId}`);
-  };
+  const handleCardClick = (eventId) => navigate(`/event/${eventId}`);
 
   const handleEdit = (eventId, e) => {
-    e.stopPropagation(); // Prevent triggering card click
+    e.stopPropagation();
     navigate(`/edit-event/${eventId}`);
   };
 
@@ -46,17 +55,16 @@ const DashEvent = () => {
     try {
       await axios.delete(`http://localhost:8080/api/events/${eventId}`);
       message.success('Event deleted successfully');
-      setEvents((prev) => prev.filter((event) => event.eventId !== eventId));
+      fetchFilteredEvents();
     } catch (error) {
       console.error('Failed to delete event:', error);
       message.error('Failed to delete event');
     }
   };
 
-  // Helper function to check if user can edit/delete
-  const canEditOrDelete = () => {
-    return currentUser && (currentUser.role === 'LCP' || currentUser.role === 'LCVP');
-  };
+  useEffect(() => {
+    fetchFilteredEvents();
+  }, []);
 
   return (
     <div className="p-8 min-h-screen bg-gray-50">
@@ -76,9 +84,12 @@ const DashEvent = () => {
 
       {showAddForm && canEditOrDelete() && (
         <div className="mb-6 border p-4 rounded shadow bg-white">
-          <AddEventForm onEventAdded={fetchEvents} />
+          <AddEventForm onEventAdded={fetchFilteredEvents} />
         </div>
       )}
+
+      {/* 🔍 Filter Form */}
+      <EventFilterForm filters={filters} setFilters={setFilters} onFilter={fetchFilteredEvents} />
 
       {loading ? (
         <div className="flex justify-center items-center min-h-[200px]">

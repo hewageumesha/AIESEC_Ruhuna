@@ -11,8 +11,8 @@ const TshirtSizes = [
   "L",
   "XL",
   "XXL",
-  "XXXL",
-]; // Should match your backend enum values
+ 
+]; 
 
 const TShirtOrderForm = ({
   merchandise,
@@ -26,7 +26,6 @@ const TShirtOrderForm = ({
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
 
-  // You can adjust validation and form layout as needed
   const [form] = Form.useForm();
 
   const handleSubmit = async (values) => {
@@ -46,21 +45,21 @@ const TShirtOrderForm = ({
       merchandiseId: merchandise.merchandiseId,
       quantity: values.quantity,
       size: values.size,
-      id: user ? user.id : null,
-      guestUser: user
-        ? null
-        : {
-            name: guestName,
-            email: guestEmail,
-          },
+      userId: user ? user.id : null,
+      //guestUser: user
+        //? null
+        //: {
+          //  name: guestName,
+          //  email: guestEmail,
+         // },
     };
 
     try {
       await axios.post("http://localhost:8080/api/tshirt-orders", orderPayload);
       message.success("T-Shirt order placed!");
       form.resetFields();
-      setGuestName("");
-      setGuestEmail("");
+      //setGuestName("");
+      //setGuestEmail("");
       if (onOrderSuccess) onOrderSuccess();
     } catch (error) {
       console.error("Failed to place order:", error);
