@@ -228,18 +228,20 @@ export default function DashSidebar() {
             <>
               <Link to='/dashboard?tab=task'>
                 <Sidebar.Item
-                  active={tab === 'task'}
-                  icon={HiNewspaper}
-                  as='div'
-                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  onClick={() => {
-                    setIsCommitteeExpanded(false);
-                    setIsProfileExpanded(false);
-                  }}
+                    active={tab === 'task'}
+                    icon={HiNewspaper}
+                    as='div'
+                    className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    onClick={() => {
+                      navigate(''); // 🚀 DIRECT TO CREATE TASK PAGE
+                      setIsCommitteeExpanded(false);
+                      setIsProfileExpanded(false);
+                    }}
                 >
                   <span className="font-medium">Tasks</span>
                 </Sidebar.Item>
               </Link>
+
             </>
           )}
               <Link to='/dashboard?tab=event'>

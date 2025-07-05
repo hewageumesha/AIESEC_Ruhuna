@@ -38,6 +38,7 @@ function App() {
         <Route path="/become-member" element={<BecomeMember />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/edit-event/:id" element={<EditEvent />} />
+        <Route path="/das" element={<EventDetails />} />
       </Routes>
     <Footer/>
     </BrowserRouter>
