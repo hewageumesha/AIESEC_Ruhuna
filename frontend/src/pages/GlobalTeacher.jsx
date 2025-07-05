@@ -1,10 +1,24 @@
-import React from "react";
+import React ,{ useEffect }from "react";
+import { useLocation } from 'react-router-dom';
+import { scrollToSection } from '../utils/Scroll';
 
 const GlobalTeacher = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === '#hero-section' || location.state?.shouldScroll) {
+      const element = document.getElementById('hero-section');
+      if (element) {
+        window.scrollTo(0, 0);
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [location]);
+
   return (
     <div className="font-sans">
       {/* Full-screen Hero Section */}
-      <section className="relative h-screen w-full overflow-hidden">
+      <section id="hero-section" className="relative h-screen w-full overflow-hidden">
         {/* Background Image with Gradient Overlay */}
         <div className="absolute inset-0">
           <img

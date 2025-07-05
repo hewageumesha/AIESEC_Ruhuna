@@ -3,8 +3,11 @@ import { BsFacebook, BsInstagram, BsYoutube, BsTiktok } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import React from 'react';
 
-
 export default function FooterComponent() {
+    const handleGlobalInternClick = () => {
+    // This will be called when navigating from the same page
+        scrollToSection('hero-section');
+    };
     return (
         <Footer container className='border-t-8 border-t-blue-400 py-4 w-full text-center'>
             <div className='w-full max-w-7xl mx-auto'>
@@ -18,15 +21,15 @@ export default function FooterComponent() {
                         <div>
                             <Footer.Title title=" " />
                             <Footer.LinkGroup col>
-                                <Footer.Link> <Link to="global-intern">Global Talent</Link></Footer.Link>
-                                <Footer.Link> <Link to="global-teacher">Global Teacher</Link></Footer.Link>
-                                <Footer.Link> <Link to="global-volunteer">Global Volunteer</Link></Footer.Link>
+                                <Footer.Link> <Link to="global-intern#hero-section" onClick={handleGlobalInternClick} state={{ shouldScroll: true }} >Global Talent</Link></Footer.Link>
+                                <Footer.Link> <Link to="global-teacher#hero-section" onClick={handleGlobalInternClick} state={{ shouldScroll: true }}>Global Teacher</Link></Footer.Link>
+                                <Footer.Link> <Link to="global-volunteer#hero-section" onClick={handleGlobalInternClick} state={{ shouldScroll: true }}>Global Volunteer</Link></Footer.Link>
                             </Footer.LinkGroup>
                         </div>
                         <div>
                             <Footer.Title title=" " />
                             <Footer.LinkGroup col>
-                                <Footer.Link> <Link to="about"> About us </Link></Footer.Link>
+                                <Footer.Link> <Link to="about#hero-section" onClick={handleGlobalInternClick} state={{ shouldScroll: true }}> About us </Link></Footer.Link>
                                 <Footer.Link href='https://blog.aiesec.org/category/press/'>Press</Footer.Link>
                                 <Footer.Link href="https://aiesec-alumni.org/">Alumni</Footer.Link>
                             </Footer.LinkGroup>
@@ -34,7 +37,7 @@ export default function FooterComponent() {
                         <div>
                             <Footer.Title title=" " />
                             <Footer.LinkGroup col>
-                                <Footer.Link> <Link to="contact">Contact us </Link> </Footer.Link>
+                                <Footer.Link> <Link to="contact#hero-section" onClick={handleGlobalInternClick} state={{ shouldScroll: true }}>Contact us </Link> </Footer.Link>
                                 <Footer.Link >Partner with us</Footer.Link>
                             </Footer.LinkGroup>
                         </div> 
