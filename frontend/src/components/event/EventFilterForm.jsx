@@ -1,170 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Spin, Button, message, Tag, Popconfirm } from 'antd';
-import { PlusOutlined, CloseOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import AddEventForm from './AddEventForm';
-import EventFilterForm from './EventFilterForm';
 
-const { Meta } = Card;
+import React from 'react';
+import { Input, Select, DatePicker, Button } from 'antd';
+import dayjs from 'dayjs';
 
-const DashEvent = () => {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [filters, setFilters] = useState({ search: '', status: '', date: '' });
-  const navigate = useNavigate();
+const { Option } = Select;
 
-  const currentUser = useSelector((state) => state.user.currentUser);
-
-  const canEditOrDelete = () => {
-    return currentUser && (currentUser.role === 'LCP' || currentUser.role === 'LCVP');
-  };
-
-  const fetchFilteredEvents = async () => {
-    setLoading(true);
-    try {
-      const params = {};
-      if (filters.search) params.search = filters.search;
-      if (filters.status) params.status = filters.status;
-      if (filters.date) params.date = filters.date;
-
-      const response = await axios.get('http://localhost:8080/api/events/filter', { params });
-      setEvents(response.data.content);
-    } catch (error) {
-      console.error('Failed to fetch events:', error);
-      message.error('Failed to load events.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCardClick = (eventId) => navigate(`/event/${eventId}`);
-  const handleEdit = (eventId, e) => {
-    e.stopPropagation();
-    navigate(`/edit-event/${eventId}`);
-  };
-
-  const handleDelete = async (eventId, e) => {
-    e.stopPropagation();
-    try {
-      await axios.delete(`http://localhost:8080/api/events/${eventId}`);
-      message.success('Event deleted successfully');
-      fetchFilteredEvents();
-    } catch (error) {
-      console.error('Failed to delete event:', error);
-      message.error('Failed to delete event');
-    }
-  };
-
-  useEffect(() => {
-    fetchFilteredEvents();
-  }, []);
-
+const EventFilterForm = ({ filters, setFilters, onFilter }) => {
   return (
-    <div className="p-8 min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Event Management</h2>
-        {canEditOrDelete() && (
-          <Button
-            type="primary"
-            icon={showAddForm ? <CloseOutlined /> : <PlusOutlined />}
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-          >
-            {showAddForm ? 'Close Form' : 'Add Event'}
-          </Button>
-        )}
-      </div>
+    <div className="flex flex-wrap gap-4 items-end mb-4">
+      <Input
+        placeholder="Search by event name"
+        value={filters.search}
+        onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+      />
 
-      {showAddForm && canEditOrDelete() && (
-        <div className="mb-6 border p-4 rounded shadow bg-white dark:bg-gray-800 dark:border-gray-700">
-          <AddEventForm onEventAdded={fetchFilteredEvents} />
-        </div>
-      )}
+      <Select
+        value={filters.status}
+        onChange={(value) => setFilters({ ...filters, status: value })}
+        placeholder="Select status"
+        style={{ width: 150 }}
+        allowClear
+      >
+        <Option value="upcoming">Upcoming</Option>
+        <Option value="past">Past</Option>
+        <Option value="public">Public</Option>
+        <Option value="private">Private</Option>
+      </Select>
 
-      <EventFilterForm filters={filters} setFilters={setFilters} onFilter={fetchFilteredEvents} />
+      <DatePicker
+        value={filters.date ? dayjs(filters.date) : null}
+        onChange={(date) =>
+          setFilters({ ...filters, date: date ? date.format('YYYY-MM-DD') : '' })
+        }
+        placeholder="Select date"
+      />
 
-      {loading ? (
-        <div className="flex justify-center items-center min-h-[200px]">
-          <Spin size="large" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {events.map((event) => (
-            <Card
-              key={event.eventId}
-              hoverable
-              onClick={() => handleCardClick(event.eventId)}
-              className="relative group transition-transform transform hover:scale-105 shadow-md hover:shadow-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 cursor-pointer"
-              cover={
-                <img
-                  alt={event.eventName}
-                  src={event.imageUrl || '/default-event.jpg'}
-                  onError={(e) => (e.target.src = '/default-event.jpg')}
-                  className="h-48 object-cover rounded-t"
-                />
-              }
-            >
-              {event.eventType && (
-                <Tag color="blue" className="absolute top-2 right-2 z-10">
-                  {event.eventType}
-                </Tag>
-              )}
-
-              {canEditOrDelete() && (
-                <div className="absolute top-2 left-2 z-10 hidden group-hover:flex gap-2">
-                  <Button
-                    icon={<EditOutlined />}
-                    size="small"
-                    onClick={(e) => handleEdit(event.eventId, e)}
-                  />
-                  <Popconfirm
-                    title="Are you sure you want to delete this event?"
-                    onConfirm={(e) => handleDelete(event.eventId, e)}
-                    okText="Yes"
-                    cancelText="No"
-                    onCancel={(e) => e.stopPropagation()}
-                  >
-                    <Button
-                      icon={<DeleteOutlined />}
-                      size="small"
-                      danger
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  </Popconfirm>
-                </div>
-              )}
-
-              <Meta
-                title={
-                  <span className="font-semibold text-lg text-gray-800 dark:text-white">
-                    {event.eventName}
-                  </span>
-                }
-                description={
-                  <div className="text-gray-600 dark:text-gray-300 mt-2 space-y-1 text-sm">
-                    <p>
-                      <strong>Date:</strong> {event.startDate} to {event.endDate}
-                    </p>
-                    <p>
-                      <strong>Time:</strong> {event.eventTime} - {event.endTime}
-                    </p>
-                    {event.totalRegistrations !== undefined && (
-                      <p className="text-green-600 font-medium">
-                        {event.totalRegistrations} registered
-                      </p>
-                    )}
-                  </div>
-                }
-              />
-            </Card>
-          ))}
-        </div>
-      )}
+      <Button type="primary" onClick={onFilter}>
+        Filter
+      </Button>
     </div>
   );
 };
 
-export default DashEvent;
+export default EventFilterForm;
