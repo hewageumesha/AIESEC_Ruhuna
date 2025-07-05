@@ -19,7 +19,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findByStartDateAfter(LocalDate date);
 
     // Find public events that start after a given date
-    List<Event> findByIsPublicTrueAndStartDateAfter(LocalDate date);
+    List<Event> findByIsPublicTrueAndStartDateGreaterThanEqual(LocalDate date);
 
     //Event search feature
     @Query("SELECT e FROM Event e " +

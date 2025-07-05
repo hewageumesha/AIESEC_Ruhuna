@@ -122,7 +122,7 @@ public class EventServiceimpl implements EventService {
     @Override
     public List<EventDTO> getPublicUpcomingEvents() {
         LocalDate now = LocalDate.now();
-        return eventRepository.findByIsPublicTrueAndStartDateAfter(now)
+        return eventRepository.findByIsPublicTrueAndStartDateGreaterThanEqual(now)
                 .stream()
                 .map(EventMapper::toDTO)
                 .collect(Collectors.toList());

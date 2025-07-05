@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Spin, message, Modal, Table } from 'antd';
 import axios from 'axios';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
@@ -18,6 +18,7 @@ const AIESEC_BLUE = '#0072C6';
 
 const EventDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { currentUser, loading: userLoading } = useSelector((state) => state.user);
 
   const [event, setEvent] = useState(null);
@@ -34,10 +35,18 @@ const EventDetails = () => {
       setLoading(true);
       try {
         const res = await axios.get(`http://localhost:8080/api/events/${id}`);
-        setEvent(res.data);
+        const eventData = res.data;
 
-        // ✅ Corrected condition: check for hasMerchandise
-        if (res.data.hasMerchandise) {
+        // ⛔ Prevent guests from accessing private events
+        if (!eventData.isPublic && !currentUser) {
+          message.error("This is a private event. Please log in as an AIESEC member.");
+          navigate('/login');
+          return;
+        }
+
+        setEvent(eventData);
+
+        if (eventData.hasMerchandise) {
           const merchRes = await axios.get(`http://localhost:8080/api/merchandise/event/${id}`);
           setMerchandise(merchRes.data);
 
@@ -54,14 +63,10 @@ const EventDetails = () => {
     };
 
     if (id) fetchEvent();
-  }, [id]);
+  }, [id, currentUser, navigate]);
 
   const openRegistrationModal = () => {
     if (!event) return;
-    if (!event.isPublic && !currentUser) {
-      message.error("This is a private event. Please log in to register.");
-      return;
-    }
     setIsModalVisible(true);
   };
 
@@ -138,7 +143,6 @@ const EventDetails = () => {
         </Motion.button>
       </div>
 
-      {/* ✅ Merchandise Section */}
       {merchandise && (
         <div className="mt-10">
           <h3 className="text-black xl font-semibold mb-2">Official Merchandise</h3>
