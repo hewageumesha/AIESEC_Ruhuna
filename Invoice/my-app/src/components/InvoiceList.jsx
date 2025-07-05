@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Button } from '../components/ui/button';
+import { Button } from './ui/button';
 
 const InvoiceList = () => {
     const [invoices, setInvoices] = useState([]);

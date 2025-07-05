@@ -25,9 +25,28 @@ public class InvoiceController {
     private PdfGenerator pdfGenerator;
 
     @PostMapping
-    public ResponseEntity<Invoice> createInvoice(@RequestBody Invoice invoice) {
-        Invoice saved = invoiceService.saveInvoice(invoice);
-        return ResponseEntity.ok(saved);
+    public ResponseEntity<?> createInvoice(@RequestBody Invoice invoice) {
+        try {
+            Invoice saved = invoiceService.saveInvoice(invoice);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            e.printStackTrace();  // Log full error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to save invoice: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateInvoice(@PathVariable Long id, @RequestBody Invoice invoice) {
+        try {
+            invoice.setId(id);
+            Invoice updated = invoiceService.saveInvoice(invoice);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            e.printStackTrace();  // Log full error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update invoice: " + e.getMessage());
+        }
     }
 
     @GetMapping
