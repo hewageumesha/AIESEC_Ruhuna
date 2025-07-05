@@ -1,17 +1,10 @@
 package com.aiesec.service;
 
-import com.aiesec.dto.UserDTO;
-import com.aiesec.dto.UserHierarchyDTO;
 import com.aiesec.enums.UserRole;
 import com.aiesec.model.User;
-import com.aiesec.repository.DepartmentRepo;
 import com.aiesec.repository.UserRepository;
 
-import io.jsonwebtoken.lang.Collections;
-import jakarta.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -213,7 +206,7 @@ public class UserService {
         return hierarchyList;
     }
 
-    private List<User> findChildren(List<User> allUsers, Long parentId, UserRole role) {
+    private List<User> findChildren(List<User> allUsers, Integer parentId, UserRole role) {
         return allUsers.stream()
                 .filter(u -> u.getTeamLeaderId() != null)
                 .filter(u -> u.getTeamLeaderId().equals(parentId.toString()))

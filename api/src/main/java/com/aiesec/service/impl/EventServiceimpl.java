@@ -1,16 +1,12 @@
 package com.aiesec.service.impl;
 
 import com.aiesec.dto.EventDTO;
-import com.aiesec.mapper.EventMapper;
 import com.aiesec.model.event.Event;
+import com.aiesec.mapper.EventMapper;
 import com.aiesec.repository.event.EventRepository;
-import com.aiesec.repository.event.MerchandiseRepository;
 import com.aiesec.service.interfaces.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,32 +17,32 @@ import java.util.stream.Collectors;
 public class EventServiceimpl implements EventService {
 
     private final EventRepository eventRepository;
-    private final MerchandiseRepository merchandiseRepository;
 
     @Autowired
-    public EventServiceimpl(EventRepository eventRepository, MerchandiseRepository merchandiseRepository) {
+    public EventServiceimpl(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
-        this.merchandiseRepository = merchandiseRepository;
     }
-
     @Override
     public EventDTO createEvent(EventDTO eventDTO) {
         Event event = EventMapper.toEntity(eventDTO);
 
+        // Handle null value for hasTshirtOrder (if EventDTO uses Boolean)
         if (eventDTO.getHasTshirtOrder() == null) {
-            event.setHasTshirtOrder(false);
+            event.setHasTshirtOrder(false); // default to false
         } else {
             event.setHasTshirtOrder(eventDTO.getHasTshirtOrder());
         }
 
+        // Handle null or empty visibility
         if (eventDTO.getVisibility() == null || eventDTO.getVisibility().isEmpty()) {
-            event.setVisibility("Private");
+            event.setVisibility("Private"); // default visibility
         } else {
             event.setVisibility(eventDTO.getVisibility());
         }
 
         return EventMapper.toDTO(eventRepository.save(event));
     }
+
 
     @Override
     public EventDTO updateEvent(Long eventId, EventDTO updatedEvent) {
@@ -86,12 +82,7 @@ public class EventServiceimpl implements EventService {
     }
 
     @Override
-    @Transactional
     public void deleteEvent(Long eventId) {
-        // First delete merchandise related to this event
-        merchandiseRepository.deleteByEventEventId(eventId);
-
-        // Then delete the event
         eventRepository.deleteById(eventId);
     }
 
@@ -112,7 +103,6 @@ public class EventServiceimpl implements EventService {
                 .map(EventMapper::toDTO)
                 .collect(Collectors.toList());
     }
-
     @Override
     public void updateTshirtOrder(Long eventId, Boolean hasTshirtOrder) {
         Optional<Event> optionalEvent = eventRepository.findById(eventId);
@@ -137,10 +127,11 @@ public class EventServiceimpl implements EventService {
         }
     }
 
-    @Override
-    public Page<EventDTO> filterEvents(String search, String status, String dateStr, Pageable pageable) {
-        LocalDate date = (dateStr != null && !dateStr.isEmpty()) ? LocalDate.parse(dateStr) : null;
-        Page<Event> events = eventRepository.filterEvents(search, status, date, pageable);
-        return events.map(EventMapper::toDTO);
-    }
+
+
+    //@Override
+    //public List<EventDTO> getEventsByGroup(String groupName) {
+        //return List.of(); // Dummy return for now
+    //}
 }
+

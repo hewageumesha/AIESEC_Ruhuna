@@ -69,5 +69,5 @@ public class Comment {
         this.createdAt = createdAt;
     }
 
-    
+
 }

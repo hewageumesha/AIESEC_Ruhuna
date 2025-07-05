@@ -9,8 +9,6 @@ import java.util.Optional;
 
 public interface MerchandiseRepository extends JpaRepository<Merchandise, Long> {
     Optional<Merchandise> findByEventEventId(Long eventId);
-    void deleteByEventEventId(Long eventId);
-
 
 }
 

@@ -4,8 +4,6 @@ package com.aiesec.controller.event;
 import com.aiesec.dto.EventDTO;
 import com.aiesec.service.interfaces.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,18 +66,4 @@ public class EventController {
         eventService.deleteEvent(eventId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
-    //Search filter
-    @GetMapping("/filter")
-    public ResponseEntity<Page<EventDTO>> filterEvents(
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String date,
-            Pageable pageable) {
-
-        Page<EventDTO> results = eventService.filterEvents(search, status, date, pageable);
-        return ResponseEntity.ok(results);
-    }
-
-
 }
