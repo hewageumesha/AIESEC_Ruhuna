@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.aiesec.dto.CommentDTO;
+import com.aiesec.enums.UserRole;
 import com.aiesec.model.Comment;
 import com.aiesec.model.User;
 import com.aiesec.service.CommentService;

@@ -2,10 +2,8 @@ package com.aiesec.controller;
 import com.aiesec.dto.CommentDTO;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
-
 import com.aiesec.enums.UserRole;
 import com.aiesec.model.User;
-
 import com.aiesec.repository.UserRepository;
 import com.aiesec.security.UserDetailsImpl;
 import com.aiesec.service.CommentService;

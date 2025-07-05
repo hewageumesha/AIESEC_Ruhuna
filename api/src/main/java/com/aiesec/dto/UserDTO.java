@@ -10,6 +10,7 @@ import com.aiesec.enums.UserStatus;
 import com.aiesec.model.Department;
 import com.aiesec.model.Function;
 
+
 public class UserDTO {
     private Long id;
     private String firstName;

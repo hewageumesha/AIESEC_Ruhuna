@@ -1,9 +1,7 @@
 package com.aiesec.dto;
 
 import com.aiesec.enums.UserRole;
-
 import java.util.List;
-
 
 public class UserHierarchyDTO {
     private Long id;
