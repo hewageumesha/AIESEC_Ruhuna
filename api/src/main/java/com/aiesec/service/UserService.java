@@ -36,7 +36,7 @@ public class UserService {
     public User updateUser(String aiesecEmail, User userDetails) {
         User user = userRepository.findByAiesecEmail(aiesecEmail)
             .orElseThrow(() -> new RuntimeException("User not found with email: " + aiesecEmail));
-        user.setFirstName(userDetails.getFirstName());
+        user.setUserName(userDetails.getUserName());
         user.setLastName(userDetails.getLastName());
         return userRepository.save(user);
     }
@@ -93,7 +93,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         //Update allowed fields
-        if (userDetails.getFirstName() != null) {
+        if (userDetails.getUserName() != null) {
             user.setAiesecEmail(userDetails.getAiesecEmail());
         }
         if (userDetails.getLastName() != null) {
@@ -151,7 +151,7 @@ public class UserService {
             // LCP section
             Map<String, Object> lcpDetails = new LinkedHashMap<>();
             lcpDetails.put("id", lcp.getId().toString());
-            lcpDetails.put("name", lcp.getFirstName() + " " + lcp.getLastName());
+            lcpDetails.put("name", lcp.getUserName() + " " + lcp.getLastName());
             lcpDetails.put("role", "lcp");
             lcpDetails.put("image", lcp.getProfilePicture());
             lcpDetails.put("email", lcp.getAiesecEmail());
@@ -163,7 +163,7 @@ public class UserService {
             for (User lcvp : findChildren(userList, lcp.getId(), UserRole.LCVP)) {
                 Map<String, Object> lcvpMap = new LinkedHashMap<>();
                 lcvpMap.put("id", lcvp.getId().toString());
-                lcvpMap.put("name", lcvp.getFirstName() + " " + lcvp.getLastName());
+                lcvpMap.put("name", lcvp.getUserName() + " " + lcvp.getLastName());
                 lcvpMap.put("role", "lcvp");
                 lcvpMap.put("image", lcvp.getProfilePicture());
                 lcvpMap.put("email", lcvp.getAiesecEmail());
@@ -174,7 +174,7 @@ public class UserService {
                 for (User tl : findChildren(userList, lcvp.getId(), UserRole.Team_Leader)) {
                     Map<String, Object> tlMap = new LinkedHashMap<>();
                     tlMap.put("id", tl.getId().toString());
-                    tlMap.put("name", tl.getFirstName() + " " + tl.getLastName());
+                    tlMap.put("name", tl.getUserName() + " " + tl.getLastName());
                     tlMap.put("role", "team_leader");
                     tlMap.put("image", tl.getProfilePicture());
                     tlMap.put("email", tl.getAiesecEmail());
@@ -184,7 +184,7 @@ public class UserService {
                     for (User member : findChildren(userList, tl.getId(), UserRole.Member)) {
                         Map<String, Object> memberMap = new LinkedHashMap<>();
                         memberMap.put("id", member.getId().toString());
-                        memberMap.put("name", member.getFirstName() + " " + member.getLastName());
+                        memberMap.put("name", member.getUserName() + " " + member.getLastName());
                         memberMap.put("role", "member");
                         memberMap.put("image", member.getProfilePicture());
                         memberMap.put("email", member.getAiesecEmail());

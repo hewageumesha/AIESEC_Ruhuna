@@ -12,7 +12,7 @@ import com.aiesec.model.Function;
 
 public class UserDTO {
     private Long id;
-    private String firstName;
+    private String userName;
     private String lastName;
     private String aiesecEmail;  // Add this field
     private String email;
@@ -46,12 +46,12 @@ public class UserDTO {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getLastName() {
