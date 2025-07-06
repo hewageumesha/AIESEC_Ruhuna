@@ -40,15 +40,16 @@ public class EventServiceimpl implements EventService {
             event.setHasMerchandise(eventDTO.getHasMerchandise());
         }
 
-        if (eventDTO.getVisibility() == null || eventDTO.getVisibility().isEmpty()) {
-            event.setVisibility("Private");
+        // Use Boolean isPublic instead of String visibility
+        if (eventDTO.getIsPublic() == null) {
+            event.setIsPublic(false); // Default to private
         } else {
-            event.setVisibility(eventDTO.getVisibility());
+            event.setIsPublic(eventDTO.getIsPublic());
         }
 
-        return EventMapper.toDTO(eventRepository.save(event));
+        Event savedEvent = eventRepository.save(event);
+        return EventMapper.toDTO(savedEvent);
     }
-
     @Override
     public EventDTO updateEvent(Long eventId, EventDTO updatedEvent) {
         Optional<Event> existing = eventRepository.findById(eventId);
@@ -126,6 +127,32 @@ public class EventServiceimpl implements EventService {
                 .collect(Collectors.toList());
     }
 
+
+    @Override
+    public List<EventDTO> getPrivateUpcomingEvents() {
+        LocalDate now = LocalDate.now();
+        return eventRepository.findByIsPublicFalseAndStartDateGreaterThanEqual(now)
+                .stream()
+                .map(EventMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EventDTO> getAllPublicEvents() {
+        return eventRepository.findByIsPublicTrue()
+                .stream()
+                .map(EventMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EventDTO> getAllPrivateEvents() {
+        return eventRepository.findByIsPublicFalse()
+                .stream()
+                .map(EventMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
     @Override
     public void updateTshirtOrder(Long eventId, Boolean hasTshirtOrder) {
         Optional<Event> optionalEvent = eventRepository.findById(eventId);
@@ -138,17 +165,7 @@ public class EventServiceimpl implements EventService {
         }
     }
 
-    @Override
-    public void updateEventVisibility(Long eventId, String visibility) {
-        Optional<Event> optionalEvent = eventRepository.findById(eventId);
-        if (optionalEvent.isPresent()) {
-            Event event = optionalEvent.get();
-            event.setVisibility(visibility != null && !visibility.isEmpty() ? visibility : "Private");
-            eventRepository.save(event);
-        } else {
-            throw new RuntimeException("Event not found with ID: " + eventId);
-        }
-    }
+
 
     @Override
     public Page<EventDTO> filterEvents(String search, String status, String dateStr, Pageable pageable) {
