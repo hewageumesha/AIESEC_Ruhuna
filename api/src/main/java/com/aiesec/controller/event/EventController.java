@@ -83,7 +83,7 @@ public class EventController {
 
 
     @GetMapping("/public")
-    public ResponseEntity<List<EventDTO>> getPublicEvents() {
+    public ResponseEntity<List<EventDTO>> getPublicUpcomingEvents() {
         List<EventDTO> publicEvents = eventService.getPublicUpcomingEvents();
         return new ResponseEntity<>(publicEvents, HttpStatus.OK);
     }
