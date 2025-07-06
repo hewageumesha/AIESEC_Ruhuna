@@ -66,8 +66,6 @@ public class EventServiceimpl implements EventService {
             event.setIsVirtual(updatedEvent.getIsVirtual());
             event.setVirtualLink(updatedEvent.getVirtualLink());
             event.setHasMerchandise(updatedEvent.getHasMerchandise());
-            event.setHasMerchandise(updatedEvent.getHasMerchandise());
-
 
             return EventMapper.toDTO(eventRepository.save(event));
         }
