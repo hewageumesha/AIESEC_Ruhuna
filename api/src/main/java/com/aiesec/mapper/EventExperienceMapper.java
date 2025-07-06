@@ -2,10 +2,10 @@ package com.aiesec.mapper;
 
 
 import com.aiesec.dto.EventExperienceDTO; 
-import com.aiesec.model.event.Event; 
-import com.aiesec.model.event.GuestUser; 
+import com.aiesec.model.event.Event;
 import com.aiesec.model.User;
 import com.aiesec.model.event.EventExperience;
+import com.aiesec.model.event.GuestEventRegistration;
 
 public class EventExperienceMapper {
 
@@ -39,7 +39,7 @@ public class EventExperienceMapper {
 
         // Set GuestUser
         if (dto.getGuestUserId() != null) {
-            GuestUser guestUser = new GuestUser();
+            GuestEventRegistration guestUser = new GuestEventRegistration();
             guestUser.setGuestUserId(dto.getGuestUserId());
             experience.setGuestUser(guestUser);
         }

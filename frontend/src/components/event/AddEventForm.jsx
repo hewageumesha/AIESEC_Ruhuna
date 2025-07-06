@@ -110,7 +110,7 @@ const AddEventForm = () => {
         imageUrl: eventImageUrl,
         isPublic: values.visibility === 'public',
         isVirtual: eventType === 'virtual',
-        location: eventType === 'virtual' ? values.location : values.location,
+        location: eventType === 'virtual' ? '' : values.location,
         virtualLink: eventType === 'virtual' ? values.location : '',
         hasTshirtOrder: tshirtAvailable,
    

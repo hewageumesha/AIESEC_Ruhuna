@@ -17,7 +17,7 @@ import React from 'react';
 import Contact from './pages/Contact';
 import EventDetails from "./pages/EventDetails";
 import EditEvent from "./components/event/EditEvent";
-
+import PublicEventsPage from "./pages/PublicEvents";
 function App() {
   return (
     <BrowserRouter>
@@ -38,6 +38,8 @@ function App() {
         <Route path="/become-member" element={<BecomeMember />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/edit-event/:id" element={<EditEvent />} />
+        <Route path="/public-events" element={<PublicEventsPage />} />
+
       </Routes>
     <Footer/>
     </BrowserRouter>
