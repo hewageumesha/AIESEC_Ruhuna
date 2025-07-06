@@ -150,9 +150,9 @@ const HISTORY_TIMELINE = [
       "- Realizations: 43 iGV, 2 iGTe, 5 iGTa, 4 iGT, and 1 oGTa",
       "- Hosted flagship events like Youth Space 3.0, Odyssey 3.0, and South Fest as our annual awurudu celebration",
       "We also received multiple national recognitions:",
-      "- Activating Leadership – iGV Board (NLDS 2023)",
+      "- Activating Leadership - iGV Board (NLDS 2023)",
       "- Activating Leadership incoming Global Talent Award(NetCon 2023)",
-      "- Activating Leadership incoming Global Teacher – Nominee (NetCon 2023)"
+      "- Activating Leadership incoming Global Teacher - Nominee (NetCon 2023)"
     ],
     image: "/history/2025.webp"
   }
@@ -292,11 +292,17 @@ const TimelineItem = ({ year, title, description, image }) => (
           <div className="md:w-2/3">
             <h2 className="text-2xl font-bold mb-4 dark:text-white">{title}</h2>
             {Array.isArray(description) ? (
-              <ul className="list-disc pl-6 mb-4 text-gray-600 dark:text-gray-300">
+              <div className="text-gray-600 dark:text-gray-300">
                 {description.map((item, i) => (
-                  <li key={i}>{item}</li>
+                  item.startsWith("- ") ? (
+                    <ul className="list-disc pl-6 mb-4">
+                      <li key={i}>{item.substring(2)}</li>
+                    </ul>
+                  ) : (
+                    <p key={i} className="mb-4">{item}</p>
+                  )
                 ))}
-              </ul>
+              </div>
             ) : (
               <p className="text-gray-600 dark:text-gray-300">{description}</p>
             )}

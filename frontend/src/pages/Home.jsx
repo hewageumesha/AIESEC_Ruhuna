@@ -109,6 +109,73 @@ export default function Home() {
     { id: 15, logo: "/logos/Electrolux Professional Group.png", alt: "Electrolux Professional Group" },
   ];
 
+  const [countdown, setCountdown] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    isOpen: false
+  });
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      
+      // Set intake period (July 1 to August 1)
+      let intakeStart = new Date(currentYear, 6, 1); // July is month 6 (0-indexed)
+      let intakeEnd = new Date(currentYear, 7, 1); // August is month 7
+      
+      // If we're past this year's intake, set for next year
+      if (now > intakeEnd) {
+        intakeStart = new Date(currentYear + 1, 6, 1);
+        intakeEnd = new Date(currentYear + 1, 7, 1);
+      }
+
+      const isIntakeOpen = now >= intakeStart && now <= intakeEnd;
+      
+      if (isIntakeOpen) {
+        // Calculate time until intake closes
+        const diff = intakeEnd - now;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        setCountdown({
+          days,
+          hours,
+          minutes,
+          seconds,
+          isOpen: true
+        });
+      } else {
+        // Calculate time until next intake opens
+        const diff = intakeStart - now;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        setCountdown({
+          days,
+          hours,
+          minutes,
+          seconds,
+          isOpen: false
+        });
+      }
+    };
+
+    // Update immediately
+    updateCountdown();
+    
+    // Update every second
+    const interval = setInterval(updateCountdown, 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div>
       {/* Photo Slider */}
@@ -201,13 +268,44 @@ export default function Home() {
                 Join one of our local chapters and develop yourself through practical experiences in the world's largest youth-led organization.
               </p>
               
-              {/* "Become a member" Button */}
-              <Link 
-                to="/become-member" 
-                className="inline-block px-8 py-3 bg-[#037EF3] text-white rounded-lg hover:bg-[#0366d6] transition-colors text-lg font-medium"
-              >
-                Become a member
-              </Link>
+              {/* Become a member */}
+              <div className="w-full max-w-md mx-auto p-6 rounded-xl shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-xl font-bold text-center mb-4 text-gray-800 dark:text-white">
+                  {countdown.isOpen ? '🎉 Membership Intake Open!' : '⏳ Next Intake Countdown'}
+                </h3>
+                
+                <div className="flex justify-center gap-2 mb-4">
+                  {/* Days */}
+                  <div className="flex flex-col items-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg min-w-[70px]">
+                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-200">{countdown.days}</span>
+                    <span className="text-xs text-blue-500 dark:text-blue-300">DAYS</span>
+                  </div>
+                  
+                  {/* Hours */}
+                  <div className="flex flex-col items-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg min-w-[70px]">
+                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-200">{countdown.hours}</span>
+                    <span className="text-xs text-blue-500 dark:text-blue-300">HOURS</span>
+                  </div>
+                  
+                  {/* Minutes */}
+                  <div className="flex flex-col items-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg min-w-[70px]">
+                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-200">{countdown.minutes}</span>
+                    <span className="text-xs text-blue-500 dark:text-blue-300">MINUTES</span>
+                  </div>
+                  
+                  {/* Seconds */}
+                  <div className="flex flex-col items-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg min-w-[70px]">
+                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-200">{countdown.seconds}</span>
+                    <span className="text-xs text-blue-500 dark:text-blue-300">SECONDS</span>
+                  </div>
+                </div>
+                
+                <p className="text-center text-sm text-gray-600 dark:text-gray-300">
+                  {countdown.isOpen 
+                    ? 'Applications close on August 1st - Apply now!'
+                    : 'Next application window opens July 1st'}
+                </p>
+              </div>
             </div>
           </div>
       </section>

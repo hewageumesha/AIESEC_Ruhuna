@@ -38,7 +38,7 @@ export default function FooterComponent() {
                             <Footer.Title title=" " />
                             <Footer.LinkGroup col>
                                 <Footer.Link> <Link to="contact#hero-section" onClick={handleGlobalInternClick} state={{ shouldScroll: true }}>Contact us </Link> </Footer.Link>
-                                <Footer.Link >Partner with us</Footer.Link>
+                                <Footer.Link> <Link to="partner#hero-section" onClick={handleGlobalInternClick} state={{ shouldScroll: true }}>Partner with us </Link> </Footer.Link>
                             </Footer.LinkGroup>
                         </div> 
                     </div>      
