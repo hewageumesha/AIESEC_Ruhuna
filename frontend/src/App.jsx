@@ -22,6 +22,7 @@ import TaskList from "./components/Task/TaskList.jsx";
 import AssignedTasks from "./components/Task/AssignedTasks.jsx";
 import UserProgressPage from "./components/Task/UserProgressPage.jsx";
 import CreateTask from "./components/Task/CreateTask.jsx";
+import TaskUpdate from "./components/Task/TaskUpdate.jsx";
 
 function App() {
   console.log("👀 current user from localStorage:", JSON.parse(localStorage.getItem("user")));
@@ -52,6 +53,7 @@ function App() {
         <Route path="/assigned-tasks" element={<AssignedTasks/>}/>
         <Route path="/user/:id/progress" element={<UserProgressPage />} />
         <Route path="/user/:id/CreateTask" element={<CreateTask/>}/>
+        <Route path="/users/:id/tasks/:taskId/edit" element={<TaskUpdate/>}/>
 
         {/* LCP dashboard */}
         <Route path="/user/:id/TaskDashboard" element={<TaskDashboard />} />
