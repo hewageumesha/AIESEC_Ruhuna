@@ -38,7 +38,7 @@ const TaskDashboard = () => {
 
     // 🔹 Navigation Handlers
     const handleShowAllTasks = () => {
-        navigate(`/user/${id}/TaskList`);
+        navigate(`/assigned-tasks`);
     };
 
     const handleCreateTask = () => {
@@ -55,7 +55,7 @@ const TaskDashboard = () => {
                 <ul className="space-y-4">
                     <li>
                         <button
-                            onClick={() => navigate(`/user/${id}`)}
+                            onClick={() => navigate(`/dashboard`)}
                             className="w-full text-left px-4 py-2 rounded hover:bg-blue-700"
                         >
                             Dashboard

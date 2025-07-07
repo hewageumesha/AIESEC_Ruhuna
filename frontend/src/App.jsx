@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {BrowserRouter, Routes, Route, useParams} from "react-router-dom";
 import SignIn from "./pages/SignIn"
 import ForgetPassword from "./pages/ForgetPassword";
 import ChangePassword from "./pages/ChangePassword";
@@ -23,6 +23,14 @@ import AssignedTasks from "./components/Task/AssignedTasks.jsx";
 import UserProgressPage from "./components/Task/UserProgressPage.jsx";
 import CreateTask from "./components/Task/CreateTask.jsx";
 import TaskUpdate from "./components/Task/TaskUpdate.jsx";
+import Notifications from "./components/Task/Notifications.jsx";
+
+const NotificationsWrapper = () => {
+  const { id } = useParams();
+  console.log("🚀 Extracted ID from URL:", id);
+  if (!id) return <div>User ID missing</div>;
+  return <Notifications id={id}></Notifications>;
+};
 
 function App() {
   console.log("👀 current user from localStorage:", JSON.parse(localStorage.getItem("user")));
@@ -54,6 +62,7 @@ function App() {
         <Route path="/user/:id/progress" element={<UserProgressPage />} />
         <Route path="/user/:id/CreateTask" element={<CreateTask/>}/>
         <Route path="/users/:id/tasks/:taskId/edit" element={<TaskUpdate/>}/>
+        <Route path="/user/:id/notifications" element={<NotificationsWrapper />} />
 
         {/* LCP dashboard */}
         <Route path="/user/:id/TaskDashboard" element={<TaskDashboard />} />
