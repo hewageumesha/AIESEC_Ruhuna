@@ -2,6 +2,7 @@ package com.aiesec.service.impl;
 
 import com.aiesec.dto.TaskDto;
 import com.aiesec.dto.UserProgressDto;
+import com.aiesec.enums.UserRole;
 import com.aiesec.exception.ResourcesNotFoundException;
 import com.aiesec.model.Task;
 import com.aiesec.model.TaskProof;
@@ -21,6 +22,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.aiesec.enums.UserRole.Member;
+
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -37,33 +40,50 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskDto createTask(TaskDto taskDto, Integer id) {
-
-        User creator = this.userRepo.findById(Long.valueOf(id))
+        User assigner = userRepo.findById(Long.valueOf(id))
                 .orElseThrow(() -> new ResourcesNotFoundException("User", "id", id));
 
-        Task task = this.DtoToTask(taskDto);
+        Task task = DtoToTask(taskDto);
 
         if (taskDto.getAssignedTo() != null && taskDto.getAssignedTo().getId() != null) {
-            User assignee = this.userRepo.findById(Long.valueOf(taskDto.getAssignedTo().getId()))
+            User assignee = userRepo.findById(Long.valueOf(taskDto.getAssignedTo().getId()))
                     .orElseThrow(() -> new ResourcesNotFoundException("User", "assignedTo", taskDto.getAssignedTo().getId()));
+
+            boolean allowed = false;
+
+            switch (assigner.getRole()) {
+                case LCP:
+                    allowed = List.of(UserRole.LCVP, UserRole.Team_Leader, UserRole.Member).contains(assignee.getRole());
+                    break;
+                case LCVP:
+                    allowed = List.of(UserRole.Team_Leader, UserRole.Member).contains(assignee.getRole())
+                            && assigner.getDepartment() != null
+                            && assignee.getDepartment() != null
+                            && assigner.getDepartment().getId().equals(assignee.getDepartment().getId());
+                    break;
+                case Team_Leader:
+                    allowed = assignee.getRole() == UserRole.Member
+                            && assigner.getDepartment() != null
+                            && assignee.getDepartment() != null
+                            && assigner.getDepartment().getId().equals(assignee.getDepartment().getId());
+                    break;
+            }
+
+            if (!allowed) {
+                throw new RuntimeException("Not allowed to assign task: hierarchy or department violation.");
+            }
+
             task.setAssignedTo(assignee);
         }
 
-        if (taskDto.getAssignedBy() != null && taskDto.getAssignedBy().getId() != null) {
-            User assigner = this.userRepo.findById(Long.valueOf(taskDto.getAssignedBy().getId()))
-                    .orElseThrow(() -> new ResourcesNotFoundException("User", "assignedBy", taskDto.getAssignedBy().getId()));
-            task.setAssignedBy(assigner);
-        } else {
-            task.setAssignedBy(creator);
-        }
+        task.setAssignedBy(assigner);
+        task.setUser(assigner);
 
-        creator.setNoOfTask(creator.getNoOfTask() + 1);
-        task.setUser(creator);
+        Task savedTask = taskRepo.save(task);
+        assigner.setNoOfTask(assigner.getNoOfTask() + 1);
+        userRepo.save(assigner);
 
-        Task saved = this.taskRepo.save(task);
-        this.userRepo.save(creator);
-
-        return this.taskToDto(saved);
+        return taskToDto(savedTask);
     }
 
 

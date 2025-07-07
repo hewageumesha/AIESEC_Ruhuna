@@ -8,8 +8,7 @@ import {
     Flag,
     RefreshCw,
     UserPlus,
-    UserCheck,
-    FileWarning
+    UserCheck
 } from 'lucide-react';
 import './CreateTask.css';
 import Swal from "sweetalert2";
@@ -21,23 +20,33 @@ const CreateTask = () => {
     const [taskName, setTaskName] = useState('');
     const [description, setDescription] = useState('');
     const [deadLine, setDeadline] = useState('');
-    const [status, setStatus] = useState('');
+    const [status, setStatus] = useState('pending'); // ✅ default pending
     const [priority, setPriority] = useState('MEDIUM');
     const [users, setUsers] = useState([]);
     const [assignTo, setAssignTo] = useState('');
-
+    const [loggedInUser, setLoggedInUser] = useState(null);
 
     useEffect(() => {
         fetch('http://localhost:8080/api/user/users')
             .then((res) => res.json())
             .then((data) => {
+                console.log("Users fetched: ", data);
                 if (Array.isArray(data)) setUsers(data);
             })
             .catch((err) => console.error(err));
     }, []);
 
+    useEffect(() => {
+        fetch(`http://localhost:8080/api/users/profile/id/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                console.log("Logged in user: ", data);
+                setLoggedInUser(data);
+            })
+            .catch(err => console.error(err));
+    }, [id]);
+
     const handleCreateTask = () => {
-        // ✅ Validation
         if (!taskName || !description || !deadLine || !status || !assignTo) {
             Swal.fire('Validation Error', 'Please fill all required fields', 'warning');
             return;
@@ -104,6 +113,7 @@ const CreateTask = () => {
                         type="text"
                         value={taskName}
                         onChange={(e) => setTaskName(e.target.value)}
+                        style={{ color: 'black', backgroundColor: 'white' }}
                     />
                 </div>
 
@@ -113,6 +123,7 @@ const CreateTask = () => {
                         className="form-input"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
+                        style={{ color: 'black', backgroundColor: 'white' }}
                     />
                 </div>
             </div>
@@ -132,6 +143,7 @@ const CreateTask = () => {
                         value={deadLine}
                         min={new Date().toISOString().split("T")[0]}
                         onChange={(e) => setDeadline(e.target.value)}
+                        style={{ color: 'black', backgroundColor: 'white' }}
                     />
                 </div>
 
@@ -141,6 +153,7 @@ const CreateTask = () => {
                         className="form-input"
                         value={priority}
                         onChange={(e) => setPriority(e.target.value)}
+                        style={{ color: 'black', backgroundColor: 'white' }}
                     >
                         <option value="HIGH">High</option>
                         <option value="MEDIUM">Medium</option>
@@ -157,15 +170,14 @@ const CreateTask = () => {
                 </div>
 
                 <div className="form-group">
-                    <label><RefreshCw className="icon" /> Work </label>
+                    <label><RefreshCw className="icon" /> Work Status</label>
                     <select
                         className="form-input"
                         value={status}
                         onChange={(e) => setStatus(e.target.value)}
+                        style={{ color: 'black', backgroundColor: 'white' }}
                     >
                         <option value="pending">Pending</option>
-                        <option value="in-progress">In Progress</option>
-                        <option value="completed">Completed</option>
                     </select>
                 </div>
 
@@ -175,13 +187,30 @@ const CreateTask = () => {
                         className="form-input"
                         value={assignTo}
                         onChange={(e) => setAssignTo(Number(e.target.value))}
+                        style={{ color: 'black', backgroundColor: 'white' }}
                     >
                         <option value="">Select User</option>
-                        {users.map((user) => (
-                            <option key={user.id} value={user.id}>
-                                {user.userName}
-                            </option>
-                        ))}
+                        {users
+                            .filter(user => {
+                                if (!loggedInUser) return false;
+                                if (loggedInUser.role === "LCP") {
+                                    return ["LCVP", "Team_Leader", "Member"].includes(user.role);
+                                }
+                                if (loggedInUser.role === "LCVP") {
+                                    return ["Team_Leader", "Member"].includes(user.role) &&
+                                        user.departmentId === loggedInUser.departmentId;
+                                }
+                                if (loggedInUser.role === "Team_Leader") {
+                                    return user.role === "Member" &&
+                                        user.departmentId === loggedInUser.departmentId;
+                                }
+                                return false;
+                            })
+                            .map(user => (
+                                <option key={user.id} value={user.id}>
+                                    {user.userName} ({user.role} - {user.departmentName})
+                                </option>
+                            ))}
                     </select>
                 </div>
             </div>

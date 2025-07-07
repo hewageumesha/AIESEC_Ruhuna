@@ -24,6 +24,8 @@ import UserProgressPage from "./components/Task/UserProgressPage.jsx";
 import CreateTask from "./components/Task/CreateTask.jsx";
 import TaskUpdate from "./components/Task/TaskUpdate.jsx";
 import Notifications from "./components/Task/Notifications.jsx";
+import TaskDashboardLCVP from "./components/Task/TaskDashboardLCVP.jsx";
+import TaskDashboardTL from "./components/Task/TaskDashboardTL.jsx";
 
 const NotificationsWrapper = () => {
   const { id } = useParams();
@@ -66,6 +68,10 @@ function App() {
 
         {/* LCP dashboard */}
         <Route path="/user/:id/TaskDashboard" element={<TaskDashboard />} />
+        {/* LCVP dashboard */}
+        <Route path="/user/:id/TaskDashboardLCVP" element={<TaskDashboardLCVP />} />
+        {/* TL dashboard */}
+        <Route path="/user/:id/TaskDashboardTL" element={<TaskDashboardTL />} />
       </Routes>
     <Footer/>
     </BrowserRouter>

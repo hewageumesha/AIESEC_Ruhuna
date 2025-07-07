@@ -5,6 +5,9 @@ import com.aiesec.dto.TaskDto;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserProgressDto;
 import com.aiesec.enums.Priority;
+import com.aiesec.exception.ResourcesNotFoundException;
+import com.aiesec.model.User;
+import com.aiesec.repository.UserRepository;
 import com.aiesec.service.UserService;
 import com.aiesec.service.interfaces.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,8 @@ public class TaskController {
     private TaskService taskService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRepository userRepo;
 
 
     // ✅ POST: Create Task with Default Priority if not provided
@@ -40,6 +45,14 @@ public class TaskController {
         TaskDto createdTask = taskService.createTask(taskDto, id);
         return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
     }
+
+//    @GetMapping("/profile/id/{id}")
+//    public ResponseEntity<User> getProfileById(@PathVariable Integer id) {
+//        User user = userRepo.findById(Long.valueOf(id))
+//                .orElseThrow(() -> new ResourcesNotFoundException("User", "id", id));
+//        return ResponseEntity.ok(user);
+//    }
+
 
     // ✅ PUT: Update Task
     @PutMapping("/{id}/{taskId}/")

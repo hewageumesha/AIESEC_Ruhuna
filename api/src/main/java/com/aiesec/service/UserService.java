@@ -238,6 +238,11 @@ public class UserService {
         userDto.setPassword(user.getPassword());
         userDto.setNoOfTask(user.getNoOfTask());
         userDto.setRole(user.getRole());
+
+        if (user.getDepartment() != null) {
+            userDto.setDepartmentId(user.getDepartment().getId()    );
+            userDto.setDepartmentName(user.getDepartment().getName());
+        }
         return  userDto;
     }
 

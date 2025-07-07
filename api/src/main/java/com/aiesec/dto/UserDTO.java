@@ -7,7 +7,6 @@ import java.util.List;
 import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
-import com.aiesec.model.Department;
 import com.aiesec.model.Function;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,9 +31,9 @@ public class UserDTO {
     private String profilePicture;
     private UserRole role;
     private UserStatus status;
-    private Function functionId;  
+    private Function functionId;
     private String functionName; 
-    private Department departmentId;  
+    private Long departmentId;
     private String departmentName;  
     private String teamLeaderAiesecEmail;
     private String teamLeaderName;
@@ -188,11 +187,11 @@ public class UserDTO {
         this.functionName = functionName;
     }
 
-    public Department getDepartmentId() {
+    public Long getDepartmentId() {
         return departmentId;
     }
 
-    public void setDepartmentId(Department departmentId) {
+    public void setDepartmentId(Long departmentId) {
         this.departmentId = departmentId;
     }
 

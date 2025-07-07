@@ -4,6 +4,7 @@ import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
 
 import com.aiesec.enums.UserRole;
+import com.aiesec.exception.ResourcesNotFoundException;
 import com.aiesec.model.User;
 
 import com.aiesec.repository.UserRepository;
@@ -51,6 +52,21 @@ public class UserController {
     public ResponseEntity<UserDTO> getUser(@PathVariable Integer id) {
         UserDTO user = userService.getUserById(id);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/profile/id/{id}")
+    public ResponseEntity<Map<String, Object>> getProfileById(@PathVariable Integer id) {
+        User user = userRepo.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ResourcesNotFoundException("User", "id", id));
+
+        Map<String, Object> simpleUser = Map.of(
+                "id", user.getId(),
+                "userName", user.getUserName(),
+                "role", user.getRole().toString(),
+                "departmentId", user.getDepartment() != null ? user.getDepartment().getId() : null
+        );
+
+        return ResponseEntity.ok(simpleUser);
     }
 
     @PostMapping("/add")
