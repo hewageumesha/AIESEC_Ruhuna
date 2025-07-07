@@ -22,6 +22,8 @@ public class UserDTO {
     private String city;
     private String stateORProvince;
     private String ZIPORPostalCode; 
+    private String s_department;
+    private String faculty;
     private Date birthday;
     private Gender gender;
     private Date joinedDate;
@@ -243,5 +245,22 @@ public class UserDTO {
     public void setAbout(String about) {
         this.about = about;
     }
+
+    public String getS_department() {
+        return s_department;
+    }
+
+    public void setS_department(String s_department) {
+        this.s_department = s_department;
+    }
+
+    public String getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(String faculty) {
+        this.faculty = faculty;
+    }
+    
 }
 

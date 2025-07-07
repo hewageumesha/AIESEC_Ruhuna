@@ -64,6 +64,10 @@ public class User {
 
     private String teamLeaderId;
 
+    private String s_department;
+
+    private String faculty;
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
@@ -274,4 +278,29 @@ public class User {
     public void setTeamLeaderId(String teamLeaderId) {
         this.teamLeaderId = teamLeaderId;
     }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getS_department() {
+        return s_department;
+    }
+
+    public void setS_department(String s_department) {
+        this.s_department = s_department;
+    }
+
+    public String getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(String faculty) {
+        this.faculty = faculty;
+    }
+    
 }

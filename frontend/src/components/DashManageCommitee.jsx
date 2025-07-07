@@ -154,7 +154,7 @@ const OrgTable = () => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">{organization.lcp.email}</div>
-                <div className="text-sm text-gray-500">+1 (555) 123-4567</div>
+                <div className="text-sm text-gray-500">{organization.lcp.phoneNumber}</div>
               </td>
             </tr>
             }
@@ -187,7 +187,7 @@ const OrgTable = () => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">{subOrganization.lcp.email}</div>
-                <div className="text-sm text-gray-500">+1 (555) 123-4567</div>
+                <div className="text-sm text-gray-500">{organization.lcp.phoneNumber}</div>
               </td>
             </tr>
             }
@@ -232,7 +232,7 @@ const OrgTable = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{lcvp.email}</div>
-                    <div className="text-sm text-gray-500">+1 (555) 987-6543</div>
+                    <div className="text-sm text-gray-500">{lcvp.phoneNumber}</div>
                   </td>
                 </tr>
 
@@ -280,7 +280,7 @@ const OrgTable = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{tl.email}</div>
-                        <div className="text-sm text-gray-500">+1 (555) 456-7890</div>
+                        <div className="text-sm text-gray-500">{tl.phoneNumber}</div>
                       </td>
                     </tr>
 
@@ -317,7 +317,7 @@ const OrgTable = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">{member.email}</div>
-                          <div className="text-sm text-gray-500">Member</div>
+                          <div className="text-sm text-gray-500">{member.phoneNumber}</div>
                         </td>
                       </tr>
                     ))}

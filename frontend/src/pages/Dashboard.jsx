@@ -9,43 +9,50 @@ import DashFinance from '../components/DashFinance';
 import DashBirthday from '../components/DashBirthday';
 import DashboardComp from '../components/DashboardComp';
 import DashComments from '../components/DashComments';
+import DashManageMember from '../components/DashManageMember';
+import UpdatePassword from '../components/UpdatePassword';
 import React from 'react';
-
 
 export default function Dashboard() {
   const location = useLocation();
-  const [tab, setTab] = useState('dash'); // Default to Dashboard
+  const [tab, setTab] = useState('dash');
+  const [subtab, setSubtab] = useState('');
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get('tab');
-    if (tabFromUrl) {
-      setTab(tabFromUrl);
-    }
+    const subtabFromUrl = urlParams.get('subtab');
+
+    setTab(tabFromUrl || 'dash');
+    setSubtab(subtabFromUrl || '');
   }, [location.search]);
 
-  // Object mapping for better readability
   const tabComponents = {
-    profile: <DashProfile />,
-    manageCommittee: <DashManageCommitee />,
+    profile: (
+      <DashProfile>
+        {subtab === 'password' && <UpdatePassword />}
+      </DashProfile>
+    ),
+    manageCommittee: (
+      <DashManageCommitee>
+        {subtab === 'members' && <DashManageMember />}
+      </DashManageCommitee>
+    ),
     comments: <DashComments />,
     task: <DashTask />,
     event: <DashEvent />,
     finance: <DashFinance />,
     birthday: <DashBirthday />,
-    dash: <DashboardComp />, // Default Dashboard
-
+    dash: <DashboardComp />,
   };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       <div className="md:w-56">
-        {/* Sidebar */}
-        <DashSidebar />
+        <DashSidebar tab={tab} subtab={subtab} />
       </div>
-      {/* Content */}
       <div className="flex-1 p-4">
-        {tabComponents[tab] || <DashboardComp />} {/* Default to DashboardComp if the tab is invalid */}
+        {tabComponents[tab] || <DashboardComp />}
       </div>
     </div>
   );

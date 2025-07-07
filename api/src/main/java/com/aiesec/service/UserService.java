@@ -127,6 +127,12 @@ public class UserService {
         if (userDetails.getZIPORPostalCode() != null) {
             user.setZIPORPostalCode(userDetails.getZIPORPostalCode());
         }
+        if (userDetails.getS_department() != null) {
+            user.setS_department(userDetails.getS_department());
+        }
+        if (userDetails.getFaculty() != null) {
+            user.setFaculty(userDetails.getFaculty());
+        }
 
         return userRepository.save(user);
    }
@@ -162,6 +168,7 @@ public class UserService {
             lcpDetails.put("role", "lcp");
             lcpDetails.put("image", lcp.getProfilePicture());
             lcpDetails.put("email", lcp.getAiesecEmail());
+            lcpDetails.put("phoneNumber", lcp.getPhoneNumber());
             lcpDetails.put("tenure", getTenureString(lcp.getJoinedDate()));
             lcpMap.put("lcp", lcpDetails);
 
@@ -174,6 +181,7 @@ public class UserService {
                 lcvpMap.put("role", "lcvp");
                 lcvpMap.put("image", lcvp.getProfilePicture());
                 lcvpMap.put("email", lcvp.getAiesecEmail());
+                lcvpMap.put("phoneNumber", lcvp.getPhoneNumber());
                 lcvpMap.put("tenure", getTenureString(lcvp.getJoinedDate()));
 
                 // Team Leaders
@@ -185,6 +193,7 @@ public class UserService {
                     tlMap.put("role", "team_leader");
                     tlMap.put("image", tl.getProfilePicture());
                     tlMap.put("email", tl.getAiesecEmail());
+                    tlMap.put("phoneNumber", tl.getPhoneNumber());
 
                     // Members
                     List<Map<String, Object>> memberList = new ArrayList<>();
@@ -195,6 +204,7 @@ public class UserService {
                         memberMap.put("role", "member");
                         memberMap.put("image", member.getProfilePicture());
                         memberMap.put("email", member.getAiesecEmail());
+                        memberMap.put("phoneNumber", member.getPhoneNumber());
                         memberList.add(memberMap);
                     }
 

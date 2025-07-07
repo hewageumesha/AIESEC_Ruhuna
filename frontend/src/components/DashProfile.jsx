@@ -1,13 +1,12 @@
-import { useState, useRef, useEffect } from 'react';
+import React ,{ useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Alert, Button, TextInput, Modal } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { updateStart, updateSuccess, updateFailure, deleteUserStart, deleteUserFailure, deleteUserSuccess, signoutSuccess } from '../redux/user/userSlice';
 import { useNavigate } from 'react-router-dom';
-import React from 'react';
 import axios from 'axios';
 
-export default function UserProfile() {
+export default function DashProfile({children}) {
   const { currentUser, error, loading } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({});
   const [profileData, setProfileData] = useState({});
@@ -160,7 +159,7 @@ export default function UserProfile() {
 
   const handleSignout = async () => {
     try {
-      const res = await fetch('/api/user/signout', {
+      const res = await fetch('http://localhost:8080/api/user/signout', {
         method: 'POST',
       });
       const data = await res.json();
@@ -172,25 +171,6 @@ export default function UserProfile() {
       }
     } catch (error) {
       console.log(error.message);
-    }
-  };
-
-  const handleDeleteUser = async () => {
-    setShowModal(false);
-    try {
-      dispatch(deleteUserStart());
-      const res = await fetch(`/api/user/delete/${email}`, {
-        method: 'DELETE',
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        dispatch(deleteUserFailure(data.message));
-      } else {
-        dispatch(deleteUserSuccess(data));
-        navigate('/');
-      }
-    } catch (error) {
-      dispatch(deleteUserFailure(error.message));
     }
   };
 
@@ -387,6 +367,29 @@ export default function UserProfile() {
             />
           </div>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label htmlFor="s_department" className="block text-sm font-medium text-gray-700 mb-1  dark:text-gray-200">Studying Department</label>
+            <TextInput
+              id="s_department"
+              type="text"
+              value={formData.s_department || ''}
+              onChange={handleChange}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label htmlFor="faculty" className="block text-sm font-medium text-gray-700 mb-1  dark:text-gray-200">Faculty</label>
+            <TextInput
+              id="faculty"
+              type="text"
+              value={formData.faculty || ''}
+              onChange={handleChange}
+              className="w-full"
+            />
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-end space-x-3">
@@ -406,26 +409,6 @@ export default function UserProfile() {
           {updateUserError}
         </Alert>
       )}
-
-      <Modal show={showModal} onClose={() => setShowModal(false)} popup size="md">
-        <Modal.Header />
-        <Modal.Body>
-          <div className="text-center">
-            <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
-            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
-              Are you sure you want to delete your account?
-            </h3>
-            <div className="flex justify-center gap-4">
-              <Button color="failure" onClick={handleDeleteUser}>
-                Yes, I'm sure
-              </Button>
-              <Button color="gray" onClick={() => setShowModal(false)}>
-                No, cancel
-              </Button>
-            </div>
-          </div>
-        </Modal.Body>
-      </Modal>
     </div>
   );
 }
