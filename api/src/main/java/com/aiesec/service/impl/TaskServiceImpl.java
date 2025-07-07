@@ -4,13 +4,20 @@ import com.aiesec.dto.TaskDto;
 import com.aiesec.dto.UserProgressDto;
 import com.aiesec.exception.ResourcesNotFoundException;
 import com.aiesec.model.Task;
+import com.aiesec.model.TaskProof;
 import com.aiesec.model.User;
+import com.aiesec.repository.TaskProofRepo;
 import com.aiesec.repository.TaskRepo;
 import com.aiesec.repository.UserRepository;
 import com.aiesec.service.interfaces.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,6 +30,10 @@ public class TaskServiceImpl implements TaskService {
 
     @Autowired
     private UserRepository userRepo;
+
+    @Autowired
+    private TaskProofRepo taskProofRepo;
+
 
     @Override
     public TaskDto createTask(TaskDto taskDto, Integer id) {
@@ -194,6 +205,15 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public void updateTaskStatus(Integer taskId, String status) {
+        Task task = taskRepo.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found with ID: " + taskId));
+
+        task.setWorkOfStatus(status);
+        taskRepo.save(task);
+    }
+
+    @Override
     public List<UserProgressDto> getUserProgressList() {
         List<User> users = userRepo.findAll();
         List<UserProgressDto> result = new ArrayList<>();
@@ -220,6 +240,40 @@ public class TaskServiceImpl implements TaskService {
 
         return result;
     }
+
+    @Override
+    public void saveProof(Integer taskId, Integer id, MultipartFile file, String note) throws IOException {
+        Task task = taskRepo.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        User user = userRepo.findById(Long.valueOf(id))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String filePath = null;
+
+        if (file != null && !file.isEmpty()) {
+            // Save file to disk
+            String uploadDir = "uploads/task_" + taskId + "/";
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            filePath = uploadDir + file.getOriginalFilename();
+            Path fileFullPath = uploadPath.resolve(file.getOriginalFilename());
+            Files.write(fileFullPath, file.getBytes());
+        }
+
+        // Save TaskProof in DB with or without filePath
+        TaskProof proof = new TaskProof();
+        proof.setTask(task);
+        proof.setUser(user);
+        proof.setNote(note);
+        proof.setFilePath(filePath);
+
+        taskProofRepo.save(proof);
+    }
+
 
     public Task convertToEntity(TaskDto taskDto) {
         Task task = new Task();

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -62,6 +63,16 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
+    @PutMapping("/task/{taskId}/updateStatus")
+    public ResponseEntity<?> updateTaskStatus(
+            @PathVariable Integer taskId,
+            @RequestParam String status
+    ) {
+        taskService.updateTaskStatus(taskId, status);
+        return ResponseEntity.ok(Map.of("message", "Task status updated successfully"));
+    }
+
+
     // GET: Fetch all users for dropdown (Assign To)
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
@@ -75,11 +86,15 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
-    @PostMapping("/api/task/{taskId}/upload-proof")
-    public ResponseEntity<?> uploadProof(@PathVariable Integer taskId, @RequestParam MultipartFile file, @RequestParam String note) {
-        // save file + note logic
+    @PostMapping("/task/{taskId}/upload-proof")
+    public ResponseEntity<?> uploadProof(@PathVariable Integer taskId,
+                                         @RequestParam("id") Integer id,
+                                         @RequestParam("proof") MultipartFile file,
+                                         @RequestParam("note") String note) throws IOException {
+        taskService.saveProof(taskId, id, file, note);
         return ResponseEntity.ok(Map.of("message", "Proof uploaded successfully"));
     }
+
 
     @GetMapping("/tasks/status-count")
     public ResponseEntity<Map<String, Long>> getTaskStatusCount() {

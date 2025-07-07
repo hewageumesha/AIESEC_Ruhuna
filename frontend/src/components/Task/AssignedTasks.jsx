@@ -12,6 +12,9 @@ const AssignedTasks = () => {
     const [statusFilter, setStatusFilter] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
     const [proofNotes, setProofNotes] = useState({});
+    const [assignedByFilter, setAssignedByFilter] = useState("All");
+    const [deadlineSort, setDeadlineSort] = useState("asc");
+
 
     // Safely parse user from localStorage
     let user = {};
@@ -78,7 +81,7 @@ const AssignedTasks = () => {
     const handleStatusChange = async (taskId, newStatus) => {
         try {
             await axios.put(
-                `http://localhost:8080/api/task/${taskId}/updateStatus`,
+                `http://localhost:8080/api/user/task/${taskId}/updateStatus`,
                 null,
                 { params: { status: newStatus } }
             );
@@ -100,9 +103,10 @@ const AssignedTasks = () => {
         const formData = new FormData();
         formData.append("proof", file);
         formData.append("note", proofNotes[taskId] || "");
+        formData.append("id", id);
 
         try {
-            await axios.post(`http://localhost:8080/api/task/${taskId}/uploadProof`, formData, {
+            await axios.post(`http://localhost:8080/api/user/task/${taskId}/upload-proof`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             Swal.fire("Success", "Proof uploaded successfully!", "success");
@@ -194,16 +198,79 @@ const AssignedTasks = () => {
                     <table className="min-w-full table-auto text-left text-gray-800">
                         <thead style={{ backgroundColor: "#0CB9C1" }}>
                         <tr className="text-white text-lg">
-                            <th className="px-6 py-4">Task Name</th>
-                            <th className="px-6 py-4">Description</th>
-                            <th className="px-6 py-4">Priority</th>
-                            <th className="px-6 py-4">Status</th>
-                            <th className="px-6 py-4">Deadline</th>
-                            <th className="px-6 py-4">Days Left</th>
-                            <th className="px-6 py-4">Assigned By</th>
-                            <th className="px-6 py-4">Upload Proof</th>
+                            <th className="px-6 py-4 whitespace-nowrap">Task Name</th>
+                            <th className="px-6 py-4 whitespace-nowrap">Description</th>
+
+                            <th className="px-6 py-4 whitespace-nowrap">
+                                <div className="inline-flex items-center gap-1">
+                                    Priority
+                                    <select
+                                        className="w-20 p-0.5 rounded text-black text-sm"
+                                        onChange={(e) => setPriorityFilter(e.target.value)}
+                                        value={priorityFilter}
+                                    >
+                                        <option value="All">All</option>
+                                        <option value="HIGH">High</option>
+                                        <option value="MEDIUM">Medium</option>
+                                        <option value="LOW">Low</option>
+                                    </select>
+                                </div>
+                            </th>
+
+                            <th className="px-6 py-4 whitespace-nowrap">
+                                <div className="inline-flex items-center gap-1">
+                                    Status
+                                    <select
+                                        className="w-24 p-0.5 rounded text-black text-sm"
+                                        onChange={(e) => setStatusFilter(e.target.value)}
+                                        value={statusFilter}
+                                    >
+                                        <option value="All">All</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="in-progress">In Progress</option>
+                                        <option value="completed">Completed</option>
+                                    </select>
+                                </div>
+                            </th>
+
+                            <th className="px-6 py-4 whitespace-nowrap">
+                                <div className="inline-flex items-center gap-1">
+                                    Deadline
+                                    <button
+                                        onClick={() => setDeadlineSort((prev) => (prev === "asc" ? "desc" : "asc"))}
+                                        className="w-6 h-6 flex items-center justify-center rounded bg-gray-200 text-black text-xs"
+                                    >
+                                        {deadlineSort === "asc" ? "↑" : "↓"}
+                                    </button>
+                                </div>
+                            </th>
+
+                            <th className="px-6 py-4 whitespace-nowrap">Days Left</th>
+
+                            <th className="px-6 py-4 whitespace-nowrap">
+                                <div className="inline-flex items-center gap-1">
+                                    Assigned By
+                                    <select
+                                        className="w-20 p-0.5 rounded text-black text-sm"
+                                        onChange={(e) => setAssignedByFilter(e.target.value)}
+                                        value={assignedByFilter}
+                                    >
+                                        <option value="All">All</option>
+                                        {Array.from(new Set(tasks.map((t) => t.assignedBy?.username || "Unknown")))
+                                            .filter(name => name !== "Unknown")
+                                            .map((name, idx) => (
+                                                <option key={idx} value={name}>{name}</option>
+                                            ))}
+                                    </select>
+                                </div>
+                            </th>
+
+                            <th className="px-6 py-4 whitespace-nowrap">Upload Proof</th>
                         </tr>
                         </thead>
+
+
+
                         <tbody className="divide-y divide-gray-200">
                         {sortedTasks.map((task) => (
                             <tr key={task.taskId} className="hover:bg-blue-50">
