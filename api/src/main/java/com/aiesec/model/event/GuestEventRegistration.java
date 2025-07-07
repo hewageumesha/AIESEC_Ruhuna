@@ -20,11 +20,9 @@ public class GuestEventRegistration {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long guestUserId;
     private Long eventId;
-
     private String name;
     private String email;
     private String phone;
-    //private LocalDateTime registrationDate;
     @Enumerated(EnumType.STRING)
     private InterestStatus interestStatus;
     private String comment;
