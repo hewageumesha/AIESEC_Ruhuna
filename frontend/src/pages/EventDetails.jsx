@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Spin, message, Modal } from 'antd';
 import axios from 'axios';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
@@ -278,6 +278,9 @@ const EventSidebar = ({ event, merchandise, orders }) => (
 // Main Event Page Component
 const EventDetailsPage = () => {
   const { id } = useParams();
+  const location = useLocation();
+const isPublicPage = location.pathname.includes("/public");
+
   const navigate = useNavigate();
   const { currentUser, loading: userLoading } = useSelector((state) => state.user);
   const [event, setEvent] = useState(null);
@@ -413,38 +416,40 @@ const EventDetailsPage = () => {
         </div>
       </div>
 
-      <AnimatePresence>
-        {isModalVisible && (
-          <Motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-          >
-            {isMember ? (
-              <MemberRegistrationModal
-                visible={isModalVisible}
-                onClose={() => setIsModalVisible(false)}
-                eventId={event.eventId || id}
-                onRegister={() => {
-                  message.success("Registration successful!");
-                  setIsModalVisible(false);
-                }}
-              />
-            ) : (
-              <GuestRegistrationModal
-                visible={isModalVisible}
-                onClose={() => setIsModalVisible(false)}
-                eventId={event.eventId || id}
-                onRegister={() => {
-                  message.success("Guest registration successful!");
-                  setIsModalVisible(false);
-                }}
-              />
-            )}
-          </Motion.div>
-        )}
-      </AnimatePresence>
+<AnimatePresence>
+  {isModalVisible && (
+    <Motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.3 }}
+    >
+      {isPublicPage && event?.isPublic ? (
+        <GuestRegistrationModal
+          visible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          eventId={event?.eventId || id}
+          onRegister={() => {
+            message.success("Guest registration successful!");
+            setIsModalVisible(false);
+          }}
+        />
+      ) : isMember ? (
+        <MemberRegistrationModal
+          visible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          eventId={event.eventId || id}
+          onRegister={() => {
+            message.success("Registration successful!");
+            setIsModalVisible(false);
+          }}
+        />
+      ) : null}
+    </Motion.div>
+  )}
+</AnimatePresence>
+
+
 
       {/* T-Shirt Order Modal */}
       {event.hasTshirtOrder && merchandise && (

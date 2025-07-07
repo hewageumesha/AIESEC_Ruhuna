@@ -38,7 +38,8 @@ function App() {
         <Route path="/become-member" element={<BecomeMember />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/edit-event/:id" element={<EditEvent />} />
-        <Route path="/public-events" element={<PublicEventsPage />} />
+        <Route path="/public-event" element={<PublicEventsPage />} />
+        <Route path="/public-event/:id" element={<EventDetails />} />
 
       </Routes>
     <Footer/>

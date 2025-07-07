@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
 
@@ -20,6 +19,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     // Find public events that start after a given date
     List<Event> findByIsPublicTrueAndStartDateGreaterThanEqual(LocalDate date);
+
+    // Find private events that start after a given date
+    List<Event> findByIsPublicFalseAndStartDateGreaterThanEqual(LocalDate date);
+
+    // Find all public events
+    List<Event> findByIsPublicTrue();
+
+    // Find all private events
+    List<Event> findByIsPublicFalse();
 
     //Event search feature
     @Query("SELECT e FROM Event e " +
@@ -35,19 +43,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                              @Param("date") LocalDate date,
                              Pageable pageable);
 
-
     // Find events with a t-shirt order option, starting after a given date
     List<Event> findByHasMerchandiseTrueAndStartDateAfter(LocalDate date);
 
     // Find events based on visibility and starting date
-    List<Event> findByVisibilityAndStartDateAfter(String visibility, LocalDate date);
+    List<Event> findByIsPublicAndStartDateAfter(Boolean isPublic, LocalDate date);
 
     // Find events with t-shirt orders, based on visibility, and starting after a given date
-    List<Event> findByHasMerchandiseTrueAndVisibilityAndStartDateAfter(String visibility, LocalDate date);
+    List<Event> findByHasMerchandiseTrueAndIsPublicAndStartDateAfter(Boolean isPublic, LocalDate date);
 
     // Optionally, find all events that have a t-shirt order regardless of the start date
     List<Event> findByHasMerchandiseTrue();
-
-    // Optionally, find events with a specific visibility
-    List<Event> findByVisibility(String visibility);
 }

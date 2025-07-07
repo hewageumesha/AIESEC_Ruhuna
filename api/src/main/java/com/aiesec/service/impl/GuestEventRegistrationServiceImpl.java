@@ -19,13 +19,15 @@ public class GuestEventRegistrationServiceImpl implements GuestEventRegistration
 
     @Override
     public GuestEventRegistrationDTO register(GuestEventRegistrationDTO dto) {
+        System.out.println("Registering guest: " + dto);
         boolean exists = registrationRepository.existsByEventIdAndEmail(dto.getEventId(), dto.getEmail());
         if (exists) {
             throw new IllegalStateException("You have already registered for this event with this email.");
         }
-
         GuestEventRegistration entity = GuestEventRegistrationMapper.toEntity(dto);
+        System.out.println("Mapped entity: " + entity);
         GuestEventRegistration saved = registrationRepository.save(entity);
+        System.out.println("Saved entity: " + saved);
         return GuestEventRegistrationMapper.toDTO(saved);
     }
 

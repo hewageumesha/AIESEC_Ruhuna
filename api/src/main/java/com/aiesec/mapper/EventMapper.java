@@ -20,7 +20,6 @@ public class EventMapper {
                 .isVirtual(event.getIsVirtual())
                 .virtualLink(event.getVirtualLink())
                 .hasMerchandise(event.getHasMerchandise())
-                .visibility(event.getVisibility())
                 .build();
     }
 
@@ -39,7 +38,6 @@ public class EventMapper {
                 .isVirtual(dto.getIsVirtual())
                 .virtualLink(dto.getVirtualLink())
                 .hasMerchandise(dto.getHasMerchandise())
-                .visibility(dto.getVisibility())
                 .build();
     }
 }
