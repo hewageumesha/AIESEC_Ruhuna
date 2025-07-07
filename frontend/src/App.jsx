@@ -17,8 +17,14 @@ import React from 'react';
 import Contact from './pages/Contact';
 import EventDetails from "./pages/EventDetails";
 import EditEvent from "./components/event/EditEvent";
+import TaskDashboard from "./components/Task/TaskDashboard.jsx";
+import TaskList from "./components/Task/TaskList.jsx";
+import AssignedTasks from "./components/Task/AssignedTasks.jsx";
+import UserProgressPage from "./components/Task/UserProgressPage.jsx";
 
 function App() {
+  console.log("👀 current user from localStorage:", JSON.parse(localStorage.getItem("user")));
+
   return (
     <BrowserRouter>
     <Header/>
@@ -39,6 +45,14 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/edit-event/:id" element={<EditEvent />} />
         <Route path="/das" element={<EventDetails />} />
+        {/* Task Routs */}
+
+        <Route path="/user/:id/TaskList" element={<TaskList />}/>
+        <Route path="/assigned-tasks" element={<AssignedTasks/>}/>
+        <Route path="/user/:id/progress" element={<UserProgressPage />} />
+
+        {/* LCP dashboard */}
+        <Route path="/user/:id/TaskDashboard" element={<TaskDashboard />} />
       </Routes>
     <Footer/>
     </BrowserRouter>

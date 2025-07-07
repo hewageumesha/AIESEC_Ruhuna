@@ -1,0 +1,255 @@
+package com.aiesec.service.impl;
+
+import com.aiesec.dto.TaskDto;
+import com.aiesec.dto.UserProgressDto;
+import com.aiesec.exception.ResourcesNotFoundException;
+import com.aiesec.model.Task;
+import com.aiesec.model.User;
+import com.aiesec.repository.TaskRepo;
+import com.aiesec.repository.UserRepository;
+import com.aiesec.service.interfaces.TaskService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+
+@Service
+public class TaskServiceImpl implements TaskService {
+
+    @Autowired
+    private TaskRepo taskRepo;
+
+    @Autowired
+    private UserRepository userRepo;
+
+    @Override
+    public TaskDto createTask(TaskDto taskDto, Integer id) {
+
+        User creator = this.userRepo.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ResourcesNotFoundException("User", "id", id));
+
+        Task task = this.DtoToTask(taskDto);
+
+        if (taskDto.getAssignedTo() != null && taskDto.getAssignedTo().getId() != null) {
+            User assignee = this.userRepo.findById(Long.valueOf(taskDto.getAssignedTo().getId()))
+                    .orElseThrow(() -> new ResourcesNotFoundException("User", "assignedTo", taskDto.getAssignedTo().getId()));
+            task.setAssignedTo(assignee);
+        }
+
+        if (taskDto.getAssignedBy() != null && taskDto.getAssignedBy().getId() != null) {
+            User assigner = this.userRepo.findById(Long.valueOf(taskDto.getAssignedBy().getId()))
+                    .orElseThrow(() -> new ResourcesNotFoundException("User", "assignedBy", taskDto.getAssignedBy().getId()));
+            task.setAssignedBy(assigner);
+        } else {
+            task.setAssignedBy(creator);
+        }
+
+        creator.setNoOfTask(creator.getNoOfTask() + 1);
+        task.setUser(creator);
+
+        Task saved = this.taskRepo.save(task);
+        this.userRepo.save(creator);
+
+        return this.taskToDto(saved);
+    }
+
+
+
+
+    @Override
+    public TaskDto taskUpdate(TaskDto taskDto, Integer taskId, Integer id) {
+        Task task = this.taskRepo.findById(taskId)
+                .orElseThrow(() -> new ResourcesNotFoundException("Task", "taskId", taskId));
+
+        // Fetch the user to assign the task to
+        User user = this.userRepo.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ResourcesNotFoundException("User", "id", id));
+
+        // Update task fields
+        task.setTaskName(taskDto.getTaskName());
+        task.setDescription(taskDto.getDescription());
+        task.setDeadLine(taskDto.getDeadLine());
+        task.setPriority(taskDto.getPriority());
+        task.setUser(user); // Assign to the new user
+        task.setWorkOfStatus(taskDto.getWorkOfStatus());
+
+        Task updatedTask = this.taskRepo.save(task);
+        return this.taskToDto(updatedTask);
+    }
+
+
+
+
+    @Override
+    public TaskDto getTaskById(Integer taskId, Integer id) {
+        User user = this.userRepo.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ResourcesNotFoundException("User", "User Id", id));
+
+        List<Task> tasks = this.taskRepo.findByUser(user);
+        Task task = tasks.stream()
+                .filter(obj -> Objects.equals(obj.getTaskId(), taskId))
+                .findFirst()
+                .orElseThrow(() -> new ResourcesNotFoundException("Task", "task Id", taskId));
+
+        return this.taskToDto(task);
+    }
+
+    @Override
+    public void deleteTask(Integer taskId, Integer id) {
+        User user = this.userRepo.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ResourcesNotFoundException("User", "User Id", id));
+
+        Task task = this.taskRepo.findById(taskId)
+                .orElseThrow(() -> new ResourcesNotFoundException("Task", "task Id", taskId));
+
+        user.getTasks().remove(task);
+        this.taskRepo.delete(task);
+    }
+
+    @Override
+    public List<TaskDto> getAllTasksByUser(Integer id) {
+        User user = this.userRepo.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ResourcesNotFoundException("User", "User Id", id));
+
+        List<Task> tasks = this.taskRepo.findByUser(user);
+        return tasks.stream().map(this::taskToDto).toList();
+    }
+
+    @Override
+    public List<TaskDto> getTasksAssignedToUser(Integer id) {
+        List<Task> tasks = taskRepo.findByAssignedTo_Id(id);
+        return tasks.stream().map(this::taskToDto).collect(Collectors.toList());
+    }
+
+    // ========== Mappers ==========
+
+    public Task DtoToTask(TaskDto taskDto) {
+        Task task = new Task();
+        task.setTaskId(taskDto.getTaskId());
+        task.setTaskName(taskDto.getTaskName());
+        task.setDescription(taskDto.getDescription());
+        task.setPriority(taskDto.getPriority());
+        task.setDeadLine(taskDto.getDeadLine());
+        task.setWorkOfStatus(taskDto.getWorkOfStatus());
+        return task;
+    }
+
+    public TaskDto taskToDto(Task task) {
+        TaskDto dto = new TaskDto();
+        dto.setTaskId(task.getTaskId());
+        dto.setTaskName(task.getTaskName());
+        dto.setDeadLine(task.getDeadLine());
+        dto.setDescription(task.getDescription());
+        dto.setPriority(task.getPriority());
+        dto.setWorkOfStatus(task.getWorkOfStatus());
+
+        // Safe null check before accessing task.getUser()
+        if (task.getUser() != null) {
+            dto.setId(task.getUser().getId());
+        } else {
+            dto.setId(null);  // or some default value if needed
+        }
+
+        // Set assignedTo with null check
+        if (task.getAssignedTo() != null) {
+            TaskDto.AssignedUserDTO assignedTo = new TaskDto.AssignedUserDTO(
+                    task.getAssignedTo().getId(),
+                    task.getAssignedTo().getUserName(),
+                    task.getAssignedTo().getNoOfTask()
+            );
+            dto.setAssignedTo(assignedTo);
+        } else {
+            dto.setAssignedTo(null);
+        }
+
+        // Set assignedBy with null check
+        if (task.getAssignedBy() != null) {
+            TaskDto.AssignedUserDTO assignedBy = new TaskDto.AssignedUserDTO(
+                    task.getAssignedBy().getId(),
+                    task.getAssignedBy().getUserName(),
+                    task.getAssignedBy().getNoOfTask()
+            );
+            dto.setAssignedBy(assignedBy);
+        } else {
+            dto.setAssignedBy(null);
+        }
+
+        return dto;
+    }
+
+    @Override
+    public Map<String, Long> getTaskCountByStatus() {
+        List<Object[]> results = taskRepo.countTasksByWorkStatus();
+        Map<String, Long> statusMap = new HashMap<>();
+
+        for (Object[] row : results) {
+            String status = (String) row[0];
+            Long count = (Long) row[1];
+            statusMap.put(status, count);
+        }
+
+        return statusMap;
+    }
+
+    @Override
+    public List<UserProgressDto> getUserProgressList() {
+        List<User> users = userRepo.findAll();
+        List<UserProgressDto> result = new ArrayList<>();
+
+        for (User user : users) {
+            List<Task> tasks = taskRepo.findByAssignedToId(user.getId());
+            long total = tasks.size();
+            long completed = tasks.stream()
+                    .filter(t -> "completed".equalsIgnoreCase(t.getWorkOfStatus()))
+                    .count();
+
+            double progress = total == 0 ? 0.0 : ((double) completed / total) * 100;
+
+            UserProgressDto dto = new UserProgressDto();
+            dto.setId(user.getId());
+            dto.setName(user.getUserName());
+            //dto.setEmail(user.getEmail());
+            dto.setTotalTasks(total);
+            dto.setCompletedTasks(completed);
+            dto.setProgressPercentage(progress);
+
+            result.add(dto);
+        }
+
+        return result;
+    }
+
+    public Task convertToEntity(TaskDto taskDto) {
+        Task task = new Task();
+        task.setTaskId(taskDto.getTaskId());
+        task.setTaskName(taskDto.getTaskName());
+        task.setDeadLine(taskDto.getDeadLine());
+        task.setDescription(taskDto.getDescription());
+        task.setPriority(taskDto.getPriority());
+        task.setWorkOfStatus(taskDto.getWorkOfStatus());
+
+        if (taskDto.getAssignedBy() != null) {
+            User assignedByUser = new User();
+            assignedByUser.setId(taskDto.getAssignedBy().getId());
+            assignedByUser.setUserName(taskDto.getAssignedBy().getUsername());
+            task.setAssignedBy(assignedByUser);
+        }
+
+        if (taskDto.getAssignedTo() != null) {
+            User assignedToUser = new User();
+            assignedToUser.setId(taskDto.getAssignedTo().getId());
+            assignedToUser.setUserName(taskDto.getAssignedTo().getUsername());
+            task.setAssignedTo(assignedToUser);
+        }
+
+        return task;
+    }
+
+
+
+
+
+}
+

@@ -5,8 +5,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -14,6 +17,8 @@ import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User {
@@ -61,12 +66,17 @@ public class User {
     private String teamLeaderAiesecEmail;
 
     private String teamLeaderId;
+    private int noOfTask=0;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Task> tasks=new ArrayList<>();
+
 
     @ManyToOne
     @JoinColumn(name = "function_id")

@@ -1,6 +1,8 @@
 package com.aiesec.service;
 
+import com.aiesec.dto.UserDTO;
 import com.aiesec.enums.UserRole;
+import com.aiesec.exception.ResourcesNotFoundException;
 import com.aiesec.model.User;
 import com.aiesec.repository.UserRepository;
 
@@ -221,10 +223,34 @@ public class UserService {
         return startYear + "-" + (startYear + 1);
     }
 
+    public List<UserDTO> getAllUsers() {
+        List<User> users = this.userRepository.findAll();
+        if (users == null || users.isEmpty()) {
+            return Collections.emptyList(); // or return a new ArrayList<UserDto>()
+        }
+        return users.stream().map(this::userToDto).toList();
+    }
+
+    public UserDTO userToDto(User user){
+        UserDTO userDto=new UserDTO();
+        userDto.setId(Long.valueOf(user.getId()));
+        userDto.setUserName(user.getUserName());
+        userDto.setPassword(user.getPassword());
+        userDto.setNoOfTask(user.getNoOfTask());
+        userDto.setRole(user.getRole());
+        return  userDto;
+    }
+
+    public UserDTO getUserById(Integer id) {
+
+        User user=this.userRepository.findById(Long.valueOf(id)).orElseThrow(()-> new ResourcesNotFoundException("User","User Id",(long)id));
+        return this.userToDto(user);
+    }
+
 
 
     /* 
-    private UserHierarchyDTO buildHierarchy(User user) {
+    private UserHierarchyDTO buildHierarchy(User user) {zz
         UserHierarchyDTO dto = new UserHierarchyDTO();
         dto.setId(user.getId());
         dto.setName(user.getFirstName() + " " + user.getLastName());

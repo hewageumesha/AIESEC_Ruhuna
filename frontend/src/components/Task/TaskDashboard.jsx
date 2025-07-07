@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 import UserProgressPage from "./UserProgressPage";
 
-const TaskDashboard: React.FC = () => {
+const TaskDashboard = () => {
     // 🔹 Extract userId from URL
     const { id} = useParams();
 
@@ -20,7 +20,7 @@ const TaskDashboard: React.FC = () => {
     useEffect(() => {
         const fetchUserDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/users/${id}/`);
+                const response = await fetch(`http://localhost:8080/api/users/id/${id}`);
                 if (response.ok) {
                     const userDetails = await response.json();
                     setUsername(userDetails.userName);
@@ -28,7 +28,7 @@ const TaskDashboard: React.FC = () => {
                 } else {
                     throw new Error("Failed to fetch user details");
                 }
-            } catch (error: any) {
+            } catch (error) {
                 console.error("Error fetching user details:", error.message);
             }
         };
@@ -142,7 +142,7 @@ const TaskDashboard: React.FC = () => {
                         </BarChart>
 
                         {/* 🔹 User Progress Section */}
-                        <UserProgressPage />
+
 
                     </div>
                 </div>

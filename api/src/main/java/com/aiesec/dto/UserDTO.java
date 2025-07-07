@@ -9,7 +9,11 @@ import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
 import com.aiesec.model.Department;
 import com.aiesec.model.Function;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class UserDTO {
     private Long id;
     private String userName;
@@ -36,7 +40,10 @@ public class UserDTO {
     private String teamLeaderName;
     private List<UserDTO> teamMembers;
     private List<String> commentsForUser; 
-    private List<String> commentsCreated; 
+    private List<String> commentsCreated;
+    private String password;
+    private int noOfTask;
+
 
     public Long getId() {
         return id;

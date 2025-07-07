@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,9 +36,21 @@ public class UserController {
     private UserRepository userRepo;
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        return ResponseEntity.ok(userRepo.getUserById(id));
+//    @GetMapping("/{id}")
+//    public ResponseEntity<User> getUser(@PathVariable Long id) {
+//        return ResponseEntity.ok(userRepo.getUserById(id));
+//    }
+//
+//    @GetMapping("/{id}/")
+//    public ResponseEntity<UserDto> GetUser( @PathVariable String id){
+//        UserDto user=this.userService.getUserById(Integer.valueOf(id));
+//        return new ResponseEntity<>(user, HttpStatus.CREATED);
+//    }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<UserDTO> getUser(@PathVariable Integer id) {
+        UserDTO user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/add")

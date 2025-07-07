@@ -2,40 +2,23 @@ import React, { useEffect, useState } from "react";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Pencil, Trash2 } from "lucide-react";
+import notfound from "../asset/notfound.gif";  // <-- fixed import here
 
-// Interfaces
-interface User {
-    id: string;
-    username: string;
-    numberOfTasks: number;
-}
-
-interface Task {
-    taskId: number;
-    taskName: string;
-    deadLine: string;
-    priority: string;
-    workOfStatus: string;
-    description: string;
-    assignedTo?: User;
-}
-
-const TaskList: React.FC = () => {
+const TaskList = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [userDetails, setUserDetails] = useState<User | null>(null);
-    const [tasks, setTasks] = useState<Task[]>([]);
+    const [userDetails, setUserDetails] = useState(null);
+    const [tasks, setTasks] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedPriority, setSelectedPriority] = useState<string>("");
-    const [selectedStatus, setSelectedStatus] = useState<string>("");
+    const [selectedPriority, setSelectedPriority] = useState("");
+    const [selectedStatus, setSelectedStatus] = useState("");
 
-    // Fetch user + tasks
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                console.log("Fetching user from:", `http://localhost:8080/api/users/${id}/`);
-                const userRes = await fetch(`http://localhost:8080/api/users/${id}/`);
+                console.log("Fetching user from:", `http://localhost:8080/api/users/id/${id}/`);
+                const userRes = await fetch(`http://localhost:8080/api/users/id/${id}`);
                 if (!userRes.ok) throw new Error("Failed to fetch user");
                 const userData = await userRes.json();
                 setUserDetails(userData);
@@ -46,14 +29,13 @@ const TaskList: React.FC = () => {
                 const userTasks = await tasksRes.json();
                 console.log("Fetched tasks:", userTasks);
                 setTasks(userTasks);
-            } catch (err: any) {
+            } catch (err) {
                 console.error("Fetch error:", err.message);
             }
         };
         fetchUserData();
     }, [id]);
 
-    // Filters
     const filteredTasks = tasks.filter((task) => {
         const matchesSearch =
             task.taskName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -68,8 +50,7 @@ const TaskList: React.FC = () => {
 
     console.log("Filtered tasks to display:", filteredTasks);
 
-    // Handlers
-    const handleEditTask = (taskId: number) => {
+    const handleEditTask = (taskId) => {
         const editPath = generatePath("/users/:userId/tasks/:taskId/edit", {
             userId: id || "",
             taskId: taskId.toString(),
@@ -77,7 +58,7 @@ const TaskList: React.FC = () => {
         navigate(editPath);
     };
 
-    const handleDeleteTask = (taskId: number) => {
+    const handleDeleteTask = (taskId) => {
         Swal.fire({
             title: "Are you sure?",
             text: "Do you really want to delete this task?",
@@ -95,7 +76,7 @@ const TaskList: React.FC = () => {
                     if (!res.ok) throw new Error("Failed to delete task");
                     setTasks((prev) => prev.filter((task) => task.taskId !== taskId));
                     Swal.fire("Deleted!", "Your task has been deleted.", "success");
-                } catch (err: any) {
+                } catch (err) {
                     console.error("Delete error:", err.message);
                     Swal.fire("Error!", "Failed to delete task.", "error");
                 }
@@ -107,7 +88,7 @@ const TaskList: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 py-10 font-sans">
             {userDetails && (
                 <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mb-6 text-center">
-                    Task Overview for {userDetails.username}
+                    Task Overview for {userDetails.userName}
                 </h2>
             )}
 
@@ -170,33 +151,33 @@ const TaskList: React.FC = () => {
                                 <td className="px-6 py-3 font-medium text-gray-900">{task.taskName}</td>
                                 <td className="px-6 py-3 text-gray-600">{task.description}</td>
                                 <td className="px-6 py-3">
-                    <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
-                            task.priority === "HIGH"
-                                ? "bg-red-100 text-red-800"
-                                : task.priority === "MEDIUM"
-                                    ? "bg-yellow-100 text-yellow-700"
-                                    : "bg-green-100 text-green-700"
-                        }`}
-                    >
-                      {task.priority}
-                    </span>
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
+                                                task.priority === "HIGH"
+                                                    ? "bg-red-100 text-red-800"
+                                                    : task.priority === "MEDIUM"
+                                                        ? "bg-yellow-100 text-yellow-700"
+                                                        : "bg-green-100 text-green-700"
+                                            }`}
+                                        >
+                                            {task.priority}
+                                        </span>
                                 </td>
                                 <td className="px-6 py-3 text-gray-700">
                                     {new Date(task.deadLine).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-3">
-                    <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
-                            task.workOfStatus === "completed"
-                                ? "bg-green-200 text-green-900"
-                                : task.workOfStatus === "in-progress"
-                                    ? "bg-yellow-200 text-yellow-900"
-                                    : "bg-red-100 text-red-800"
-                        }`}
-                    >
-                      {task.workOfStatus}
-                    </span>
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
+                                                task.workOfStatus === "completed"
+                                                    ? "bg-green-200 text-green-900"
+                                                    : task.workOfStatus === "in-progress"
+                                                        ? "bg-yellow-200 text-yellow-900"
+                                                        : "bg-red-100 text-red-800"
+                                            }`}
+                                        >
+                                            {task.workOfStatus}
+                                        </span>
                                 </td>
                                 <td className="px-6 py-3 font-medium text-gray-800">
                                     {task.assignedTo?.username || "Not Assigned"}
@@ -225,7 +206,7 @@ const TaskList: React.FC = () => {
             ) : (
                 <p className="text-center text-gray-500 mt-10 text-lg">
                     <img
-                        src={require("../asset/notfound.gif")}
+                        src={notfound}
                         alt="sad"
                         className="inline-block w-16 h-16"
                         style={{ marginTop: "10px" }}
