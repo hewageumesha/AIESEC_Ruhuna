@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/expenses")
-@CrossOrigin(origins = "http://localhost:3000") // Allow frontend access
+@CrossOrigin
 public class ExpenseController {
 
     private final ExpenseService expenseService;

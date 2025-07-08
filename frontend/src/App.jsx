@@ -17,6 +17,14 @@ import React from 'react';
 import Contact from './pages/Contact';
 import EventDetails from "./pages/EventDetails";
 import EditEvent from "./components/event/EditEvent";
+import HomeB from './pages/HomeB';
+import AddBirthday from './pages/AddBirthday';
+import DashBirthday from './components/DashBirthday';
+import AddExpensePage from "./pages/AddExpensePage";
+import EditExpensePage from "./pages/EditExpensePage";
+import HomeExpensePage from "./pages/HomeExpensePage";
+import DashFinance from "./components/DashFinance";
+
 
 function App() {
   return (
@@ -38,6 +46,14 @@ function App() {
         <Route path="/become-member" element={<BecomeMember />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/edit-event/:id" element={<EditEvent />} />
+         <Route path="/add-birthday" element={<AddBirthday />} />
+        <Route path="/homeB-birthday" element={<HomeB />} />
+         <Route path="/expense" element={<HomeExpensePage />} />
+        <Route path="/expense/add" element={<AddExpensePage />} />
+        <Route path="/expense/edit/:id" element={<EditExpensePage />} />
+        <Route path="/dashboard/birthday/*" element={<DashBirthday />} />
+        <Route path="/dashboard/finance/*" element={<DashFinance />} />
+
       </Routes>
     <Footer/>
     </BrowserRouter>
