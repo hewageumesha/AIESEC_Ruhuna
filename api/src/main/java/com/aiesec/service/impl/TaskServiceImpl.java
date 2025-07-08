@@ -10,13 +10,16 @@ import com.aiesec.repository.TaskRepo;
 import com.aiesec.repository.UserRepository;
 import com.aiesec.service.interfaces.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -236,8 +239,16 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new RuntimeException("Task not found with ID: " + taskId));
 
         task.setWorkOfStatus(status);
+
+        if ("completed".equalsIgnoreCase(status)) {
+            task.setCompletedAt(LocalDateTime.now());
+        } else {
+            task.setCompletedAt(null);  // reset if re-opened
+        }
+
         taskRepo.save(task);
     }
+
 
     @Override
     public List<UserProgressDto> getUserProgressList(Long loggedInUserId) {
@@ -360,6 +371,27 @@ public class TaskServiceImpl implements TaskService {
         proof.setFilePath(filePath);
 
         taskProofRepo.save(proof);
+    }
+
+
+    @Service
+    public class TaskCleanupService {
+
+        @Autowired
+        private TaskRepo taskRepo;
+
+        @Transactional
+        @Scheduled(cron = "0 0 2 * * ?")  // every day at 2 AM
+        public void deleteCompletedTasksOlderThan2Days() {
+            LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);
+            List<Task> tasksToDelete = taskRepo.findByWorkOfStatusAndCompletedAtBefore("completed", twoDaysAgo);
+
+            for (Task task : tasksToDelete) {
+                taskRepo.delete(task);
+            }
+
+            System.out.println("Deleted " + tasksToDelete.size() + " completed tasks older than 2 days.");
+        }
     }
 
 

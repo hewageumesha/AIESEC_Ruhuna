@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -35,6 +36,10 @@ public class Task {
 
     @Column(name = "work_of_status", nullable = false)
     private String workOfStatus;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
+
 
     @ManyToOne
     @JoinColumn(name = "user_user_id")
