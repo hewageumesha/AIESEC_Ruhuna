@@ -18,6 +18,7 @@ import Contact from './pages/Contact';
 import EventDetails from "./pages/EventDetails";
 import EditEvent from "./components/event/EditEvent";
 import PublicEventsPage from "./pages/PublicEvents";
+import EventAnalytics from "./pages/EventAnalytics";
 function App() {
   return (
     <BrowserRouter>
@@ -40,6 +41,7 @@ function App() {
         <Route path="/edit-event/:id" element={<EditEvent />} />
         <Route path="/public-event" element={<PublicEventsPage />} />
         <Route path="/public-event/:id" element={<EventDetails />} />
+        <Route path="/event-analytics" element={<EventAnalytics />} />
 
       </Routes>
     <Footer/>
