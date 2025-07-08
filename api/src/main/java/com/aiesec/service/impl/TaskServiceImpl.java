@@ -239,35 +239,47 @@ public class TaskServiceImpl implements TaskService {
         List<User> allUsers = userRepo.findAll();
         List<User> filteredUsers = new ArrayList<>();
 
-        switch (loggedInUser.getRole()) {
-            case LCP -> {
-                filteredUsers = allUsers.stream()
-                        .filter(u -> u.getRole() == UserRole.LCVP || u.getRole() == UserRole.Member)
-                        .toList();
+        // Check if logged in user is from ED function
+        boolean isFromEDFunction = loggedInUser.getFunction() != null
+                && "ED".equalsIgnoreCase(loggedInUser.getFunction().getName());
+
+        if (isFromEDFunction) {
+            // If user belongs to ED function, show all users
+            filteredUsers = allUsers;
+        } else {
+            // Normal role based filtering
+            switch (loggedInUser.getRole()) {
+                case LCP -> {
+                    filteredUsers = allUsers.stream()
+                            .filter(u -> u.getRole() == UserRole.LCVP || u.getRole() == UserRole.Member)
+                            .toList();
+                }
+                case LCVP -> {
+                    filteredUsers = allUsers.stream()
+                            .filter(u -> u.getRole() == UserRole.Team_Leader || u.getRole() == UserRole.Member)
+                            .toList();
+                }
+                case Team_Leader -> {
+                    filteredUsers = allUsers.stream()
+                            .filter(u -> u.getTeamLeaderId() != null
+                                    && u.getTeamLeaderId().equals(loggedInUser.getId().toString())
+                                    && u.getRole() == UserRole.Member)
+                            .toList();
+                }
+                case Member -> {
+                    filteredUsers = allUsers.stream()
+                            .filter(u -> !u.getId().equals(loggedInUser.getId())
+                                    && u.getRole() == UserRole.Member
+                                    && u.getDepartment() != null
+                                    && loggedInUser.getDepartment() != null
+                                    && u.getDepartment().getId().equals(loggedInUser.getDepartment().getId()))
+                            .toList();
+                }
+                default -> throw new RuntimeException("Unknown role");
             }
-            case LCVP -> {
-                filteredUsers = allUsers.stream()
-                        .filter(u -> u.getRole() == UserRole.Team_Leader || u.getRole() == UserRole.Member)
-                        .toList();
-            }
-            case Team_Leader -> {
-                filteredUsers = allUsers.stream()
-                        .filter(u -> u.getTeamLeaderId() != null
-                                && u.getTeamLeaderId().equals(loggedInUser.getId().toString())
-                                && u.getRole() == UserRole.Member)
-                        .toList();
-            }
-            case Member -> {
-                filteredUsers = allUsers.stream()
-                        .filter(u -> !u.getId().equals(loggedInUser.getId())
-                                && u.getRole() == UserRole.Member
-                                && u.getDepartment() != null
-                                && loggedInUser.getDepartment() != null
-                                && u.getDepartment().getId().equals(loggedInUser.getDepartment().getId()))
-                        .toList();
-            }
-            default -> throw new RuntimeException("Unknown role");
         }
+
+        // ... rest of your existing mapping logic for UserProgressDto
 
         List<UserProgressDto> result = new ArrayList<>();
         for (User user : filteredUsers) {
@@ -286,13 +298,9 @@ public class TaskServiceImpl implements TaskService {
             dto.setCompletedTasks(completed);
             dto.setProgressPercentage(progress);
 
-            // ✨ NEW FIELDS:
             dto.setProfilePicture(user.getProfilePicture());
             dto.setRole(user.getRole() != null ? UserRole.valueOf(user.getRole().toString()) : null);
-            //dto.setDepartmentName(user.getDepartment() != null ? user.getDepartment().getName() : null);
-            //dto.setFunctionName(user.getFunctionId() != null ? user.getFunctionId().getName() : null);
 
-            // 🌸 Set minimal Department object
             if (user.getDepartment() != null) {
                 Department dept = new Department();
                 dept.setId(user.getDepartment().getId());
@@ -300,7 +308,6 @@ public class TaskServiceImpl implements TaskService {
                 dto.setDepartment(dept);
             }
 
-            // 🌸 Set minimal Function object
             if (user.getFunction() != null) {
                 Function func = new Function();
                 func.setId(user.getFunction().getId());
@@ -313,8 +320,6 @@ public class TaskServiceImpl implements TaskService {
 
         return result;
     }
-
-
 
     @Override
     public void saveProof(Integer taskId, Integer id, MultipartFile file, String note) throws IOException {
