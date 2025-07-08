@@ -8,6 +8,8 @@ A fully-featured Management Information System (MIS) developed for AIESEC in Ruh
 This web-based system allows AIESEC members and guests to interact with the organization through a centralized platform. Key functionalities include:
 
 - **User Role Management** (LCP, LCVP, Team Leaders, Members, Guests)
+- **User Management** (Add, Update, Delete)
+- **Comment Section**
 - **Event Management** (Creation, Registration, Experience Sharing, Merchandise)
 - **Task Management**
 - **Finance and Budget Tracking**
