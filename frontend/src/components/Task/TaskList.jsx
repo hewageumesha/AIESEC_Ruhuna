@@ -17,6 +17,9 @@ const TaskList = () => {
     const [deadlineFrom, setDeadlineFrom] = useState("");
     const [deadlineTo, setDeadlineTo] = useState("");
 
+    const [showModal, setShowModal] = useState(false);
+    const [selectedTask, setSelectedTask] = useState(null);
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -36,12 +39,10 @@ const TaskList = () => {
         fetchUserData();
     }, [id]);
 
-    // Unique assigned usernames for Assigned To dropdown
     const assignedUsers = Array.from(
         new Set(tasks.map((task) => task.assignedTo?.username).filter(Boolean))
     );
 
-    // Filtering logic
     const filteredTasks = tasks.filter((task) => {
         const matchesSearch =
             task.taskName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -97,6 +98,16 @@ const TaskList = () => {
         });
     };
 
+    const openMoreModal = (task) => {
+        setSelectedTask(task);
+        setShowModal(true);
+    };
+
+    const closeMoreModal = () => {
+        setSelectedTask(null);
+        setShowModal(false);
+    };
+
     return (
         <div className="max-w-7xl mx-auto px-6 py-10 font-sans">
             {userDetails && (
@@ -105,7 +116,6 @@ const TaskList = () => {
                 </h2>
             )}
 
-            {/* Search and Deadline filters */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 max-w-3xl mx-auto">
                 <input
                     type="text"
@@ -128,7 +138,6 @@ const TaskList = () => {
                 />
             </div>
 
-            {/* Task Table */}
             {filteredTasks.length > 0 ? (
                 <div className="overflow-x-auto rounded-xl shadow-2xl border border-gray-100">
                     <table className="min-w-full text-sm text-left bg-white">
@@ -136,7 +145,6 @@ const TaskList = () => {
                         <tr>
                             <th className="py-4 px-6 whitespace-nowrap">Task</th>
                             <th className="py-4 px-6 whitespace-nowrap">Description</th>
-
                             <th className="py-4 px-6 whitespace-nowrap">
                                 <div className="flex items-center space-x-1">
                                     Priority
@@ -153,9 +161,7 @@ const TaskList = () => {
                                     </select>
                                 </div>
                             </th>
-
                             <th className="py-4 px-6 whitespace-nowrap">Deadline</th>
-
                             <th className="py-4 px-6 whitespace-nowrap">
                                 <div className="flex items-center space-x-1">
                                     Status
@@ -172,7 +178,6 @@ const TaskList = () => {
                                     </select>
                                 </div>
                             </th>
-
                             <th className="py-4 px-6 whitespace-nowrap">
                                 <div className="flex items-center space-x-1">
                                     Assigned To
@@ -191,51 +196,46 @@ const TaskList = () => {
                                     </select>
                                 </div>
                             </th>
-
+                            <th className="py-4 px-6 text-center whitespace-nowrap">More</th>
                             <th className="py-4 px-6 text-center whitespace-nowrap">⚙️ Actions</th>
                         </tr>
                         </thead>
-
-
                         <tbody>
                         {filteredTasks.map((task) => (
-                            <tr
-                                key={task.taskId}
-                                className="border-t border-gray-100 hover:bg-indigo-50 transition"
-                            >
+                            <tr key={task.taskId} className="border-t border-gray-100 hover:bg-indigo-50 transition">
                                 <td className="px-6 py-3 font-medium text-gray-900">{task.taskName}</td>
                                 <td className="px-6 py-3 text-gray-600">{task.description}</td>
                                 <td className="px-6 py-3">
-                    <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
-                            task.priority === "HIGH"
-                                ? "bg-red-100 text-red-800"
-                                : task.priority === "MEDIUM"
-                                    ? "bg-yellow-100 text-yellow-700"
-                                    : "bg-green-100 text-green-700"
-                        }`}
-                    >
-                      {task.priority}
-                    </span>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
+                                        task.priority === "HIGH"
+                                            ? "bg-red-100 text-red-800"
+                                            : task.priority === "MEDIUM"
+                                                ? "bg-yellow-100 text-yellow-700"
+                                                : "bg-green-100 text-green-700"
+                                    }`}>{task.priority}</span>
                                 </td>
                                 <td className="px-6 py-3 text-gray-700">
                                     {new Date(task.deadLine).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-3">
-                    <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
-                            task.workOfStatus === "completed"
-                                ? "bg-green-200 text-green-900"
-                                : task.workOfStatus === "in-progress"
-                                    ? "bg-yellow-200 text-yellow-900"
-                                    : "bg-red-100 text-red-800"
-                        }`}
-                    >
-                      {task.workOfStatus}
-                    </span>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
+                                        task.workOfStatus === "completed"
+                                            ? "bg-green-200 text-green-900"
+                                            : task.workOfStatus === "in-progress"
+                                                ? "bg-yellow-200 text-yellow-900"
+                                                : "bg-red-100 text-red-800"
+                                    }`}>{task.workOfStatus}</span>
                                 </td>
                                 <td className="px-6 py-3 font-medium text-gray-800">
                                     {task.assignedTo?.username || "Not Assigned"}
+                                </td>
+                                <td className="px-6 py-3 text-center">
+                                    <button
+                                        onClick={() => openMoreModal(task)}
+                                        className="text-indigo-600 hover:text-indigo-800 underline"
+                                    >
+                                        More
+                                    </button>
                                 </td>
                                 <td className="px-6 py-3 flex justify-center gap-3">
                                     <button
@@ -260,14 +260,38 @@ const TaskList = () => {
                 </div>
             ) : (
                 <p className="text-center text-gray-500 mt-10 text-lg">
-                    <img
-                        src={notfound}
-                        alt="sad"
-                        className="inline-block w-16 h-16"
-                        style={{ marginTop: "10px" }}
-                    />{" "}
+                    <img src={notfound} alt="sad" className="inline-block w-16 h-16" style={{ marginTop: "10px" }} />{" "}
                     No tasks found
                 </p>
+            )}
+
+            {showModal && selectedTask && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white text-gray-800 rounded-lg p-6 max-w-lg w-full shadow-lg relative">                        <button
+                            onClick={closeMoreModal}
+                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-900"
+                        >
+                            ✖
+                        </button>
+                        <h3 className="text-xl font-semibold mb-4">Task Details</h3>
+                        <p><strong>Note:</strong> {selectedTask.note || "No note provided."}</p>
+                        <p className="mt-3">
+                            <strong>Proof Document:</strong>{" "}
+                            {selectedTask.proofDocumentUrl ? (
+                                <a
+                                    href={selectedTask.proofDocumentUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-indigo-600 hover:underline"
+                                >
+                                    View Document
+                                </a>
+                            ) : (
+                                "No proof document uploaded."
+                            )}
+                        </p>
+                    </div>
+                </div>
             )}
         </div>
     );

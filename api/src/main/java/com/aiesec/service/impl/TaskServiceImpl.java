@@ -215,6 +215,12 @@ public class TaskServiceImpl implements TaskService {
         } else {
             dto.setAssignedBy(null);
         }
+        if (task.getProofs() != null && !task.getProofs().isEmpty()) {
+            TaskProof proof = task.getProofs().get(0);  // get first proof
+            dto.setNote(proof.getNote());
+            dto.setFilePath(proof.getFilePath());
+        }
+
 
         return dto;
     }
@@ -258,47 +264,42 @@ public class TaskServiceImpl implements TaskService {
         List<User> allUsers = userRepo.findAll();
         List<User> filteredUsers = new ArrayList<>();
 
-        // Check if logged in user is from ED function
-        boolean isFromEDFunction = loggedInUser.getFunction() != null
-                && "ED".equalsIgnoreCase(loggedInUser.getFunction().getName());
-
-        if (isFromEDFunction) {
-            // If user belongs to ED function, show all users
-            filteredUsers = allUsers;
-        } else {
-            // Normal role based filtering
-            switch (loggedInUser.getRole()) {
-                case LCP -> {
-                    filteredUsers = allUsers.stream()
-                            .filter(u -> u.getRole() == UserRole.LCVP || u.getRole() == UserRole.Member)
-                            .toList();
-                }
-                case LCVP -> {
-                    filteredUsers = allUsers.stream()
-                            .filter(u -> u.getRole() == UserRole.Team_Leader || u.getRole() == UserRole.Member)
-                            .toList();
-                }
-                case Team_Leader -> {
-                    filteredUsers = allUsers.stream()
-                            .filter(u -> u.getTeamLeaderId() != null
-                                    && u.getTeamLeaderId().equals(loggedInUser.getId().toString())
-                                    && u.getRole() == UserRole.Member)
-                            .toList();
-                }
-                case Member -> {
-                    filteredUsers = allUsers.stream()
-                            .filter(u -> !u.getId().equals(loggedInUser.getId())
-                                    && u.getRole() == UserRole.Member
-                                    && u.getDepartment() != null
-                                    && loggedInUser.getDepartment() != null
-                                    && u.getDepartment().getId().equals(loggedInUser.getDepartment().getId()))
-                            .toList();
-                }
-                default -> throw new RuntimeException("Unknown role");
+        switch (loggedInUser.getRole()) {
+            case LCP -> {
+                filteredUsers = allUsers.stream()
+                        .filter(u -> u.getRole() == UserRole.LCVP
+                                || u.getRole() == UserRole.Team_Leader
+                                || u.getRole() == UserRole.Member)
+                        .toList();
             }
+            case LCVP -> {
+                filteredUsers = allUsers.stream()
+                        .filter(u ->
+                                (u.getRole() == UserRole.Team_Leader || u.getRole() == UserRole.Member)
+                                        && u.getFunction() != null
+                                        && loggedInUser.getFunction() != null
+                                        && u.getFunction().getId().equals(loggedInUser.getFunction().getId())
+                        )
+                        .toList();
+            }
+            case Team_Leader -> {
+                filteredUsers = allUsers.stream()
+                        .filter(u -> u.getTeamLeaderId() != null
+                                && u.getTeamLeaderId().equals(loggedInUser.getId().toString())
+                                && u.getRole() == UserRole.Member)
+                        .toList();
+            }
+            case Member -> {
+                filteredUsers = allUsers.stream()
+                        .filter(u -> !u.getId().equals(loggedInUser.getId())
+                                && u.getRole() == UserRole.Member
+                                && u.getFunction() != null
+                                && loggedInUser.getFunction() != null
+                                && u.getFunction().getId().equals(loggedInUser.getFunction().getId()))
+                        .toList();
+            }
+            default -> throw new RuntimeException("Unknown role");
         }
-
-        // ... rest of your existing mapping logic for UserProgressDto
 
         List<UserProgressDto> result = new ArrayList<>();
         for (User user : filteredUsers) {
@@ -316,9 +317,8 @@ public class TaskServiceImpl implements TaskService {
             dto.setTotalTasks(total);
             dto.setCompletedTasks(completed);
             dto.setProgressPercentage(progress);
-
             dto.setProfilePicture(user.getProfilePicture());
-            dto.setRole(user.getRole() != null ? UserRole.valueOf(user.getRole().toString()) : null);
+            dto.setRole(user.getRole());
 
             if (user.getDepartment() != null) {
                 Department dept = new Department();
@@ -339,6 +339,7 @@ public class TaskServiceImpl implements TaskService {
 
         return result;
     }
+
 
     @Override
     public void saveProof(Integer taskId, Integer id, MultipartFile file, String note) throws IOException {
@@ -403,6 +404,10 @@ public class TaskServiceImpl implements TaskService {
         task.setDescription(taskDto.getDescription());
         task.setPriority(taskDto.getPriority());
         task.setWorkOfStatus(taskDto.getWorkOfStatus());
+
+
+
+
 
         if (taskDto.getAssignedBy() != null) {
             User assignedByUser = new User();

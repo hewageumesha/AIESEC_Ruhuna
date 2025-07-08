@@ -23,6 +23,9 @@ public class TaskDto {
     private AssignedUserDTO assignedTo; // User to whom task is assigned
     private AssignedUserDTO assignedBy; // User who assigned the task
 
+    private String note;
+    private String filePath;
+
     @NoArgsConstructor
     @Getter
     @Setter

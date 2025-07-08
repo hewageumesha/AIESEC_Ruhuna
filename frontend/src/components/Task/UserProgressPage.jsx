@@ -14,6 +14,7 @@ const UserProgressPage = () => {
     // Filters state
     const [selectedDepartment, setSelectedDepartment] = useState("");
     const [selectedFunction, setSelectedFunction] = useState("");
+    const [selectedRole, setSelectedRole] = useState(""); // NEW role filter
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -49,12 +50,15 @@ const UserProgressPage = () => {
         }
     };
 
-    // Extract unique departments and functions for filter dropdowns
+    // Extract unique values for filters
     const uniqueDepartments = Array.from(
         new Set(progressData.map((u) => u.department?.name).filter(Boolean))
     );
     const uniqueFunctions = Array.from(
         new Set(progressData.map((u) => u.function?.name).filter(Boolean))
+    );
+    const uniqueRoles = Array.from(
+        new Set(progressData.map((u) => u.role).filter(Boolean))
     );
 
     const exportToCSV = () => {
@@ -97,18 +101,16 @@ const UserProgressPage = () => {
                 fillColor: "#0052cc",
                 textColor: "#ffffff",
             },
-            head: [
-                [
-                    "Name",
-                    "Email",
-                    "Department",
-                    "Function",
-                    "Role",
-                    "Total Tasks",
-                    "Completed Tasks",
-                    "Progress (%)",
-                ],
-            ],
+            head: [[
+                "Name",
+                "Email",
+                "Department",
+                "Function",
+                "Role",
+                "Total Tasks",
+                "Completed Tasks",
+                "Progress (%)",
+            ]],
             body: progressData.map((user) => [
                 user.name,
                 user.email || "",
@@ -123,7 +125,7 @@ const UserProgressPage = () => {
         doc.save("user_progress.pdf");
     };
 
-    // Filter based on search, department, and function
+    // Filter based on search, department, function, role
     const filteredData = progressData.filter((user) => {
         const matchesSearch =
             user.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -134,20 +136,21 @@ const UserProgressPage = () => {
         const matchesFunction = selectedFunction
             ? user.function?.name === selectedFunction
             : true;
-        return matchesSearch && matchesDepartment && matchesFunction;
+        const matchesRole = selectedRole
+            ? user.role === selectedRole
+            : true;
+        return matchesSearch && matchesDepartment && matchesFunction && matchesRole;
     });
 
-    // Pagination calculations
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const currentData = filteredData.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
 
-    // Reset page if search or filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [search, selectedDepartment, selectedFunction]);
+    }, [search, selectedDepartment, selectedFunction, selectedRole]);
 
     const goToPrevPage = () => {
         if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -157,14 +160,12 @@ const UserProgressPage = () => {
         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
     };
 
-    // Progress bar color: using AIESEC blue shades with lighter for low progress
     const getProgressColor = (percentage) => {
-        if (percentage >= 80) return "#0052cc"; // Primary blue for good progress
-        if (percentage >= 40) return "#6699ff"; // Light blue for medium progress
-        return "#b3c7ff"; // Very light blue for low progress
+        if (percentage >= 80) return "#0052cc";
+        if (percentage >= 40) return "#6699ff";
+        return "#b3c7ff";
     };
 
-    // Generate initials for fallback avatar
     const getInitials = (name) => {
         if (!name) return "";
         const parts = name.trim().split(" ");
@@ -172,13 +173,12 @@ const UserProgressPage = () => {
         return (parts[0][0] + parts[1][0]).toUpperCase();
     };
 
-    // Generate consistent background color based on name (blue tinted)
     const stringToColor = (str) => {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
             hash = str.charCodeAt(i) + ((hash << 5) - hash);
         }
-        const hue = hash % 240; // restrict to blue hues (0-240)
+        const hue = hash % 240;
         return `hsl(${hue}, 70%, 60%)`;
     };
 
@@ -189,9 +189,9 @@ const UserProgressPage = () => {
                 margin: "2rem auto",
                 padding: "1rem",
                 fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-                backgroundColor: "#e6f0ff", // Light Blue background
+                backgroundColor: "#e6f0ff",
                 minHeight: "100vh",
-                color: "#222222", // Dark text
+                color: "#222222",
             }}
         >
             <header
@@ -214,13 +214,12 @@ const UserProgressPage = () => {
                             userSelect: "none",
                         }}
                     >
-                         User Progress Dashboard
+                        User Progress Dashboard
                     </h1>
                     <p style={{ color: "#0041a3", fontWeight: "600" }}>
                         Track and export your team's task completion progress.
                     </p>
                 </div>
-
                 <div style={{ display: "flex", gap: "0.75rem" }}>
                     <button
                         onClick={exportToCSV}
@@ -270,7 +269,7 @@ const UserProgressPage = () => {
                     gap: "1rem",
                     marginBottom: "1.5rem",
                     flexWrap: "wrap",
-                    maxWidth: 700,
+                    maxWidth: 900,
                     color: "#222222",
                 }}
             >
@@ -336,6 +335,30 @@ const UserProgressPage = () => {
                     {uniqueFunctions.map((func) => (
                         <option key={func} value={func}>
                             {func}
+                        </option>
+                    ))}
+                </select>
+
+                <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    style={{
+                        padding: "0.5rem",
+                        borderRadius: 6,
+                        border: "1px solid #0052cc",
+                        fontSize: "1rem",
+                        minWidth: 150,
+                        color: "#222222",
+                        outlineColor: "#0052cc",
+                        backgroundColor: "#ffffff",
+                        cursor: "pointer",
+                    }}
+                    aria-label="Filter by Role"
+                >
+                    <option value="">All Roles</option>
+                    {uniqueRoles.map((role) => (
+                        <option key={role} value={role}>
+                            {role}
                         </option>
                     ))}
                 </select>
