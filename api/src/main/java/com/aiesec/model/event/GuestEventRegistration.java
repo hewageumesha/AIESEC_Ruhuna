@@ -19,7 +19,10 @@ public class GuestEventRegistration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long guestUserId;
-    private Long eventId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Event_ID", referencedColumnName = "Event_ID")
+    private Event event;
+
     private String name;
     private String email;
     private String phone;
