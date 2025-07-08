@@ -23,8 +23,8 @@ public class Google {
 
     private static final String APPLICATION_NAME = "Birthday Notifier";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final String SPREADSHEET_ID = "155_BT7L-ilRRRObtiDDmnBMDjnpE7xEZ7dJLPpXTO9A";
-    private static final String RANGE = "Birthday Notifier!A2:F";
+    private static final String SPREADSHEET_ID = "1_0qdg9lbJmMG4OAmghccPx_Yc5XQUz14SpzaW61cdY4";
+    private static final String RANGE = "Sorted Birthdays!A2:E";
 
     private final BirthdayRepository birthdayRepository;
 
@@ -52,7 +52,7 @@ public class Google {
         List<BirthdayPerson> birthdayPeople = new ArrayList<>();
 
         if (values != null && !values.isEmpty()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
 
             for (List<Object> row : values) {
                 try {
