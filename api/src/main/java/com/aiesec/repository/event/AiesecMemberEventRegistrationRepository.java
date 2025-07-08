@@ -4,7 +4,10 @@ import com.aiesec.dto.EventRegistrationSummaryDTO;
 import com.aiesec.model.event.AiesecMemberEventRegistration;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AiesecMemberEventRegistrationRepository extends JpaRepository<AiesecMemberEventRegistration, Long> {
@@ -29,4 +32,13 @@ public interface AiesecMemberEventRegistrationRepository extends JpaRepository<A
             "FROM AiesecMemberEventRegistration r " +
             "GROUP BY r.event.eventId, r.event.eventName")
     List<EventRegistrationSummaryDTO> getSummaryByEvent();
+
+    int countByEvent_EventId(Long eventId);
+    @Query("SELECT FUNCTION('DATE', r.registeredAt), COUNT(r) FROM AiesecMemberEventRegistration r " +
+            "WHERE r.registeredAt BETWEEN :startDate AND :endDate " +
+            "GROUP BY FUNCTION('DATE', r.registeredAt) ORDER BY FUNCTION('DATE', r.registeredAt)")
+    List<Object[]> countRegistrationsGroupedByDate(@Param("startDate") LocalDateTime startDate,
+                                                   @Param("endDate") LocalDateTime endDate);
+
+
 }
