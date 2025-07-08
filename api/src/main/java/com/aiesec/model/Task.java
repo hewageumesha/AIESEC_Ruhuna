@@ -48,6 +48,9 @@ public class Task {
     @JoinColumn(name = "assigned_by")
     private User assignedBy;
 
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<TaskProof> proofs = new java.util.ArrayList<>();
+
     // Optional: Provide setter that maps from DTO (can be removed if unused)
 
 
