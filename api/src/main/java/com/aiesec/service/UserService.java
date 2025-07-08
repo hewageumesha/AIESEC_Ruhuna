@@ -1,5 +1,6 @@
 package com.aiesec.service;
 
+import com.aiesec.dto.PasswordUpdateRequest;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
 import com.aiesec.enums.UserRole;
@@ -12,6 +13,7 @@ import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +30,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();;
 
     // Method to add a new user
     public User addUser(User user) {
@@ -238,122 +243,22 @@ public class UserService {
         return startYear + "-" + (startYear + 1);
     }
 
+    public String updatePassword(String aiesecEmail, PasswordUpdateRequest request) {
+        User user = userRepository.findByAiesecEmail(aiesecEmail)
+                .orElseThrow(() -> new RuntimeException("User not found!"));
 
-
-    /* 
-    private UserHierarchyDTO buildHierarchy(User user) {
-        UserHierarchyDTO dto = new UserHierarchyDTO();
-        dto.setId(user.getId());
-        dto.setName(user.getFirstName() + " " + user.getLastName());
-        dto.setAiesecEmail(user.getAiesecEmail());
-        dto.setRole(user.getRole());
-        dto.setProfilePicture(user.getProfilePicture());
-        
-        if (user.getDepartment() != null) {
-            dto.setDepartmentName(user.getDepartment().getName());
-        }
-        
-        if (user.getFunction() != null) {
-            dto.setFunctionName(user.getFunction().getName());
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            return "Current password is incorrect!";
         }
 
-        List<User> children;
-        if (user.getRole() == Role.LCP) {
-            children = userRepository.findByRole(Role.LCVP);
-        } else if (user.getRole() == Role.LCVP) {
-            children = userRepository.findByRoleAndTeamLeaderId(Role.Team_Leader, user.getId());
-        } else if (user.getRole() == Role.Team_Leader) {
-            children = userRepository.findByTeamLeaderId(user.getId());
-        } else {
-            children = Collections.emptyList();
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            return "New password and confirm password do not match!";
         }
 
-        if (!children.isEmpty()) {
-            dto.setChildren(children.stream()
-                .map(this::buildHierarchy)
-                .collect(Collectors.toList()));
-        }
+        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
 
-        return dto;
+        return "Password updated successfully!";
     }
-
-    public UserDTO getUserDetails(Long id) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return convertToDTO(user);
-    }
-
-    
-    private UserDTO convertToDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setAiesecEmail(user.getAiesecEmail());
-        dto.setBirthday(user.getBirthday());
-        dto.setJoinedDate(user.getJoinedDate());
-        dto.setProfilePicture(user.getProfilePicture());
-        dto.setRole(user.getRole());
-        dto.setStatus(user.getStatus());
-        
-        if (user.getFunction() != null) {
-            dto.setFunctionId(user.getFunction().getId());
-            dto.setFunctionName(user.getFunction().getName());
-        }
-        
-        if (user.getDepartment() != null) {
-            dto.setDepartmentId(user.getDepartment().getId());
-            dto.setDepartmentName(user.getDepartment().getName());
-        }
-        
-        if (user.getTeamLeader() != null) {
-            dto.setTeamLeaderId(user.getTeamLeader().getId());
-            dto.setTeamLeaderName(user.getTeamLeader().getFirstName() + " " + user.getTeamLeader().getLastName());
-        }
-        
-        if (!user.getTeamMembers().isEmpty()) {
-            dto.setTeamMembers(user.getTeamMembers().stream()
-                .map(this::convertToSimpleDTO)
-                .collect(Collectors.toList()));
-        }
-        
-        return dto;
-    }
-
-    private UserDTO convertToSimpleDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setAiesecEmail(user.getAiesecEmail());
-        dto.setRole(user.getRole());
-        dto.setProfilePicture(user.getProfilePicture());
-        return dto;
-    }
-
-    @Transactional
-    public UserDTO createUser(UserDTO userDTO) {
-        User user = new User();
-        // Set all fields from DTO
-        // Handle relationships
-        User savedUser = userRepository.save(user);
-        return convertToDTO(savedUser);
-    }
-
-    @Transactional
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        // Update fields from DTO
-        User updatedUser = userRepository.save(user);
-        return convertToDTO(updatedUser);
-    }
-
-    @Transactional
-    public void deleteUser(Long id) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        userRepository.delete(user);
-    }
-    */
 }

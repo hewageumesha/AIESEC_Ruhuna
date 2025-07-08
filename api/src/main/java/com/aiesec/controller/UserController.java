@@ -1,5 +1,6 @@
 package com.aiesec.controller;
 import com.aiesec.dto.CommentDTO;
+import com.aiesec.dto.PasswordUpdateRequest;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
 
@@ -98,34 +99,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getCommitteeHierarchy());
     }
 
-    /* 
-    @GetMapping("/hierarchy")
-    public ResponseEntity<List<UserHierarchyDTO>> getCommitteeHierarchy() {
-        return ResponseEntity.ok(userService.getCommitteeHierarchy());
+    @PostMapping("/update-password")
+    public String updatePassword(
+            @RequestParam String aiesecEmail, // you can pass this from logged-in user context instead of request param
+            @RequestBody PasswordUpdateRequest request
+    ) {
+        return userService.updatePassword(aiesecEmail, request);
     }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserDetails(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserDetails(id));
-    }
-
-    @PostMapping
-    @PreAuthorize("hasRole('LCP') or hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.createUser(userDTO));
-    }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('LCP') or hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.updateUser(id, userDTO));
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('LCP') or hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
-    }
-    */
 }
