@@ -72,6 +72,8 @@ function App() {
         <Route path="/user/:id/TaskDashboardLCVP" element={<TaskDashboardLCVP />} />
         {/* TL dashboard */}
         <Route path="/user/:id/TaskDashboardTL" element={<TaskDashboardTL />} />
+        {/* TL dashboard */}
+        <Route path="/user/:id/TaskDashboardMember" element={<TaskDashboardTL />} />
       </Routes>
     <Footer/>
     </BrowserRouter>

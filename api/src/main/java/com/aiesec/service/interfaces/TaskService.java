@@ -26,10 +26,12 @@ public interface TaskService {
 
     Map<String, Long> getTaskCountByStatus();
 
-    List<UserProgressDto> getUserProgressList();
+   // List<UserProgressDto> getUserProgressList();
 
     void updateTaskStatus(Integer taskId, String status);
 
     void saveProof(Integer taskId, Integer id, MultipartFile file, String note) throws IOException;
+
+    List<UserProgressDto> getUserProgressList(Long userId);
 }
 

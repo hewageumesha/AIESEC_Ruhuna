@@ -115,11 +115,10 @@ public class TaskController {
     }
 
     @GetMapping("/progress")
-    public ResponseEntity<List<UserProgressDto>> getAllUserProgress() {
-        List<UserProgressDto> progressList = taskService.getUserProgressList();
+    public ResponseEntity<List<UserProgressDto>> getUserProgress(@RequestParam Long userId) {
+        List<UserProgressDto> progressList = taskService.getUserProgressList(userId);
         return ResponseEntity.ok(progressList);
     }
-
     @GetMapping("/{id}/notification")
     public ResponseEntity<List<TaskDto>> getTasksAssignedToUser(@PathVariable Integer id) {
         List<TaskDto> tasks = taskService.getTasksAssignedToUser(id);

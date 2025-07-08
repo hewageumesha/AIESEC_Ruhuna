@@ -4,9 +4,7 @@ import com.aiesec.dto.TaskDto;
 import com.aiesec.dto.UserProgressDto;
 import com.aiesec.enums.UserRole;
 import com.aiesec.exception.ResourcesNotFoundException;
-import com.aiesec.model.Task;
-import com.aiesec.model.TaskProof;
-import com.aiesec.model.User;
+import com.aiesec.model.*;
 import com.aiesec.repository.TaskProofRepo;
 import com.aiesec.repository.TaskRepo;
 import com.aiesec.repository.UserRepository;
@@ -234,32 +232,89 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<UserProgressDto> getUserProgressList() {
-        List<User> users = userRepo.findAll();
-        List<UserProgressDto> result = new ArrayList<>();
+    public List<UserProgressDto> getUserProgressList(Long loggedInUserId) {
+        User loggedInUser = userRepo.findById(loggedInUserId)
+                .orElseThrow(() -> new RuntimeException("Logged in user not found"));
 
-        for (User user : users) {
+        List<User> allUsers = userRepo.findAll();
+        List<User> filteredUsers = new ArrayList<>();
+
+        switch (loggedInUser.getRole()) {
+            case LCP -> {
+                filteredUsers = allUsers.stream()
+                        .filter(u -> u.getRole() == UserRole.LCVP || u.getRole() == UserRole.Member)
+                        .toList();
+            }
+            case LCVP -> {
+                filteredUsers = allUsers.stream()
+                        .filter(u -> u.getRole() == UserRole.Team_Leader || u.getRole() == UserRole.Member)
+                        .toList();
+            }
+            case Team_Leader -> {
+                filteredUsers = allUsers.stream()
+                        .filter(u -> u.getTeamLeaderId() != null
+                                && u.getTeamLeaderId().equals(loggedInUser.getId().toString())
+                                && u.getRole() == UserRole.Member)
+                        .toList();
+            }
+            case Member -> {
+                filteredUsers = allUsers.stream()
+                        .filter(u -> !u.getId().equals(loggedInUser.getId())
+                                && u.getRole() == UserRole.Member
+                                && u.getDepartment() != null
+                                && loggedInUser.getDepartment() != null
+                                && u.getDepartment().getId().equals(loggedInUser.getDepartment().getId()))
+                        .toList();
+            }
+            default -> throw new RuntimeException("Unknown role");
+        }
+
+        List<UserProgressDto> result = new ArrayList<>();
+        for (User user : filteredUsers) {
             List<Task> tasks = taskRepo.findByAssignedToId(user.getId());
             long total = tasks.size();
             long completed = tasks.stream()
                     .filter(t -> "completed".equalsIgnoreCase(t.getWorkOfStatus()))
                     .count();
-
             double progress = total == 0 ? 0.0 : ((double) completed / total) * 100;
 
             UserProgressDto dto = new UserProgressDto();
             dto.setId(user.getId());
             dto.setName(user.getUserName());
-            //dto.setEmail(user.getEmail());
+            dto.setEmail(user.getEmail());
             dto.setTotalTasks(total);
             dto.setCompletedTasks(completed);
             dto.setProgressPercentage(progress);
+
+            // ✨ NEW FIELDS:
+            dto.setProfilePicture(user.getProfilePicture());
+            dto.setRole(user.getRole() != null ? UserRole.valueOf(user.getRole().toString()) : null);
+            //dto.setDepartmentName(user.getDepartment() != null ? user.getDepartment().getName() : null);
+            //dto.setFunctionName(user.getFunctionId() != null ? user.getFunctionId().getName() : null);
+
+            // 🌸 Set minimal Department object
+            if (user.getDepartment() != null) {
+                Department dept = new Department();
+                dept.setId(user.getDepartment().getId());
+                dept.setName(user.getDepartment().getName());
+                dto.setDepartment(dept);
+            }
+
+            // 🌸 Set minimal Function object
+            if (user.getFunction() != null) {
+                Function func = new Function();
+                func.setId(user.getFunction().getId());
+                func.setName(user.getFunction().getName());
+                dto.setFunction(func);
+            }
 
             result.add(dto);
         }
 
         return result;
     }
+
+
 
     @Override
     public void saveProof(Integer taskId, Integer id, MultipartFile file, String note) throws IOException {
