@@ -35,7 +35,6 @@ const TaskUpdate = () => {
                 });
 
                 setUsers(usersData);
-                console.log("Fetched users:", usersData); // ✅ Add this
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -85,106 +84,91 @@ const TaskUpdate = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Edit Task #{taskId}</h2>
+        <div className="create-task-wrapper">
+            <h2 className="create-task-title">Edit Task #{taskId}</h2>
 
-            <div className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Task Name</label>
+            <div className="task-step">
+                <div className="form-group">
+                    <label>Task Name</label>
                     <input
                         name="taskName"
                         value={task.taskName}
                         onChange={handleInputChange}
-                        className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                        className="form-input"
+                        style={{ color: 'black', backgroundColor: 'white' }}
                     />
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <div className="form-group col-span-2">
+                    <label>Description</label>
                     <textarea
                         name="description"
                         value={task.description}
                         onChange={handleInputChange}
-                        className="w-full p-2 border rounded-md h-32 focus:ring-2 focus:ring-blue-500"
+                        className="form-input h-32"
+                        style={{ color: 'black', backgroundColor: 'white' }}
+                    ></textarea>
+                </div>
+
+                <div className="form-group">
+                    <label>Deadline</label>
+                    <input
+                        type="date"
+                        name="deadLine"
+                        value={task.deadLine}
+                        onChange={handleInputChange}
+                        className="form-input"
+                        style={{ color: 'black', backgroundColor: 'white' }}
                     />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Deadline</label>
-                        <input
-                            type="date"
-                            name="deadLine"
-                            value={task.deadLine}
-                            onChange={handleInputChange}
-                            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                        <select
-                            name="priority"
-                            value={task.priority}
-                            onChange={handleInputChange}
-                            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="HIGH">High</option>
-                            <option value="MEDIUM">Medium</option>
-                            <option value="LOW">Low</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <select
-                            name="workOfStatus"
-                            value={task.workOfStatus}
-                            onChange={handleInputChange}
-                            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="pending">Pending</option>
-                            <option value="in-progress">In Progress</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Assign To</label>
-                        <select
-                            value={task.assignedTo?.id?.toString() || ""}
-                            onChange={handleAssigneeChange}
-                            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="">Unassigned</option>
-                            {users.map((user) => {
-                                console.log("Rendering user:", user); // ✅ Debug each user
-                                return (
-                                    <option key={user.id} value={user.id.toString()}>
-                                        {user.userName}
-                                    </option>
-                                );
-                            })}
-                        </select>
-                    </div>
-                </div>
-
-                <div className="mt-6 flex justify-end gap-3">
-                    <button
-                        onClick={() => navigate(`/user/${id}/TaskList`)}
-                        className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                <div className="form-group">
+                    <label>Priority</label>
+                    <select
+                        name="priority"
+                        value={task.priority}
+                        onChange={handleInputChange}
+                        className="form-input"
+                        style={{ color: 'black', backgroundColor: 'white' }}
                     >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleUpdate}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                        Save Changes
-                    </button>
+                        <option value="HIGH">High</option>
+                        <option value="MEDIUM">Medium</option>
+                        <option value="LOW">Low</option>
+                    </select>
                 </div>
+
+                
+
+                <div className="form-group">
+                    <label>Assign To</label>
+                    <select
+                        value={task.assignedTo?.id?.toString() || ""}
+                        onChange={handleAssigneeChange}
+                        className="form-input"
+                    >
+                        <option value="">Unassigned</option>
+                        {users.map((user) => (
+                            <option key={user.id} value={user.id.toString()}>
+                                {user.userName}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            <div className="flex gap-4 mt-6">
+                <button
+                    onClick={() => navigate(`/user/${id}/TaskList`)}
+                    className="border border-gray-400 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-100 transition"
+                >
+                    Cancel
+                </button>
+                <button
+                    onClick={handleUpdate}
+                    className="btn-submit"
+                >
+                    Save Changes
+                </button>
             </div>
         </div>
     );

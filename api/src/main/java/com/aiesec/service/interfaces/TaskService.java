@@ -24,6 +24,8 @@ public interface TaskService {
     List<TaskDto> getTasksAssignedToUser(Integer userId);
 
 
+    TaskDto getTaskByIdAndUserId(Integer taskId, Integer id);
+
     Map<String, Long> getTaskCountByStatus();
 
    // List<UserProgressDto> getUserProgressList();

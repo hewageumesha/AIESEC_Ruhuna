@@ -125,6 +125,13 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
+    @GetMapping("/{id}/task/{taskId}")
+    public ResponseEntity<TaskDto> getTaskById(@PathVariable Integer id, @PathVariable Integer taskId) {
+        TaskDto taskDto = taskService.getTaskByIdAndUserId(taskId, id);
+        return ResponseEntity.ok(taskDto);
+    }
+
+
 
 
 

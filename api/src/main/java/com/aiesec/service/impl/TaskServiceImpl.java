@@ -20,8 +20,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.aiesec.enums.UserRole.Member;
-
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -150,6 +148,16 @@ public class TaskServiceImpl implements TaskService {
     public List<TaskDto> getTasksAssignedToUser(Integer id) {
         List<Task> tasks = taskRepo.findByAssignedTo_Id(id);
         return tasks.stream().map(this::taskToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public TaskDto getTaskByIdAndUserId(Integer taskId, Integer userId) {
+        Task task = taskRepo.findById(taskId)
+                .orElseThrow(() -> new ResourcesNotFoundException("Task", "taskId", taskId));
+
+        // Check using your DTO or manually if assigned_to is not mapped to an entity field
+        throw new ResourcesNotFoundException("Task not assigned to user with id", "userId", userId);
+
     }
 
     // ========== Mappers ==========
