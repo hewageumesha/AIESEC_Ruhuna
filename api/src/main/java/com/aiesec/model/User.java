@@ -102,6 +102,9 @@ public class User {
         return passwordEncoder.encode(rawPassword);
     }
 
+    @OneToOne(mappedBy = "user")
+    private ForgotPassword forgotPassword;
+
     public Long getId() {
         return id;
     }

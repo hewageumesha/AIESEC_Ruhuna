@@ -5,6 +5,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import com.aiesec.Record.MailBody;
+
 @Service
 public class EmailService {
 
@@ -17,13 +19,13 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-    public void sendPasswordResetEmail(String toEmail, String verificationCode) {
+
+    public void sendPasswordResetEmail(MailBody mailBody) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);
-        message.setTo(toEmail);
-        message.setSubject("Password Reset Verification Code");
-        message.setText("Your verification code is: " + verificationCode + "\n\n" +
-                "This code will expire in 10 minutes.");
+        message.setTo(mailBody.to());
+        message.setSubject(mailBody.subject());
+        message.setText(mailBody.text());
 
         mailSender.send(message);
     }
