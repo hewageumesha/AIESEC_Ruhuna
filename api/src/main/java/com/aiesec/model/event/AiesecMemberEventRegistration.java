@@ -3,6 +3,7 @@ package com.aiesec.model.event;
 
 import com.aiesec.enums.InterestStatus;
 import com.aiesec.enums.RegistrationType;
+import com.aiesec.model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,10 @@ public class AiesecMemberEventRegistration {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Event_ID", referencedColumnName = "Event_ID")
     private Event event;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", referencedColumnName = "id", insertable = false, updatable = false)
+    private User user;
 
     @Enumerated(EnumType.STRING)
     private InterestStatus interestStatus;

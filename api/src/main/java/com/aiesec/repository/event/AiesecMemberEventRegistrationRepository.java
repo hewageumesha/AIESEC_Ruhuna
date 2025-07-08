@@ -1,6 +1,7 @@
 package com.aiesec.repository.event;
 
 import com.aiesec.dto.EventRegistrationSummaryDTO;
+import com.aiesec.enums.InterestStatus;
 import com.aiesec.model.event.AiesecMemberEventRegistration;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -39,6 +40,16 @@ public interface AiesecMemberEventRegistrationRepository extends JpaRepository<A
             "GROUP BY FUNCTION('DATE', r.registeredAt) ORDER BY FUNCTION('DATE', r.registeredAt)")
     List<Object[]> countRegistrationsGroupedByDate(@Param("startDate") LocalDateTime startDate,
                                                    @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT r.interestStatus, COUNT(r) FROM AiesecMemberEventRegistration r WHERE r.event.eventId = :eventId GROUP BY r.interestStatus")
+    List<Object[]> countByEventIdGroupByStatus(@Param("eventId") Long eventId);
+
+    @Query("SELECT r FROM AiesecMemberEventRegistration r WHERE " +
+            "(:eventId IS NULL OR r.event.eventId = :eventId) AND " +
+            "(:status IS NULL OR r.interestStatus = :status)")
+    List<AiesecMemberEventRegistration> findFiltered(@Param("eventId") Long eventId, @Param("status") InterestStatus status);
+
+
 
 
 }
