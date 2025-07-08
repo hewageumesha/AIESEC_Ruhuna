@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Pencil, Trash2 } from "lucide-react";
-import notfound from "../asset/notfound.gif";  // <-- fixed import here
+import notfound from "../asset/notfound.gif";
 
 const TaskList = () => {
     const { id } = useParams();
@@ -13,21 +13,21 @@ const TaskList = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedPriority, setSelectedPriority] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("");
+    const [assignedToFilter, setAssignedToFilter] = useState("");
+    const [deadlineFrom, setDeadlineFrom] = useState("");
+    const [deadlineTo, setDeadlineTo] = useState("");
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                console.log("Fetching user from:", `http://localhost:8080/api/users/id/${id}/`);
                 const userRes = await fetch(`http://localhost:8080/api/users/id/${id}`);
                 if (!userRes.ok) throw new Error("Failed to fetch user");
                 const userData = await userRes.json();
                 setUserDetails(userData);
 
-                console.log("Fetching tasks from:", `http://localhost:8080/api/user/${id}/tasks/`);
                 const tasksRes = await fetch(`http://localhost:8080/api/user/${id}/tasks/`);
                 if (!tasksRes.ok) throw new Error("Failed to fetch tasks");
                 const userTasks = await tasksRes.json();
-                console.log("Fetched tasks:", userTasks);
                 setTasks(userTasks);
             } catch (err) {
                 console.error("Fetch error:", err.message);
@@ -36,6 +36,12 @@ const TaskList = () => {
         fetchUserData();
     }, [id]);
 
+    // Unique assigned usernames for Assigned To dropdown
+    const assignedUsers = Array.from(
+        new Set(tasks.map((task) => task.assignedTo?.username).filter(Boolean))
+    );
+
+    // Filtering logic
     const filteredTasks = tasks.filter((task) => {
         const matchesSearch =
             task.taskName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -44,11 +50,18 @@ const TaskList = () => {
 
         const matchesPriority = selectedPriority ? task.priority === selectedPriority : true;
         const matchesStatus = selectedStatus ? task.workOfStatus === selectedStatus : true;
+        const matchesAssignedTo = assignedToFilter ? task.assignedTo?.username === assignedToFilter : true;
 
-        return matchesSearch && matchesPriority && matchesStatus;
+        const taskDeadline = task.deadLine ? new Date(task.deadLine) : null;
+        const fromDate = deadlineFrom ? new Date(deadlineFrom) : null;
+        const toDate = deadlineTo ? new Date(deadlineTo) : null;
+
+        let matchesDeadline = true;
+        if (taskDeadline && fromDate) matchesDeadline = matchesDeadline && taskDeadline >= fromDate;
+        if (taskDeadline && toDate) matchesDeadline = matchesDeadline && taskDeadline <= toDate;
+
+        return matchesSearch && matchesPriority && matchesStatus && matchesAssignedTo && matchesDeadline;
     });
-
-    console.log("Filtered tasks to display:", filteredTasks);
 
     const handleEditTask = (taskId) => {
         const editPath = generatePath("/users/:userId/tasks/:taskId/edit", {
@@ -92,12 +105,8 @@ const TaskList = () => {
                 </h2>
             )}
 
-            <p className="text-center text-gray-600 mb-8">
-                Showing {filteredTasks.length} of {tasks.length} tasks
-            </p>
-
-            {/* Filters */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-10">
+            {/* Search and Deadline filters */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 max-w-3xl mx-auto">
                 <input
                     type="text"
                     placeholder="🔍 Search tasks..."
@@ -105,26 +114,18 @@ const TaskList = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full px-5 py-3 bg-white border border-gray-200 shadow-md rounded-xl focus:ring-2 focus:ring-indigo-400"
                 />
-                <select
-                    value={selectedPriority}
-                    onChange={(e) => setSelectedPriority(e.target.value)}
+                <input
+                    type="date"
+                    value={deadlineFrom}
+                    onChange={(e) => setDeadlineFrom(e.target.value)}
                     className="w-full px-5 py-3 bg-white border border-gray-200 shadow-md rounded-xl focus:ring-2 focus:ring-indigo-400"
-                >
-                    <option value="">All Priorities</option>
-                    <option value="HIGH">High</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="LOW">Low</option>
-                </select>
-                <select
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
+                />
+                <input
+                    type="date"
+                    value={deadlineTo}
+                    onChange={(e) => setDeadlineTo(e.target.value)}
                     className="w-full px-5 py-3 bg-white border border-gray-200 shadow-md rounded-xl focus:ring-2 focus:ring-indigo-400"
-                >
-                    <option value="">All Statuses</option>
-                    <option value="completed">Completed</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="pending">Pending</option>
-                </select>
+                />
             </div>
 
             {/* Task Table */}
@@ -133,15 +134,69 @@ const TaskList = () => {
                     <table className="min-w-full text-sm text-left bg-white">
                         <thead className="bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-900">
                         <tr>
-                            <th className="py-4 px-6">Task</th>
-                            <th className="py-4 px-6">Description</th>
-                            <th className="py-4 px-6">Priority</th>
-                            <th className="py-4 px-6">Deadline</th>
-                            <th className="py-4 px-6">Status</th>
-                            <th className="py-4 px-6">Assigned To</th>
-                            <th className="py-4 px-6 text-center">⚙️ Actions</th>
+                            <th className="py-4 px-6 whitespace-nowrap">Task</th>
+                            <th className="py-4 px-6 whitespace-nowrap">Description</th>
+
+                            <th className="py-4 px-6 whitespace-nowrap">
+                                <div className="flex items-center space-x-1">
+                                    Priority
+                                    <select
+                                        value={selectedPriority}
+                                        onChange={(e) => setSelectedPriority(e.target.value)}
+                                        className="w-5 h-5 p-0 border border-gray-300 rounded cursor-pointer text-transparent focus:text-black focus:outline-none"
+                                        title="Filter by Priority"
+                                    >
+                                        <option value=""></option>
+                                        <option value="HIGH" className="text-black">High</option>
+                                        <option value="MEDIUM" className="text-black">Medium</option>
+                                        <option value="LOW" className="text-black">Low</option>
+                                    </select>
+                                </div>
+                            </th>
+
+                            <th className="py-4 px-6 whitespace-nowrap">Deadline</th>
+
+                            <th className="py-4 px-6 whitespace-nowrap">
+                                <div className="flex items-center space-x-1">
+                                    Status
+                                    <select
+                                        value={selectedStatus}
+                                        onChange={(e) => setSelectedStatus(e.target.value)}
+                                        className="w-5 h-5 p-0 border border-gray-300 rounded cursor-pointer text-transparent focus:text-black focus:outline-none"
+                                        title="Filter by Status"
+                                    >
+                                        <option value=""></option>
+                                        <option value="completed" className="text-black">Completed</option>
+                                        <option value="in-progress" className="text-black">In Progress</option>
+                                        <option value="pending" className="text-black">Pending</option>
+                                    </select>
+                                </div>
+                            </th>
+
+                            <th className="py-4 px-6 whitespace-nowrap">
+                                <div className="flex items-center space-x-1">
+                                    Assigned To
+                                    <select
+                                        value={assignedToFilter}
+                                        onChange={(e) => setAssignedToFilter(e.target.value)}
+                                        className="w-5 h-5 p-0 border border-gray-300 rounded cursor-pointer text-transparent focus:text-black focus:outline-none"
+                                        title="Filter by Assigned To"
+                                    >
+                                        <option value=""></option>
+                                        {assignedUsers.map((username) => (
+                                            <option key={username} value={username} className="text-black">
+                                                {username}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </th>
+
+                            <th className="py-4 px-6 text-center whitespace-nowrap">⚙️ Actions</th>
                         </tr>
                         </thead>
+
+
                         <tbody>
                         {filteredTasks.map((task) => (
                             <tr
@@ -151,33 +206,33 @@ const TaskList = () => {
                                 <td className="px-6 py-3 font-medium text-gray-900">{task.taskName}</td>
                                 <td className="px-6 py-3 text-gray-600">{task.description}</td>
                                 <td className="px-6 py-3">
-                                        <span
-                                            className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
-                                                task.priority === "HIGH"
-                                                    ? "bg-red-100 text-red-800"
-                                                    : task.priority === "MEDIUM"
-                                                        ? "bg-yellow-100 text-yellow-700"
-                                                        : "bg-green-100 text-green-700"
-                                            }`}
-                                        >
-                                            {task.priority}
-                                        </span>
+                    <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
+                            task.priority === "HIGH"
+                                ? "bg-red-100 text-red-800"
+                                : task.priority === "MEDIUM"
+                                    ? "bg-yellow-100 text-yellow-700"
+                                    : "bg-green-100 text-green-700"
+                        }`}
+                    >
+                      {task.priority}
+                    </span>
                                 </td>
                                 <td className="px-6 py-3 text-gray-700">
                                     {new Date(task.deadLine).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-3">
-                                        <span
-                                            className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
-                                                task.workOfStatus === "completed"
-                                                    ? "bg-green-200 text-green-900"
-                                                    : task.workOfStatus === "in-progress"
-                                                        ? "bg-yellow-200 text-yellow-900"
-                                                        : "bg-red-100 text-red-800"
-                                            }`}
-                                        >
-                                            {task.workOfStatus}
-                                        </span>
+                    <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
+                            task.workOfStatus === "completed"
+                                ? "bg-green-200 text-green-900"
+                                : task.workOfStatus === "in-progress"
+                                    ? "bg-yellow-200 text-yellow-900"
+                                    : "bg-red-100 text-red-800"
+                        }`}
+                    >
+                      {task.workOfStatus}
+                    </span>
                                 </td>
                                 <td className="px-6 py-3 font-medium text-gray-800">
                                     {task.assignedTo?.username || "Not Assigned"}
