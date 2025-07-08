@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import TaskList from "./TaskList";
 import AssignedTasks from "./AssignedTasks";
-import {
-    BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer
-} from 'recharts';
 import UserProgressPage from "./UserProgressPage";
 
 const TaskDashboardMember = () => {
@@ -100,39 +96,12 @@ const TaskDashboardMember = () => {
                     </div>
 
                     {/* 🔹 Components – Task List and Assigned Tasks */}
-                    <TaskList />
-                    <UserProgressPage/>
+
+
                     <AssignedTasks />
-
-                    {/* 🔹 Stats and Chart Section */}
-                    <div className="mt-6 space-y-4">
-                        <div className="flex justify-between items-center">
-                            <p className="text-lg font-semibold">Number of Tasks: {numberOfTasks}</p>
-                            <button
-                                className="bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600"
-                                onClick={handleShowAllTasks}
-                            >
-                                Show All Tasks
-                            </button>
-                        </div>
-
-                        {/* 🔹 Bar Chart – Task Status Overview */}
-                        <BarChart width={500} height={300} data={[
-                            { status: "Completed", count: 10 },
-                            { status: "In Progress", count: 5 },
-                            { status: "Not Started", count: 3 }
-                        ]}>
-                            <XAxis dataKey="status" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Bar dataKey="count" fill="#8884d8" />
-                        </BarChart>
-
-                        {/* 🔹 User Progress Section */}
+                    <UserProgressPage/>
 
 
-                    </div>
                 </div>
             </div>
         </div>

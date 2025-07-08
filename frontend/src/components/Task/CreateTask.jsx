@@ -10,7 +10,7 @@ import {
     UserPlus,
     UserCheck
 } from 'lucide-react';
-import './CreateTask.css';
+import './TaskStyles/CreateTask.css';
 import Swal from "sweetalert2";
 
 const CreateTask = () => {

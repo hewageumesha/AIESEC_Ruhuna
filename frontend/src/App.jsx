@@ -26,6 +26,7 @@ import TaskUpdate from "./components/Task/TaskUpdate.jsx";
 import Notifications from "./components/Task/Notifications.jsx";
 import TaskDashboardLCVP from "./components/Task/TaskDashboardLCVP.jsx";
 import TaskDashboardTL from "./components/Task/TaskDashboardTL.jsx";
+import TaskDashboardMember from "./components/Task/TaskDashboardMember.jsx";
 
 const NotificationsWrapper = () => {
   const { id } = useParams();
@@ -73,7 +74,7 @@ function App() {
         {/* TL dashboard */}
         <Route path="/user/:id/TaskDashboardTL" element={<TaskDashboardTL />} />
         {/* TL dashboard */}
-        <Route path="/user/:id/TaskDashboardMember" element={<TaskDashboardTL />} />
+        <Route path="/user/:id/TaskDashboardMember" element={<TaskDashboardMember />} />
       </Routes>
     <Footer/>
     </BrowserRouter>

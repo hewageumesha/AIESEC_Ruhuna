@@ -225,7 +225,7 @@ export default function DashSidebar() {
             </>
           )}
 
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' || currentUser.role === 'member') && (
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' || currentUser.role === 'Member') && (
               <>
                 <Sidebar.Item
                     active={tab === 'task'}
@@ -278,7 +278,7 @@ export default function DashSidebar() {
                   <span className="font-medium">Events</span>
                 </Sidebar.Item>
               </Link>
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' ) && (
             <>
               <Link to='/dashboard?tab=birthday'>
                 <Sidebar.Item
