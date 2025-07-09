@@ -43,6 +43,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                              @Param("date") LocalDate date,
                              Pageable pageable);
 
+
+    @Query("SELECT e.eventId, e.eventName, e.startDate FROM Event e")
+    List<Object[]> findBasicEventInfo();
+
+
     // Find events with a t-shirt order option, starting after a given date
     List<Event> findByHasMerchandiseTrueAndStartDateAfter(LocalDate date);
 
