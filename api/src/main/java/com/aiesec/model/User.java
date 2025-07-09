@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -97,7 +98,6 @@ public class User {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.encode(rawPassword);
     }
-
 
 
     public String getFirstName() {
@@ -197,20 +197,20 @@ public class User {
     }
 
     //public Date getBirthday() {
-      //  return birthday;
+    //  return birthday;
     //}
 
     //public void setBirthday(Date birthday) {
-       // this.birthday = birthday;
-   // }
+    // this.birthday = birthday;
+    // }
 
     //public Date getJoinedDate() {
     //    return joinedDate;
-   // }
+    // }
 
     //public void setJoinedDate(Date joinedDate) {
-     //   this.joinedDate = joinedDate;
-   // }
+    //   this.joinedDate = joinedDate;
+    // }
 
     public List<Comment> getCommentsForUser() {
         return commentsForUser;
@@ -275,6 +275,7 @@ public class User {
     public void setGender(Gender gender) {
         this.gender = gender;
     }
+
     public String getPhone() {
         return phone;
     }
@@ -282,7 +283,8 @@ public class User {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-        public String getAbout() {
+
+    public String getAbout() {
         return about;
     }
 
@@ -297,4 +299,7 @@ public class User {
     public void setId(Long id) {
         this.id = id;
     }
+
+
+
 }
