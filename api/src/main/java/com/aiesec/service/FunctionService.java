@@ -1,7 +1,8 @@
 package com.aiesec.service;
 
 import com.aiesec.model.Function;
-import com.aiesec.repository.FunctionRepo;
+import com.aiesec.repository.FunctionRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 public class FunctionService {
 
     @Autowired
-    private FunctionRepo functionRepository;
+    private FunctionRepository functionRepository;
 
     public Function addFunction(Function function) {
         return functionRepository.save(function);

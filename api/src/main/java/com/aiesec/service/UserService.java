@@ -2,12 +2,11 @@ package com.aiesec.service;
 
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
-
+import com.aiesec.enums.UserRole;
 import com.aiesec.model.User;
 import com.aiesec.repository.DepartmentRepo;
-
-
 import com.aiesec.repository.UserRepository;
+
 import io.jsonwebtoken.lang.Collections;
 import jakarta.transaction.Transactional;
 
@@ -17,12 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -46,17 +40,11 @@ public class UserService {
     }
 
     // Method to update user details
-    public User updateUser(String aiesecEmail, UserDTO userDetails) {
+    public User updateUser(String aiesecEmail, User userDetails) {
         User user = userRepository.findByAiesecEmail(aiesecEmail)
             .orElseThrow(() -> new RuntimeException("User not found with email: " + aiesecEmail));
         user.setFirstName(userDetails.getFirstName());
         user.setLastName(userDetails.getLastName());
-        user.setStateORProvince(userDetails.getStateORProvince());
-        user.setCity(userDetails.getCity());
-        user.setStreetAddress(userDetails.getStreetAddress());
-        user.setZIPORPostalCode(userDetails.getZIPORPostalCode());
-        user.setPhone(userDetails.getPhone());
-        user.setAbout(userDetails.getAbout());
         return userRepository.save(user);
     }
 
@@ -147,16 +135,102 @@ public class UserService {
         return userRepository.findByAiesecEmail(aiesecEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
     }
-
-    /* 
-    public List<UserHierarchyDTO> getCommitteeHierarchy() {
-        User lcp = userRepository.findByRole(Role.LCP).stream()
-            .findFirst()
-            .orElseThrow(() -> new ResourceNotFoundException("LCP not found"));
-        
-        return List.of(buildHierarchy(lcp));
+    
+    public List<Map<String, Object>>  getCommitteeHierarchy() {
+        List<User> userList = userRepository.findAll();
+        return buildAiesecHierarchy(userList);
     }
 
+    public List<Map<String, Object>> buildAiesecHierarchy(List<User> userList) {
+        Map<String, User> userById = userList.stream()
+                .collect(Collectors.toMap(u -> u.getId().toString(), u -> u));
+
+        // Find all LCPs (top-level users)
+        List<User> lcps = userList.stream()
+                .filter(u -> u.getRole().equals(UserRole.LCP) && u.getTeamLeaderId() == null)
+                .toList();
+
+        List<Map<String, Object>> hierarchyList = new ArrayList<>();
+
+        for (User lcp : lcps) {
+            Map<String, Object> lcpMap = new LinkedHashMap<>();
+
+            // LCP section
+            Map<String, Object> lcpDetails = new LinkedHashMap<>();
+            lcpDetails.put("id", lcp.getId().toString());
+            lcpDetails.put("name", lcp.getFirstName() + " " + lcp.getLastName());
+            lcpDetails.put("role", "lcp");
+            lcpDetails.put("image", lcp.getProfilePicture());
+            lcpDetails.put("email", lcp.getAiesecEmail());
+            lcpDetails.put("tenure", getTenureString(lcp.getJoinedDate()));
+            lcpMap.put("lcp", lcpDetails);
+
+            // LCVPs
+            List<Map<String, Object>> lcvpList = new ArrayList<>();
+            for (User lcvp : findChildren(userList, lcp.getId(), UserRole.LCVP)) {
+                Map<String, Object> lcvpMap = new LinkedHashMap<>();
+                lcvpMap.put("id", lcvp.getId().toString());
+                lcvpMap.put("name", lcvp.getFirstName() + " " + lcvp.getLastName());
+                lcvpMap.put("role", "lcvp");
+                lcvpMap.put("image", lcvp.getProfilePicture());
+                lcvpMap.put("email", lcvp.getAiesecEmail());
+                lcvpMap.put("tenure", getTenureString(lcvp.getJoinedDate()));
+
+                // Team Leaders
+                List<Map<String, Object>> teamLeaders = new ArrayList<>();
+                for (User tl : findChildren(userList, lcvp.getId(), UserRole.Team_Leader)) {
+                    Map<String, Object> tlMap = new LinkedHashMap<>();
+                    tlMap.put("id", tl.getId().toString());
+                    tlMap.put("name", tl.getFirstName() + " " + tl.getLastName());
+                    tlMap.put("role", "team_leader");
+                    tlMap.put("image", tl.getProfilePicture());
+                    tlMap.put("email", tl.getAiesecEmail());
+
+                    // Members
+                    List<Map<String, Object>> memberList = new ArrayList<>();
+                    for (User member : findChildren(userList, tl.getId(), UserRole.Member)) {
+                        Map<String, Object> memberMap = new LinkedHashMap<>();
+                        memberMap.put("id", member.getId().toString());
+                        memberMap.put("name", member.getFirstName() + " " + member.getLastName());
+                        memberMap.put("role", "member");
+                        memberMap.put("image", member.getProfilePicture());
+                        memberMap.put("email", member.getAiesecEmail());
+                        memberList.add(memberMap);
+                    }
+
+                    tlMap.put("members", memberList);
+                    teamLeaders.add(tlMap);
+                }
+
+                lcvpMap.put("tls", teamLeaders);
+                lcvpList.add(lcvpMap);
+            }
+
+            lcpMap.put("lcvps", lcvpList);
+            hierarchyList.add(lcpMap);
+        }
+
+        return hierarchyList;
+    }
+
+    private List<User> findChildren(List<User> allUsers, Long parentId, UserRole role) {
+        return allUsers.stream()
+                .filter(u -> u.getTeamLeaderId() != null)
+                .filter(u -> u.getTeamLeaderId().equals(parentId.toString()))
+                .filter(u -> u.getRole().equals(role))
+                .collect(Collectors.toList());
+    }
+
+    private String getTenureString(Date joinedDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(joinedDate);
+        int startYear = cal.get(Calendar.YEAR);
+        return startYear + "-" + (startYear + 1);
+    }
+
+
+
+    /* 
     private UserHierarchyDTO buildHierarchy(User user) {
         UserHierarchyDTO dto = new UserHierarchyDTO();
         dto.setId(user.getId());
@@ -199,7 +273,7 @@ public class UserService {
         return convertToDTO(user);
     }
 
-    /* 
+    
     private UserDTO convertToDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
