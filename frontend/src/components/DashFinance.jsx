@@ -29,7 +29,7 @@ export default function DashFinance() {
         <h2 className="text-xl mb-2">Total Expenses: LKR {totalExpenses.toFixed(2)}</h2>
         <Link
           to="/expense/add"
-          className="inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          className="inline-block bg-green-500 text-black px-4 py-2 rounded hover:bg-green-600"
         >
           Add New Expense
         </Link>
