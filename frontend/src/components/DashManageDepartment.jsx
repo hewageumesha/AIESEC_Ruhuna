@@ -20,7 +20,7 @@ export default function DashManageDepartment() {
 
   const fetchDepartments = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/departments");
+      const res = await axios.get("http://localhost:8080/api/departments/");
       setDepartments(res.data);
     } catch (err) {
       setErrorMsg("Failed to fetch departments!");
@@ -34,10 +34,10 @@ export default function DashManageDepartment() {
   const handleSubmit = async () => {
     try {
       if (editingId) {
-        await axios.put(`http://localhost:8080/api/departments/${editingId}`, formData);
+        await axios.put(`http://localhost:8080/api/departments/update/${editingId}`, formData);
         setSuccessMsg("Department updated successfully!");
       } else {
-        await axios.post("http://localhost:8080/api/departments", formData);
+        await axios.post("http://localhost:8080/api/departments/add", formData);
         setSuccessMsg("Department added successfully!");
       }
       setFormData({ name: "" });
@@ -60,7 +60,7 @@ export default function DashManageDepartment() {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/departments/${deleteId}`);
+      await axios.delete(`http://localhost:8080/api/departments/delete/${deleteId}`);
       setSuccessMsg("Department deleted successfully!");
       setShowModal(false);
       fetchDepartments();
@@ -105,17 +105,37 @@ export default function DashManageDepartment() {
 
       <div className="bg-white rounded-lg shadow-md p-6 dark:bg-[rgb(26,35,58)]">
         <h2 className="text-lg font-medium mb-4 dark:text-gray-50">Departments List</h2>
-        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-          {departments.map((dept) => (
-            <li key={dept.id} className="py-4 flex justify-between items-center">
-              <span className="dark:text-gray-300">{dept.name}</span>
-              <div className="space-x-2">
-                <Button color="warning" onClick={() => handleEdit(dept)}>Edit</Button>
-                <Button color="failure" onClick={() => openDeleteModal(dept.id)}>Delete</Button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  ID
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200 dark:bg-[rgb(26,35,58)] dark:divide-gray-700">
+              {departments.map((dept) => (
+                <tr key={dept.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">{dept.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">{dept.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex space-x-2">
+                      <Button color="warning" onClick={() => handleEdit(dept)}>Edit</Button>
+                      <Button color="failure" onClick={() => openDeleteModal(dept.id)}>Delete</Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Delete confirmation modal */}

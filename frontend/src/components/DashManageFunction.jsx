@@ -10,7 +10,6 @@ export default function DashManageFunction() {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Modal state
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
@@ -20,7 +19,7 @@ export default function DashManageFunction() {
 
   const fetchFunctions = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/functions");
+      const res = await axios.get("http://localhost:8080/api/functions/");
       setFunctions(res.data);
     } catch (err) {
       setErrorMsg("Failed to fetch functions!");
@@ -34,10 +33,10 @@ export default function DashManageFunction() {
   const handleSubmit = async () => {
     try {
       if (editingId) {
-        await axios.put(`http://localhost:8080/api/functions/${editingId}`, formData);
+        await axios.put(`http://localhost:8080/api/functions/update/${editingId}`, formData);
         setSuccessMsg("Function updated successfully!");
       } else {
-        await axios.post("http://localhost:8080/api/functions", formData);
+        await axios.post("http://localhost:8080/api/functions/add", formData);
         setSuccessMsg("Function added successfully!");
       }
       setFormData({ name: "" });
@@ -60,7 +59,7 @@ export default function DashManageFunction() {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/functions/${deleteId}`);
+      await axios.delete(`http://localhost:8080/api/functions/delete/${deleteId}`);
       setSuccessMsg("Function deleted successfully!");
       setShowModal(false);
       fetchFunctions();
@@ -74,6 +73,7 @@ export default function DashManageFunction() {
     <div className="max-w-3xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Function Management</h1>
 
+      {/* Add/Edit form */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-[rgb(26,35,58)]">
         <h2 className="text-lg font-medium mb-4 dark:text-gray-50">
           {editingId ? "Edit Function" : "Add Function"}
@@ -103,22 +103,37 @@ export default function DashManageFunction() {
         {errorMsg && <Alert color="failure" className="mt-4">{errorMsg}</Alert>}
       </div>
 
+      {/* Functions Table */}
       <div className="bg-white rounded-lg shadow-md p-6 dark:bg-[rgb(26,35,58)]">
         <h2 className="text-lg font-medium mb-4 dark:text-gray-50">Functions List</h2>
-        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-          {functions.map((func) => (
-            <li key={func.id} className="py-4 flex justify-between items-center">
-              <span className="dark:text-gray-300">{func.name}</span>
-              <div className="space-x-2">
-                <Button color="warning" onClick={() => handleEdit(func)}>Edit</Button>
-                <Button color="failure" onClick={() => openDeleteModal(func.id)}>Delete</Button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200 dark:bg-[rgb(26,35,58)] dark:divide-gray-700">
+              {functions.map((func) => (
+                <tr key={func.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">{func.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">{func.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex space-x-2">
+                      <Button color="warning" onClick={() => handleEdit(func)}>Edit</Button>
+                      <Button color="failure" onClick={() => openDeleteModal(func.id)}>Delete</Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Delete confirmation modal */}
+      {/* Delete Modal */}
       <Modal show={showModal} size="md" onClose={() => setShowModal(false)} popup>
         <Modal.Header />
         <Modal.Body>

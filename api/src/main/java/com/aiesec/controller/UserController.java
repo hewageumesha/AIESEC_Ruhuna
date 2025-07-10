@@ -20,6 +20,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +43,22 @@ public class UserController {
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         return ResponseEntity.ok(userRepo.getUserById(id));
     }
+
+@Autowired
+private JavaMailSender mailSender;
+
+@GetMapping("/sendmail")
+public String senMail() {
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setTo("n.u.m.hewage@gmail.com");
+    message.setSubject("Test Mail");
+    message.setText("This is a test email from Spring Boot!");
+
+    mailSender.send(message);
+
+    return "Mail sent successfully!";
+}
+
 
     @PostMapping("/add")
     public User addUser(@RequestBody UserRequestDTO dto) {

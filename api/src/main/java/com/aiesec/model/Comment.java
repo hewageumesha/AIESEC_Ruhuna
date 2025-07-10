@@ -2,13 +2,7 @@ package com.aiesec.model;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "comments")
@@ -17,13 +11,11 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private User member;
+    @Column(name = "member_id")
+    private Long member;
 
-    @ManyToOne
-    @JoinColumn(name = "created_by_id")
-    private User createdBy;
+    @Column(name = "created_by_id")
+    private Long createdBy;
 
     private String content;
 
@@ -37,19 +29,19 @@ public class Comment {
         this.id = id;
     }
 
-    public User getMember() {
+    public Long getMember() {
         return member;
     }
 
-    public void setMember(User member) {
+    public void setMember(Long member) {
         this.member = member;
     }
 
-    public User getCreatedBy() {
+    public Long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(User createdBy) {
+    public void setCreatedBy(Long createdBy) {
         this.createdBy = createdBy;
     }
 

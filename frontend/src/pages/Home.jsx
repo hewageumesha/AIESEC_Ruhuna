@@ -302,7 +302,7 @@ export default function Home() {
                 
                 <p className="text-center text-sm text-gray-600 dark:text-gray-300">
                   {countdown.isOpen 
-                    ? 'Applications close on August 1st - Apply now!'
+                    ? 'Applications close on August 1st - Apply now! If you want to be a part of the next intake, please contact us.'
                     : 'Next application window opens July 1st'}
                 </p>
               </div>

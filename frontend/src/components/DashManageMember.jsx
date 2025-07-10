@@ -17,7 +17,7 @@ export default function DashManageMember() {
     department: "",
     function: "",
   });
-  const [editingId, setEditingId] = useState(null);
+  const [editing, setEditing] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -26,17 +26,8 @@ export default function DashManageMember() {
   const [deleteId, setDeleteId] = useState(null);
 
   const roleOptions = ["lcp", "lcvp", "team_leader", "member"];
-  const departmentOptions = [
-    "Finance", "Marketing", "IT", "HR", "Sales",
-    "Product", "Operations", "OGX", "ICX",
-    "BD", "TM", "PM", "ER", "IM"
-  ];
-  const functionOptions = [
-    "Finance Analyst", "Marketing Executive", "Designer",
-    "Developer", "Recruiter", "Sales Executive",
-    "Product Owner", "Operations Associate",
-    "OGX Associate", "ICX Associate"
-  ];
+  const departmentOptions = ["Finance", "Marketing", "IT", "HR", "Sales", "Product", "Operations", "OGX", "ICX", "BD", "TM", "PM", "ER", "IM"];
+  const functionOptions = ["Finance Analyst", "Marketing Executive", "Designer", "Developer", "Recruiter", "Sales Executive", "Product Owner", "Operations Associate", "OGX Associate", "ICX Associate"];
 
   useEffect(() => {
     fetchMembers();
@@ -44,7 +35,7 @@ export default function DashManageMember() {
 
   const fetchMembers = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/members");
+      const res = await axios.get("http://localhost:8080/api/users/members");
       setMembers(res.data);
     } catch (err) {
       setErrorMsg("Failed to fetch members!");
@@ -66,11 +57,11 @@ export default function DashManageMember() {
       return;
     }
     try {
-      if (editingId) {
-        await axios.put(`http://localhost:8080/api/members/${editingId}`, formData);
+      if (editing) {
+        await axios.post(`http://localhost:8080/api/users/update/${formData.aiesecEmail}`, formData);
         setSuccessMsg("Member updated successfully!");
       } else {
-        await axios.post("http://localhost:8080/api/members", formData);
+        await axios.post("http://localhost:8080/api/users/add", formData);
         setSuccessMsg("Member added successfully!");
       }
       setFormData({
@@ -85,7 +76,7 @@ export default function DashManageMember() {
         department: "",
         function: "",
       });
-      setEditingId(null);
+      setEditing(false);
       setShowForm(false);
       fetchMembers();
     } catch (err) {
@@ -95,18 +86,18 @@ export default function DashManageMember() {
 
   const handleEdit = (member) => {
     setFormData(member);
-    setEditingId(member.id);
+    setEditing(true);
     setShowForm(true);
   };
 
-  const openDeleteModal = (id) => {
-    setDeleteId(id);
+  const openDeleteModal = (aiesecEmail) => {
+    setDeleteId(aiesecEmail);
     setShowModal(true);
   };
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/members/${deleteId}`);
+      await axios.delete(`http://localhost:8080/api/users/delete/${deleteId}`);
       setSuccessMsg("Member deleted successfully!");
       setShowModal(false);
       fetchMembers();
@@ -117,7 +108,7 @@ export default function DashManageMember() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="max-w-6xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Member Management</h1>
 
       <Button onClick={() => {
@@ -135,7 +126,7 @@ export default function DashManageMember() {
             department: "",
             function: "",
           });
-          setEditingId(null);
+          setEditing(false);
         }
       }}>
         {showForm ? "Cancel" : "Add Member"}
@@ -144,7 +135,7 @@ export default function DashManageMember() {
       {showForm && (
         <div className="bg-white rounded-lg shadow-md p-6 mt-6 dark:bg-[rgb(26,35,58)]">
           <h2 className="text-lg font-medium mb-4 dark:text-gray-50">
-            {editingId ? "Edit Member" : "Add Member"}
+            {editing ? "Edit Member" : "Add Member"}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -231,12 +222,13 @@ export default function DashManageMember() {
             </div>
           </div>
 
+
           <div className="flex justify-end space-x-3">
-            <Button color="light" onClick={() => { setShowForm(false); setEditingId(null); }}>
+            <Button color="light" onClick={() => { setShowForm(false); setEditing(false); }}>
               Cancel
             </Button>
             <Button onClick={handleSubmit}>
-              {editingId ? "Update" : "Add"}
+              {editing ? "Update" : "Add"}
             </Button>
           </div>
 
@@ -247,23 +239,41 @@ export default function DashManageMember() {
 
       <div className="bg-white rounded-lg shadow-md p-6 mt-6 dark:bg-[rgb(26,35,58)]">
         <h2 className="text-lg font-medium mb-4 dark:text-gray-50">Members List</h2>
-        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-          {members.map((member) => (
-            <li key={member.id} className="py-4 flex justify-between items-center">
-              <div className="dark:text-gray-300">
-                <p className="font-medium">{member.firstName} {member.lastName} ({member.role})</p>
-                <p className="text-sm">{member.email}</p>
-              </div>
-              <div className="space-x-2">
-                <Button color="warning" onClick={() => handleEdit(member)}>Edit</Button>
-                <Button color="failure" onClick={() => openDeleteModal(member.id)}>Delete</Button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Name</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">AIESEC Email</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Role</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200 dark:bg-[rgb(26,35,58)] dark:divide-gray-700">
+              {members.map((member) => (
+                <tr key={member.id}>
+                  <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
+                    {member.firstName} {member.lastName}
+                  </td>
+                  <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
+                    {member.aiesecEmail}
+                  </td>
+                  <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
+                    {member.role}
+                  </td>
+                  <td className="px-4 py-2">
+                    <div className="flex space-x-2">
+                      <Button color="warning" onClick={() => handleEdit(member)}>Edit</Button>
+                      <Button color="failure" onClick={() => openDeleteModal(member.aiesecEmail)}>Delete</Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Delete confirmation modal */}
       <Modal show={showModal} size="md" onClose={() => setShowModal(false)} popup>
         <Modal.Header />
         <Modal.Body>
@@ -273,12 +283,8 @@ export default function DashManageMember() {
               Are you sure you want to delete this member?
             </h3>
             <div className="flex justify-center gap-4">
-              <Button color="failure" onClick={confirmDelete}>
-                Yes, I'm sure
-              </Button>
-              <Button color="gray" onClick={() => setShowModal(false)}>
-                No, cancel
-              </Button>
+              <Button color="failure" onClick={confirmDelete}>Yes, I'm sure</Button>
+              <Button color="gray" onClick={() => setShowModal(false)}>No, cancel</Button>
             </div>
           </div>
         </Modal.Body>
