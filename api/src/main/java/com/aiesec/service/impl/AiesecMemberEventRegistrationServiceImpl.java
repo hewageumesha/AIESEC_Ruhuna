@@ -2,6 +2,7 @@ package com.aiesec.service.impl;
 
 import com.aiesec.dto.AiesecMemberEventRegistrationDTO;
 import com.aiesec.dto.EventRegistrationSummaryDTO;
+import com.aiesec.dto.RegistrationDTO;
 import com.aiesec.mapper.AiesecMemberEventRegistrationMapper;
 import com.aiesec.model.event.AiesecMemberEventRegistration;
 import com.aiesec.repository.event.AiesecMemberEventRegistrationRepository;
@@ -79,6 +80,22 @@ public class AiesecMemberEventRegistrationServiceImpl implements AiesecMemberEve
         System.out.println("Summary map: " + summary); // debug log
 
         return summary;
+    }
+
+    @Override
+    public AiesecMemberEventRegistration updateRegistration(Long id, RegistrationDTO dto) {
+        AiesecMemberEventRegistration registration = registrationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Registration not found"));
+
+        // Optional: validate that the dto.userId matches the owner
+        if (!registration.getUserId().equals(dto.getUserId())) {
+            throw new RuntimeException("You are not authorized to update this registration");
+        }
+
+        registration.setInterestStatus(dto.getInterestStatus());
+        registration.setComment(dto.getComment());
+
+        return registrationRepository.save(registration);
     }
 
 }

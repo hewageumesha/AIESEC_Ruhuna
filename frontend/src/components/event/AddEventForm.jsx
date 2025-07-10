@@ -155,7 +155,7 @@ const AddEventForm = () => {
         await Promise.all(merchandisePromises);
       }
 
-      message.success('✅ Event published successfully!');
+      message.success(' Event published successfully!');
       form.resetFields();
       setEventImageUrl('');
       setHasMerchandise(false);

@@ -3,6 +3,8 @@ package com.aiesec.controller.event;
 
 import com.aiesec.dto.AiesecMemberEventRegistrationDTO;
 import com.aiesec.dto.EventRegistrationSummaryDTO;
+import com.aiesec.dto.RegistrationDTO;
+import com.aiesec.model.event.AiesecMemberEventRegistration;
 import com.aiesec.service.interfaces.AiesecMemberEventRegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +68,21 @@ public class AiesecMemberEventRegistrationController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateRegistration(@PathVariable Long id, @RequestBody RegistrationDTO dto) {
+        try {
+            AiesecMemberEventRegistration updated = registrationService.updateRegistration(id, dto);
 
+            RegistrationDTO responseDto = new RegistrationDTO();
+            responseDto.setEventId(updated.getEventId());
+            responseDto.setUserId(updated.getUserId());
+            responseDto.setInterestStatus(String.valueOf(updated.getInterestStatus()));
+            responseDto.setComment(updated.getComment());
+
+            return ResponseEntity.ok(responseDto);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+        }
+    }
 
 }
