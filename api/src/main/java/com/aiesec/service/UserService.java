@@ -3,6 +3,7 @@ package com.aiesec.service;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.enums.UserRole;
 import com.aiesec.exception.ResourcesNotFoundException;
+import com.aiesec.model.Function;
 import com.aiesec.model.User;
 import com.aiesec.repository.UserRepository;
 
@@ -232,19 +233,30 @@ public class UserService {
     }
 
     public UserDTO userToDto(User user){
-        UserDTO userDto=new UserDTO();
+        UserDTO userDto = new UserDTO();
         userDto.setId(Long.valueOf(user.getId()));
         userDto.setUserName(user.getUserName());
         userDto.setPassword(user.getPassword());
         userDto.setNoOfTask(user.getNoOfTask());
         userDto.setRole(user.getRole());
 
+        // Department
         if (user.getDepartment() != null) {
-            userDto.setDepartmentId(user.getDepartment().getId()    );
+            userDto.setDepartmentId(user.getDepartment().getId());
             userDto.setDepartmentName(user.getDepartment().getName());
         }
-        return  userDto;
+
+        // ✅ Function
+        if (user.getFunction() != null) {
+            Function func = new Function();
+            func.setId(user.getFunction().getId());
+            func.setName(user.getFunction().getName());
+            userDto.setFunctionId(func);
+        }
+
+        return userDto;
     }
+
 
     public UserDTO getUserById(Integer id) {
 

@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { Pencil, Trash2 } from "lucide-react";
 import notfound from "../asset/notfound.gif";
 
+
 const TaskList = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -107,6 +108,30 @@ const TaskList = () => {
         setSelectedTask(null);
         setShowModal(false);
     };
+
+    const handleDownload = async (filePath) => {
+        try {
+            const response = await fetch(`http://localhost:8080/${filePath}`);
+            if (!response.ok) throw new Error("Failed to download file");
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+
+            // Extract the filename
+            const fileName = filePath.split("/").pop();
+            link.setAttribute("download", fileName);
+
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error("Download error:", err);
+        }
+    };
+
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-10 font-sans">
@@ -277,19 +302,18 @@ const TaskList = () => {
                         <p><strong>Note:</strong> {selectedTask.note || "No note provided."}</p>
                         <p className="mt-3">
                             <strong>Proof Document:</strong>{" "}
-                            {selectedTask.proofDocumentUrl ? (
-                                <a
-                                    href={selectedTask.proofDocumentUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                            {selectedTask.filePath ? (
+                                <button
+                                    onClick={() => handleDownload(selectedTask.filePath)}
                                     className="text-indigo-600 hover:underline"
                                 >
-                                    View Document
-                                </a>
+                                    Download Document
+                                </button>
                             ) : (
                                 "No proof document uploaded."
                             )}
                         </p>
+
                     </div>
                 </div>
             )}

@@ -193,25 +193,35 @@ const CreateTask = () => {
                         {users
                             .filter(user => {
                                 if (!loggedInUser) return false;
+
+                                const sameDepartment = user.departmentId === loggedInUser.departmentId;
+                                const sameFunction = (user.function || '') === (loggedInUser.function || '');
+
+                                console.log(`Checking user ${user.userName}: role=${user.role}, department=${user.departmentId}, function=${user.function}`);
+                                console.log(`sameDepartment: ${sameDepartment}, sameFunction: ${sameFunction}`);
+
                                 if (loggedInUser.role === "LCP") {
                                     return ["LCVP", "Team_Leader", "Member"].includes(user.role);
                                 }
+
                                 if (loggedInUser.role === "LCVP") {
-                                    return ["Team_Leader", "Member"].includes(user.role) &&
-                                        user.departmentId === loggedInUser.departmentId;
+                                    return ["Team_Leader", "Member"].includes(user.role) && sameDepartment && sameFunction;
                                 }
+
                                 if (loggedInUser.role === "Team_Leader") {
-                                    return user.role === "Member" &&
-                                        user.departmentId === loggedInUser.departmentId;
+                                    return user.role === "Member" && sameDepartment && sameFunction;
                                 }
+
                                 return false;
                             })
+
                             .map(user => (
                                 <option key={user.id} value={user.id}>
                                     {user.userName} ({user.role} - {user.departmentName})
                                 </option>
                             ))}
                     </select>
+
                 </div>
             </div>
 

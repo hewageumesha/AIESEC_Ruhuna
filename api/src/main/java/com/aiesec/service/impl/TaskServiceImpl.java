@@ -59,6 +59,7 @@ public class TaskServiceImpl implements TaskService {
                             && assigner.getDepartment() != null
                             && assignee.getDepartment() != null
                             && assigner.getDepartment().getId().equals(assignee.getDepartment().getId());
+
                     break;
                 case Team_Leader:
                     allowed = assignee.getRole() == UserRole.Member
@@ -352,19 +353,23 @@ public class TaskServiceImpl implements TaskService {
         String filePath = null;
 
         if (file != null && !file.isEmpty()) {
-            // Save file to disk
+            // Directory on disk to save file
             String uploadDir = "uploads/task_" + taskId + "/";
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            filePath = uploadDir + file.getOriginalFilename();
+            // Save file physically
             Path fileFullPath = uploadPath.resolve(file.getOriginalFilename());
             Files.write(fileFullPath, file.getBytes());
+
+            // Save only relative path WITHOUT "uploads/" to DB
+            // because your Spring Boot serves files from /static/ directly
+            filePath = "task_" + taskId + "/" + file.getOriginalFilename();
         }
 
-        // Save TaskProof in DB with or without filePath
+        // Save TaskProof entity
         TaskProof proof = new TaskProof();
         proof.setTask(task);
         proof.setUser(user);
@@ -373,6 +378,7 @@ public class TaskServiceImpl implements TaskService {
 
         taskProofRepo.save(proof);
     }
+
 
 
     @Service
