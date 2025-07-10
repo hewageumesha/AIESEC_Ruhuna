@@ -3,6 +3,9 @@ package com.aiesec.service.interfaces;
 
 import com.aiesec.dto.EventDTO;
 import com.aiesec.model.event.Event;
+import org.springframework.data.domain.Page;
+
+import java.awt.print.Pageable;
 import java.util.List;
 
 public interface EventService {

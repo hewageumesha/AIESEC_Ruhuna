@@ -7,10 +7,13 @@ import com.aiesec.mapper.MerchandiseMapper;
 import com.aiesec.model.event.Event;
 import com.aiesec.mapper.EventMapper;
 import com.aiesec.repository.event.EventRepository;
+import com.aiesec.repository.event.MerchandiseRepository;
 import com.aiesec.service.interfaces.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -20,10 +23,13 @@ import java.util.stream.Collectors;
 public class EventServiceimpl implements EventService {
 
     private final EventRepository eventRepository;
+    
+    private final MerchandiseRepository merchandiseRepository;
 
     @Autowired
     public EventServiceimpl(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
+        merchandiseRepository = null;
     }
     @Override
     public EventDTO createEvent(EventDTO eventDTO) {
@@ -145,6 +151,12 @@ if (eventDTO.getIsPublic() == null) {
                 .map(EventMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Page<EventDTO> filterEvents(String search, String status, String date, Pageable pageable) {
+        return null;
+    }
+
     @Override
     public void updateTshirtOrder(Long eventId, Boolean hasTshirtOrder) {
         Optional<Event> optionalEvent = eventRepository.findById(eventId);
