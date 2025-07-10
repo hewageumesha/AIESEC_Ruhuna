@@ -50,7 +50,7 @@ public class CommentService {
                     return commentRepo.findByMemberOrderByCreatedAtDesc(memberId)
                 .stream()
                 .map(c -> new CommentDTO(c.getId(), c.getContent(),
-                      c.getCreatedBy(), c.getMember(),
+                        userRepo.getUserById(c.getCreatedBy()), userRepo.getUserById(c.getMember()),
                       c.getCreatedAt()))
                 .collect(Collectors.toList());
         }else{

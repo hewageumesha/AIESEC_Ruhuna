@@ -33,7 +33,7 @@ public class EventExperienceMapper {
         // Set User
         if (dto.getUserId() != null) {
             User user = new User();
-            user.setId(Math.toIntExact(dto.getUserId()));
+            user.setId((long) Math.toIntExact(dto.getUserId()));
             experience.setUser(user);
         }
 

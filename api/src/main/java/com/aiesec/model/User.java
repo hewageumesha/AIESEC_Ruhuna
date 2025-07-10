@@ -106,7 +106,7 @@ public class User {
     @OneToOne(mappedBy = "user")
     private ForgotPassword forgotPassword;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
    
