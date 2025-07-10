@@ -3,15 +3,22 @@ package com.aiesec.service;
 import com.aiesec.dto.PasswordUpdateRequest;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
+import com.aiesec.dto.UserRequestDTO;
+import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.UserRole;
+import com.aiesec.model.Department;
+import com.aiesec.model.Function;
 import com.aiesec.model.User;
 import com.aiesec.repository.DepartmentRepo;
 import com.aiesec.repository.UserRepository;
+import com.aiesec.repository.FunctionRepo;
 
 import io.jsonwebtoken.lang.Collections;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,31 +39,92 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();;
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    @Autowired
+    private DepartmentRepo departmentRepository;
+
+    @Autowired
+    private FunctionRepo functionRepository;
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     // Method to add a new user
-    public User addUser(User user) {
-        Optional<User> existingUser = userRepository.findByAiesecEmail(user.getAiesecEmail());
-        if (existingUser.isPresent()) {
-            throw new RuntimeException("User with email " + user.getAiesecEmail() + " already exists.");
+    public User addUser(UserRequestDTO dto) {
+    User user = new User();
+    user.setAiesecEmail(dto.getAiesecEmail());
+    user.setEmail(dto.getEmail());
+    user.setFirstName(dto.getFirstName());
+    user.setLastName(dto.getLastName());
+    user.setRole(dto.getRole());
+
+    Department department = departmentRepository.findById(dto.getDepartmentId())
+            .orElseThrow(() -> new RuntimeException("Department not found"));
+    user.setDepartment(department);
+
+    Function function = functionRepository.findById(dto.getFunctionId())
+            .orElseThrow(() -> new RuntimeException("Function not found"));
+    user.setFunction(function);
+
+    // Check team leader if role == Member
+    if (dto.getRole() == UserRole.Member) {
+        if (dto.getTeamLeaderAiesecEmail() == null || dto.getTeamLeaderAiesecEmail().isEmpty()) {
+            throw new RuntimeException("teamLeaderAiesecEmail is required for MEMBER role");
         }
 
-        return userRepository.save(user);
+        User teamLeader = userRepository.findByAiesecEmail(dto.getTeamLeaderAiesecEmail())
+                .orElseThrow(() -> new RuntimeException("Team leader not found"));
+
+        if (teamLeader.getRole() != UserRole.Team_Leader) {
+            throw new RuntimeException("Provided team leader email does not belong to a TEAM_LEADER");
+        }
+
+        user.setTeamLeaderAiesecEmail(dto.getTeamLeaderAiesecEmail());
+        user.setTeamLeaderId(String.valueOf(teamLeader.getId())); // Optional, if you want
     }
 
+    String tempPassword = generateTempPassword();
+    user.setPassword(tempPassword);
+
+    userRepository.save(user);
+
+    sendTempPasswordEmail(user.getAiesecEmail(), tempPassword);
+
+    return user;
+}
+
+
     // Method to update user details
-    public User updateUser(String aiesecEmail, User userDetails) {
+    @Transactional
+    public User updateUser(String aiesecEmail, UserUpdateDTO dto) {
         User user = userRepository.findByAiesecEmail(aiesecEmail)
-            .orElseThrow(() -> new RuntimeException("User not found with email: " + aiesecEmail));
-        user.setFirstName(userDetails.getFirstName());
-        user.setLastName(userDetails.getLastName());
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (dto.getDepartmentId() != null) {
+            Department department = departmentRepository.findById(dto.getDepartmentId())
+                    .orElseThrow(() -> new RuntimeException("Department not found"));
+            user.setDepartment(department);
+        }
+
+        if (dto.getFunctionId() != null) {
+            Function function = functionRepository.findById(dto.getFunctionId())
+                    .orElseThrow(() -> new RuntimeException("Function not found"));
+            user.setFunction(function);
+        }
+
+        if (dto.getRole() != null) {
+            user.setRole(dto.getRole());
+        }
+
         return userRepository.save(user);
     }
 
     // Method to delete a user
     public void deleteUser(String aiesecEmail) {
         User user = userRepository.findByAiesecEmail(aiesecEmail)
-            .orElseThrow(() -> new RuntimeException("User not found with email: " + aiesecEmail));
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         userRepository.delete(user);
     }
 
@@ -260,5 +328,20 @@ public class UserService {
         userRepository.save(user);
 
         return "Password updated successfully!";
+    }
+
+    private String generateTempPassword() {
+        return UUID.randomUUID().toString().substring(0, 8);
+    }
+
+    private void sendTempPasswordEmail(String toEmail, String tempPassword) {
+        String subject = "Your Temporary AIESEC Password";
+        String text = "Hello,\n\nYour temporary password is: " + tempPassword + "\n\nPlease log in and change it as soon as possible.";
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject(subject);
+        message.setText(text);
+        mailSender.send(message);
     }
 }

@@ -17,6 +17,7 @@ import React from 'react';
 import Contact from './pages/Contact';
 import EventDetails from "./pages/EventDetails";
 import EditEvent from "./components/event/EditEvent";
+import Function from "./pages/FunctionalArea";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
         <Route path="/become-member" element={<BecomeMember />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/edit-event/:id" element={<EditEvent />} />
+        <Route path="/functional-area" element={<Function />} />
       </Routes>
     <Footer/>
     </BrowserRouter>

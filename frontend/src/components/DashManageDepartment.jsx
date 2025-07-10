@@ -74,7 +74,7 @@ export default function DashManageDepartment() {
     <div className="max-w-3xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Department Management</h1>
 
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-[rgb(16,23,42)]">
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-[rgb(26,35,58)]">
         <h2 className="text-lg font-medium mb-4 dark:text-gray-50">
           {editingId ? "Edit Department" : "Add Department"}
         </h2>
@@ -103,7 +103,7 @@ export default function DashManageDepartment() {
         {errorMsg && <Alert color="failure" className="mt-4">{errorMsg}</Alert>}
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6 dark:bg-[rgb(16,23,42)]">
+      <div className="bg-white rounded-lg shadow-md p-6 dark:bg-[rgb(26,35,58)]">
         <h2 className="text-lg font-medium mb-4 dark:text-gray-50">Departments List</h2>
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
           {departments.map((dept) => (

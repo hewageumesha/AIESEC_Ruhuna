@@ -3,7 +3,8 @@ import com.aiesec.dto.CommentDTO;
 import com.aiesec.dto.PasswordUpdateRequest;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
-
+import com.aiesec.dto.UserRequestDTO;
+import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.UserRole;
 import com.aiesec.model.User;
 
@@ -42,21 +43,20 @@ public class UserController {
     }
 
     @PostMapping("/add")
-    public User addUser(@RequestBody User user) {
-        return userService.addUser(user);
+    public User addUser(@RequestBody UserRequestDTO dto) {
+        return userService.addUser(dto);
     }
 
-    {/*
-    @PostMapping("/update")
-    public Optional<User> updateUser(@RequestBody UserDTO userDetails) {
-        return Optional.ofNullable(userService.updateUser(userDetails.getAiesecEmail(), userDetails));
+    @PostMapping("/update/{aiesecEmail}")
+    public User updateUser(@PathVariable String aiesecEmail, @RequestBody UserUpdateDTO dto) {
+        return userService.updateUser(aiesecEmail, dto);
     }
-    */}
+    
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{aiesecEmail}")
     public String deleteUser(@PathVariable String aiesecEmail) {
         userService.deleteUser(aiesecEmail);
-        return "User deleted successfully";
+        return "User deleted successfully!";
     }
 
     @GetMapping("/{aiesecEmail}")

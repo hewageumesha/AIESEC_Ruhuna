@@ -28,6 +28,7 @@ export default function DashSidebar({ tab, subtab }) {
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -150,11 +151,11 @@ export default function DashSidebar({ tab, subtab }) {
             {(isCommitteeExpanded || (!isMobile && tab === 'manageCommittee')) && (
               <div className="md:ml-6 md:pl-2 md:border-l-2 md:border-blue-200 dark:md:border-gray-600 space-y-1 mt-1">
                 {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
-                  <Link to='/dashboard?tab=manageCommittee&subtab=members'>
+                  <Link to='/dashboard?tab=manageCommittee&subtab=member'>
                     <Sidebar.Item
-                      active={tab === 'manageCommittee' && location.search.includes('subtab=members')}
+                      active={tab === 'manageCommittee' && location.search.includes('subtab=member')}
                       as='div'
-                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=members') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
+                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=member') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
                       onClick={() => isMobile && setIsCommitteeExpanded(false)}
                     >
                       Members
@@ -163,11 +164,11 @@ export default function DashSidebar({ tab, subtab }) {
                 )}
                 {(currentUser.role === 'LCP') && (
                 <>
-                  <Link to='/dashboard?tab=manageCommittee&subtab=depatment'>
+                  <Link to='/dashboard?tab=manageCommittee&subtab=department'>
                     <Sidebar.Item
-                      active={tab === 'manageCommittee' && location.search.includes('subtab=depatment')}
+                      active={tab === 'manageCommittee' && location.search.includes('subtab=department')}
                       as='div'
-                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=depatment') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
+                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=department') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
                       onClick={() => isMobile && setIsCommitteeExpanded(false)}
                     >
                       Department

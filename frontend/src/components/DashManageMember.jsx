@@ -1,449 +1,288 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, useLocation } from 'react-router-dom';
-import {
-  HiPlus, HiPencil, HiTrash, HiChevronDown, HiChevronUp,
-  HiUserGroup, HiUserCircle, HiOutlineUserAdd, HiOutlineUserRemove
-} from 'react-icons/hi';
-import { toast } from 'react-toastify';
-import MemberModal from '../components/MemberModal';
-import ConfirmModal from '../components/ConfirmModal';
+import React, { useState, useEffect } from "react";
+import { Alert, Button, TextInput, Modal } from "flowbite-react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
+import axios from "axios";
 
-const DashManageMember = () => {
-  const dispatch = useDispatch();
-  const location = useLocation();
-  const { currentUser } = useSelector((state) => state.user);
-  const { members, loading, error } = useSelector((state) => state.committee);
-  
-  const [activeTab, setActiveTab] = useState('members');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState(null);
-  const [expandedTeams, setExpandedTeams] = useState([]);
-  const [deleteState, setDeleteState] = useState({
-    isOpen: false,
-    member: null,
-    isLoading: false,
+export default function DashManageMember() {
+  const [members, setMembers] = useState([]);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    aiesecEmail: "",
+    birthday: "",
+    gender: "",
+    joinedDate: "",
+    role: "",
+    department: "",
+    function: "",
   });
+  const [editingId, setEditingId] = useState(null);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [showForm, setShowForm] = useState(false);
 
-  // Extract subtab from URL
+  const [showModal, setShowModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+
+  const roleOptions = ["lcp", "lcvp", "team_leader", "member"];
+  const departmentOptions = [
+    "Finance", "Marketing", "IT", "HR", "Sales",
+    "Product", "Operations", "OGX", "ICX",
+    "BD", "TM", "PM", "ER", "IM"
+  ];
+  const functionOptions = [
+    "Finance Analyst", "Marketing Executive", "Designer",
+    "Developer", "Recruiter", "Sales Executive",
+    "Product Owner", "Operations Associate",
+    "OGX Associate", "ICX Associate"
+  ];
+
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const subtab = params.get('subtab') || 'members';
-    setActiveTab(subtab);
-  }, [location.search]);
+    fetchMembers();
+  }, []);
 
-  // Fetch committee data
-  useEffect(() => {
-    dispatch(fetchCommittee());
-  }, [dispatch]);
-
-  // Permission checks
-  const isLCP = currentUser?.role === 'LCP';
-  const isLCVP = currentUser?.role === 'LCVP';
-  const isTeamLeader = currentUser?.role === 'Team_Leader';
-
-  // Filter members based on current user's permissions and active tab
-  const filteredMembers = members.filter(member => {
-    // Filter by tab first
-    if (activeTab === 'lCVPs' && member.role !== 'LCVP') return false;
-    if (activeTab === 'teamLeaders' && member.role !== 'Team_Leader') return false;
-    if (activeTab === 'members' && member.role !== 'Member') return false;
-
-    // Then filter by permissions
-    if (isLCP) return true;
-    if (isLCVP) {
-      return member.department === currentUser.department && 
-             (member.role === 'Member' || member.role === 'Team_Leader');
+  const fetchMembers = async () => {
+    try {
+      const res = await axios.get("http://localhost:8080/api/members");
+      setMembers(res.data);
+    } catch (err) {
+      setErrorMsg("Failed to fetch members!");
     }
-    if (isTeamLeader) {
-      return member.team === currentUser.team && member.role === 'Member';
-    }
-    return false;
-  });
+  };
 
-  // Group members by team
-  const teams = {};
-  filteredMembers.forEach(member => {
-    if (!teams[member.team]) {
-      teams[member.team] = [];
-    }
-    teams[member.team].push(member);
-  });
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  const toggleTeam = (teamName) => {
-    setExpandedTeams(prev => 
-      prev.includes(teamName) 
-        ? prev.filter(t => t !== teamName) 
-        : [...prev, teamName]
-    );
+  const validateAiesecEmail = (email) => {
+    return email.endsWith("@aiesec.net");
+  };
+
+  const handleSubmit = async () => {
+    setErrorMsg("");
+    if (!validateAiesecEmail(formData.aiesecEmail)) {
+      setErrorMsg("AIESEC email must end with @aiesec.net");
+      return;
+    }
+    try {
+      if (editingId) {
+        await axios.put(`http://localhost:8080/api/members/${editingId}`, formData);
+        setSuccessMsg("Member updated successfully!");
+      } else {
+        await axios.post("http://localhost:8080/api/members", formData);
+        setSuccessMsg("Member added successfully!");
+      }
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        aiesecEmail: "",
+        birthday: "",
+        gender: "",
+        joinedDate: "",
+        role: "",
+        department: "",
+        function: "",
+      });
+      setEditingId(null);
+      setShowForm(false);
+      fetchMembers();
+    } catch (err) {
+      setErrorMsg("Error saving member!");
+    }
   };
 
   const handleEdit = (member) => {
-    setSelectedMember(member);
-    setIsModalOpen(true);
+    setFormData(member);
+    setEditingId(member.id);
+    setShowForm(true);
   };
 
-  const handleDeleteClick = (member) => {
-    setDeleteState({
-      isOpen: true,
-      member,
-      isLoading: false,
-    });
+  const openDeleteModal = (id) => {
+    setDeleteId(id);
+    setShowModal(true);
   };
 
-  const handleDeleteConfirm = async () => {
-    setDeleteState(prev => ({ ...prev, isLoading: true }));
-    
+  const confirmDelete = async () => {
     try {
-      await dispatch(deleteMember(deleteState.member._id)).unwrap();
-      
-      toast.success(
-        <div>
-          <p className="font-semibold">Successfully deleted member!</p>
-          <p className="text-sm">{deleteState.member.name} has been removed.</p>
-        </div>, 
-        {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          icon: '✅',
-        }
-      );
-      
-      setDeleteState({
-        isOpen: false,
-        member: null,
-        isLoading: false,
-      });
-      
-      // Refresh the member list
-      dispatch(fetchCommittee());
-    } catch (error) {
-      toast.error(
-        <div>
-          <p className="font-semibold">Deletion failed</p>
-          <p className="text-sm">{error.message || 'Please try again later.'}</p>
-        </div>,
-        {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          icon: '❌',
-        }
-      );
-      setDeleteState(prev => ({ ...prev, isLoading: false }));
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteState({
-      isOpen: false,
-      member: null,
-      isLoading: false,
-    });
-  };
-
-  // Check if user can perform actions on a member
-  const canEditMember = (member) => {
-    if (isLCP) return true;
-    if (isLCVP) {
-      return member.role === 'Member' || 
-             (member.role === 'Team_Leader' && member.department === currentUser.department);
-    }
-    if (isTeamLeader) {
-      return member.role === 'Member' && member.team === currentUser.team;
-    }
-    return false;
-  };
-
-  const canDeleteMember = (member) => {
-    if (isLCP) return true;
-    if (isLCVP) {
-      return member.role === 'Member' || 
-             (member.role === 'Team_Leader' && member.department === currentUser.department);
-    }
-    if (isTeamLeader) {
-      return member.role === 'Member' && member.team === currentUser.team;
-    }
-    return false;
-  };
-
-  const getRoleBadge = (role) => {
-    switch(role) {
-      case 'LCP':
-        return <span className="ml-2 px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">LCP</span>;
-      case 'LCVP':
-        return <span className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">LCVP</span>;
-      case 'Team_Leader':
-        return <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Team Leader</span>;
-      default:
-        return <span className="ml-2 px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">Member</span>;
+      await axios.delete(`http://localhost:8080/api/members/${deleteId}`);
+      setSuccessMsg("Member deleted successfully!");
+      setShowModal(false);
+      fetchMembers();
+    } catch (err) {
+      setErrorMsg("Error deleting member!");
+      setShowModal(false);
     }
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Committee Management</h1>
-          {isLCP && (
-            <div className="flex flex-wrap gap-2">
-              <Link 
-                to="/dashboard?tab=manageCommittee&subtab=departments"
-                className={`px-3 py-1 md:px-4 md:py-2 rounded-lg text-sm md:text-base ${
-                  activeTab === 'departments' 
-                    ? 'bg-indigo-600 text-white' 
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                Departments
-              </Link>
-              <Link 
-                to="/dashboard?tab=manageCommittee&subtab=roles"
-                className={`px-3 py-1 md:px-4 md:py-2 rounded-lg text-sm md:text-base ${
-                  activeTab === 'roles' 
-                    ? 'bg-indigo-600 text-white' 
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                Roles
-              </Link>
+    <div className="max-w-4xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-6">Member Management</h1>
+
+      <Button onClick={() => {
+        setShowForm(!showForm);
+        if (!showForm) {
+          setFormData({
+            firstName: "",
+            lastName: "",
+            email: "",
+            aiesecEmail: "",
+            birthday: "",
+            gender: "",
+            joinedDate: "",
+            role: "",
+            department: "",
+            function: "",
+          });
+          setEditingId(null);
+        }
+      }}>
+        {showForm ? "Cancel" : "Add Member"}
+      </Button>
+
+      {showForm && (
+        <div className="bg-white rounded-lg shadow-md p-6 mt-6 dark:bg-[rgb(26,35,58)]">
+          <h2 className="text-lg font-medium mb-4 dark:text-gray-50">
+            {editingId ? "Edit Member" : "Add Member"}
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium dark:text-gray-200">First Name</label>
+              <TextInput name="firstName" value={formData.firstName} onChange={handleChange} />
             </div>
-          )}
-        </div>
+            <div>
+              <label className="block text-sm font-medium dark:text-gray-200">Last Name</label>
+              <TextInput name="lastName" value={formData.lastName} onChange={handleChange} />
+            </div>
+          </div>
 
-        {/* Tabs */}
-        <div className="bg-white rounded-lg shadow mb-6 overflow-x-auto">
-          <div className="border-b border-gray-200">
-            <nav className="flex">
-              <Link
-                to="/dashboard?tab=manageCommittee&subtab=members"
-                className={`py-3 px-4 md:py-4 md:px-6 text-center border-b-2 font-medium text-sm whitespace-nowrap ${
-                  activeTab === 'members' 
-                    ? 'border-indigo-500 text-indigo-600' 
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+          <div className="mb-4">
+            <label className="block text-sm font-medium dark:text-gray-200">Email</label>
+            <TextInput name="email" value={formData.email} onChange={handleChange} />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium dark:text-gray-200">AIESEC Email</label>
+            <TextInput name="aiesecEmail" value={formData.aiesecEmail} onChange={handleChange} />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium dark:text-gray-200">Birthday</label>
+              <TextInput type="date" name="birthday" value={formData.birthday} onChange={handleChange} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium dark:text-gray-200">Gender</label>
+              <TextInput name="gender" value={formData.gender} onChange={handleChange} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium dark:text-gray-200">Joined Date</label>
+              <TextInput type="date" name="joinedDate" value={formData.joinedDate} onChange={handleChange} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium dark:text-gray-200">Role</label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="w-full rounded-md border border-gray-300 text-gray-700 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               >
-                Members
-              </Link>
-              {isLCP && (
-                <Link
-                  to="/dashboard?tab=manageCommittee&subtab=lCVPs"
-                  className={`py-3 px-4 md:py-4 md:px-6 text-center border-b-2 font-medium text-sm whitespace-nowrap ${
-                    activeTab === 'lCVPs' 
-                      ? 'border-indigo-500 text-indigo-600' 
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  LCVPs
-                </Link>
-              )}
-              {(isLCP || isLCVP) && (
-                <Link
-                  to="/dashboard?tab=manageCommittee&subtab=teamLeaders"
-                  className={`py-3 px-4 md:py-4 md:px-6 text-center border-b-2 font-medium text-sm whitespace-nowrap ${
-                    activeTab === 'teamLeaders' 
-                      ? 'border-indigo-500 text-indigo-600' 
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  Team Leaders
-                </Link>
-              )}
-            </nav>
+                <option value="">Select Role</option>
+                {roleOptions.map((r) => (
+                  <option key={r} value={r}>{r}</option>
+                ))}
+              </select>
+            </div>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium dark:text-gray-200">Department</label>
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+                className="w-full rounded-md border border-gray-300 text-gray-700 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              >
+                <option value="">Select Department</option>
+                {departmentOptions.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium dark:text-gray-200">Function</label>
+              <select
+                name="function"
+                value={formData.function}
+                onChange={handleChange}
+                className="w-full rounded-md border border-gray-300 text-gray-700 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              >
+                <option value="">Select Function</option>
+                {functionOptions.map((f) => (
+                  <option key={f} value={f}>{f}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3">
+            <Button color="light" onClick={() => { setShowForm(false); setEditingId(null); }}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit}>
+              {editingId ? "Update" : "Add"}
+            </Button>
+          </div>
+
+          {successMsg && <Alert color="success" className="mt-4">{successMsg}</Alert>}
+          {errorMsg && <Alert color="failure" className="mt-4">{errorMsg}</Alert>}
         </div>
+      )}
 
-        {/* Content */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          {/* Action Bar */}
-          <div className="px-4 py-3 md:px-6 md:py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <h2 className="text-lg font-medium text-gray-800">
-              {activeTab === 'members' && 'All Members'}
-              {activeTab === 'lCVPs' && 'LCVPs'}
-              {activeTab === 'teamLeaders' && 'Team Leaders'}
-            </h2>
-            <button
-              onClick={() => {
-                setSelectedMember(null);
-                setIsModalOpen(true);
-              }}
-              className="flex items-center px-3 py-1 md:px-4 md:py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm md:text-base"
-              disabled={
-                (activeTab === 'lCVPs' && !isLCP) ||
-                (activeTab === 'teamLeaders' && !(isLCP || isLCVP))
-              }
-            >
-              <HiPlus className="mr-1 md:mr-2" />
-              Add {activeTab === 'members' ? 'Member' : activeTab === 'lCVPs' ? 'LCVP' : 'Team Leader'}
-            </button>
-          </div>
-
-          {/* Members List */}
-          <div className="divide-y divide-gray-200">
-            {loading ? (
-              <div className="p-6 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-                <p className="mt-2 text-gray-600">Loading members...</p>
+      <div className="bg-white rounded-lg shadow-md p-6 mt-6 dark:bg-[rgb(26,35,58)]">
+        <h2 className="text-lg font-medium mb-4 dark:text-gray-50">Members List</h2>
+        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+          {members.map((member) => (
+            <li key={member.id} className="py-4 flex justify-between items-center">
+              <div className="dark:text-gray-300">
+                <p className="font-medium">{member.firstName} {member.lastName} ({member.role})</p>
+                <p className="text-sm">{member.email}</p>
               </div>
-            ) : error ? (
-              <div className="p-6 text-center">
-                <p className="text-red-500 font-medium">Error loading members</p>
-                <p className="text-gray-600 mt-1">{error}</p>
-                <button 
-                  onClick={() => dispatch(fetchCommittee())}
-                  className="mt-3 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
-                >
-                  Retry
-                </button>
+              <div className="space-x-2">
+                <Button color="warning" onClick={() => handleEdit(member)}>Edit</Button>
+                <Button color="failure" onClick={() => openDeleteModal(member.id)}>Delete</Button>
               </div>
-            ) : filteredMembers.length === 0 ? (
-              <div className="p-6 text-center">
-                <HiOutlineUserRemove className="mx-auto h-10 w-10 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No members found</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  {activeTab === 'members' 
-                    ? 'Get started by adding a new member.' 
-                    : activeTab === 'lCVPs' 
-                      ? 'No LCVPs found in your organization.' 
-                      : 'No team leaders found in your department.'}
-                </p>
-                <div className="mt-6">
-                  <button
-                    onClick={() => {
-                      setSelectedMember(null);
-                      setIsModalOpen(true);
-                    }}
-                    className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-                  >
-                    <HiOutlineUserAdd className="-ml-1 mr-2 h-5 w-5" />
-                    Add {activeTab === 'members' ? 'Member' : activeTab === 'lCVPs' ? 'LCVP' : 'Team Leader'}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              Object.entries(teams).map(([teamName, teamMembers]) => (
-                <div key={teamName} className="bg-gray-50">
-                  {/* Team Header */}
-                  <div 
-                    className="px-4 md:px-6 py-3 flex justify-between items-center cursor-pointer hover:bg-gray-100"
-                    onClick={() => toggleTeam(teamName)}
-                  >
-                    <div className="flex items-center">
-                      <HiUserGroup className="text-gray-500 mr-2 md:mr-3" />
-                      <h3 className="font-medium text-gray-800 text-sm md:text-base">{teamName}</h3>
-                      <span className="ml-2 px-2 py-0.5 text-xs bg-gray-200 text-gray-700 rounded-full">
-                        {teamMembers.length} {teamMembers.length === 1 ? 'member' : 'members'}
-                      </span>
-                    </div>
-                    {expandedTeams.includes(teamName) ? (
-                      <HiChevronUp className="text-gray-500" />
-                    ) : (
-                      <HiChevronDown className="text-gray-500" />
-                    )}
-                  </div>
-
-                  {/* Team Members */}
-                  {expandedTeams.includes(teamName) && (
-                    <div className="pl-12 md:pl-16 pr-4 md:pr-6 divide-y divide-gray-200">
-                      {teamMembers.map((member) => (
-                        <div key={member._id} className="py-3 md:py-4 flex justify-between items-center">
-                          <div className="flex items-center">
-                            <HiUserCircle className="text-gray-400 mr-2 md:mr-3 text-xl md:text-2xl" />
-                            <div>
-                              <div className="flex items-center">
-                                <h4 className="font-medium text-gray-800 text-sm md:text-base">
-                                  {member.name}
-                                </h4>
-                                {getRoleBadge(member.role)}
-                              </div>
-                              <p className="text-xs md:text-sm text-gray-500">{member.email}</p>
-                              <p className="text-xs text-gray-400 mt-0.5">
-                                {member.department} • Joined {new Date(member.joinDate).toLocaleDateString()}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex space-x-1 md:space-x-2">
-                            {canEditMember(member) && (
-                              <button
-                                onClick={() => handleEdit(member)}
-                                className="p-1 md:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full"
-                                title="Edit member"
-                              >
-                                <HiPencil className="text-sm md:text-base" />
-                              </button>
-                            )}
-                            {canDeleteMember(member) && (
-                              <button
-                                onClick={() => handleDeleteClick(member)}
-                                className="p-1 md:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full"
-                                title="Delete member"
-                                disabled={deleteState.isLoading}
-                              >
-                                <HiTrash className="text-sm md:text-base" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      <ConfirmModal
-        isOpen={deleteState.isOpen}
-        onClose={handleDeleteCancel}
-        onConfirm={handleDeleteConfirm}
-        title="Confirm Deletion"
-        message={
-          <div>
-            <p className="mb-2">Are you sure you want to delete <strong>{deleteState.member?.name}</strong>?</p>
-            <p className="text-sm text-red-600">This action is permanent and cannot be undone.</p>
-            {deleteState.member?.role === 'LCVP' && (
-              <p className="mt-2 text-sm text-yellow-600">
-                <strong>Warning:</strong> Deleting an LCVP will also remove their access to all team management features.
-              </p>
-            )}
+      {/* Delete confirmation modal */}
+      <Modal show={showModal} size="md" onClose={() => setShowModal(false)} popup>
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete this member?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={confirmDelete}>
+                Yes, I'm sure
+              </Button>
+              <Button color="gray" onClick={() => setShowModal(false)}>
+                No, cancel
+              </Button>
+            </div>
           </div>
-        }
-        confirmText={deleteState.isLoading ? (
-          <>
-            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Deleting...
-          </>
-        ) : "Yes, Delete"}
-        confirmColor="red"
-        isLoading={deleteState.isLoading}
-      />
-
-      {/* Member Modal */}
-      <MemberModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        member={selectedMember}
-        currentUserRole={currentUser?.role}
-        currentUserDepartment={currentUser?.department}
-        currentUserTeam={currentUser?.team}
-        mode={activeTab === 'lCVPs' ? 'LCVP' : activeTab === 'teamLeaders' ? 'Team_Leader' : 'Member'}
-      />
+        </Modal.Body>
+      </Modal>
     </div>
   );
-};
-
-export default DashManageMember;
+}
