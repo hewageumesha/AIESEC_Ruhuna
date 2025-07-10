@@ -164,6 +164,8 @@ public class TaskServiceImpl implements TaskService {
 
     }
 
+
+
     // ========== Mappers ==========
 
     public Task DtoToTask(TaskDto taskDto) {
@@ -199,6 +201,7 @@ public class TaskServiceImpl implements TaskService {
                     task.getAssignedTo().getId(),
                     task.getAssignedTo().getUserName(),
                     task.getAssignedTo().getNoOfTask()
+
             );
             dto.setAssignedTo(assignedTo);
         } else {
@@ -211,6 +214,7 @@ public class TaskServiceImpl implements TaskService {
                     task.getAssignedBy().getId(),
                     task.getAssignedBy().getUserName(),
                     task.getAssignedBy().getNoOfTask()
+
             );
             dto.setAssignedBy(assignedBy);
         } else {
@@ -285,12 +289,15 @@ public class TaskServiceImpl implements TaskService {
             }
             case Team_Leader -> {
                 filteredUsers = allUsers.stream()
-                        .filter(u -> u.getTeamLeaderId() != null
-                                && u.getTeamLeaderId().equals(loggedInUser.getId().toString())
-                                && u.getRole() == UserRole.Member)
+                        .filter(u -> u.getRole() == UserRole.Member
+                                && u.getFunction() != null
+                                && loggedInUser.getFunction() != null
+                                && u.getFunction().getId().equals(loggedInUser.getFunction().getId())
+                        )
                         .toList();
             }
-            case Member -> {
+
+                case Member -> {
                 filteredUsers = allUsers.stream()
                         .filter(u -> !u.getId().equals(loggedInUser.getId())
                                 && u.getRole() == UserRole.Member
@@ -427,6 +434,7 @@ public class TaskServiceImpl implements TaskService {
             assignedToUser.setId(taskDto.getAssignedTo().getId());
             assignedToUser.setUserName(taskDto.getAssignedTo().getUsername());
             task.setAssignedTo(assignedToUser);
+
         }
 
         return task;

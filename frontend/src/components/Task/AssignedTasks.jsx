@@ -126,8 +126,12 @@ const AssignedTasks = () => {
         const matchesPriority = priorityFilter === "All" || task.priority === priorityFilter;
         const matchesStatus = statusFilter === "All" || task.workOfStatus === statusFilter;
 
-        return matchesSearch && matchesPriority && matchesStatus;
+        const assignedByName = task.assignedBy?.username || "Unknown";
+        const matchesAssignedBy = assignedByFilter === "All" || assignedByName === assignedByFilter;
+
+        return matchesSearch && matchesPriority && matchesStatus && matchesAssignedBy;
     });
+
 
     // Sort filtered tasks by deadline ascending
     const sortedTasks = [...filteredTasks].sort(
@@ -303,7 +307,11 @@ const AssignedTasks = () => {
                                 <td className="px-6 py-3 text-sm text-gray-700">{getDaysRemaining(task.deadLine)}</td>
                                 <td className="px-6 py-3">
                                     {task.assignedBy?.username ? (
-                                        <span>{task.assignedBy.username}</span>
+                                        <span
+                                            title={`Role: ${task.assignedBy?.role || task.assignedBy?.userRole || "Unknown"}`}
+                                        >
+  {task.assignedBy?.username || task.assignedBy?.userName || task.assignedBy || "Unknown"}
+</span>
                                     ) : (
                                         <i className="text-red-500">Unknown</i>
                                     )}

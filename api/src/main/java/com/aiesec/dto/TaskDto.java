@@ -34,6 +34,7 @@ public class TaskDto {
         private String username;
         private int numberOfTasks;
 
+
         public AssignedUserDTO(Integer id, String username, int numberOfTasks) {
             this.id = id;
             this.username = username;

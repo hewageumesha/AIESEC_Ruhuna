@@ -128,18 +128,7 @@ const TaskDashboardTL = () => {
                             </button>
                         </div>
 
-                        {/* 🔹 Bar Chart – Task Status Overview */}
-                        <BarChart width={500} height={300} data={[
-                            { status: "Completed", count: 10 },
-                            { status: "In Progress", count: 5 },
-                            { status: "Not Started", count: 3 }
-                        ]}>
-                            <XAxis dataKey="status" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Bar dataKey="count" fill="#8884d8" />
-                        </BarChart>
+
 
                         {/* 🔹 User Progress Section */}
 

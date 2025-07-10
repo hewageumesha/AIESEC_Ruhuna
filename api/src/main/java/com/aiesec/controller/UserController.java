@@ -12,10 +12,7 @@ import com.aiesec.security.UserDetailsImpl;
 import com.aiesec.service.CommentService;
 import com.aiesec.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -59,15 +56,25 @@ public class UserController {
         User user = userRepo.findById(Long.valueOf(id))
                 .orElseThrow(() -> new ResourcesNotFoundException("User", "id", id));
 
-        Map<String, Object> simpleUser = Map.of(
-                "id", user.getId(),
-                "userName", user.getUserName(),
-                "role", user.getRole().toString(),
-                "departmentId", user.getDepartment() != null ? user.getDepartment().getId() : null
-        );
+        Map<String, Object> simpleUser = new HashMap<>();
+        simpleUser.put("id", user.getId());
+        simpleUser.put("userName", user.getUserName());
+        simpleUser.put("role", user.getRole().toString());
+        simpleUser.put("departmentId", user.getDepartment() != null ? user.getDepartment().getId() : null);
+
+        // ✅ Add functionId as an object {id, name}
+        if (user.getFunction() != null) {
+            Map<String, Object> functionMap = new HashMap<>();
+            functionMap.put("id", user.getFunction().getId());
+            functionMap.put("name", user.getFunction().getName());
+            simpleUser.put("functionId", functionMap);
+        } else {
+            simpleUser.put("functionId", null);
+        }
 
         return ResponseEntity.ok(simpleUser);
     }
+
 
     @PostMapping("/add")
     public User addUser(@RequestBody User user) {

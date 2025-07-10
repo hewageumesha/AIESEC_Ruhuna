@@ -12,43 +12,53 @@ const TaskUpdate = () => {
         description: "",
         deadLine: "",
         workOfStatus: "pending",
-        priority: "MEDIUM"
+        priority: "MEDIUM",
+        assignedBy: null,      // keep assignedBy info for filtering users
     });
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // 🔥 Fixed URL to use assigner id
                 const taskResponse = await fetch(`http://localhost:8080/api/user/${id}/task/${taskId}`);
+                if (!taskResponse.ok) {
+                    throw new Error("Task not found");
+                }
                 const taskData = await taskResponse.json();
 
                 const usersResponse = await fetch("http://localhost:8080/api/user/users");
                 const usersData = await usersResponse.json();
 
                 const assignedUser = taskData.assignedTo
-                    ? usersData.find((user) => user.id === taskData.assignedTo.userId)
+                    ? usersData.find((user) => user.id === taskData.assignedTo.id)
                     : null;
 
                 setTask({
                     ...taskData,
                     assignedTo: assignedUser,
-                    deadLine: taskData.deadLine.split("T")[0]
+                    deadLine: taskData.deadLine?.split("T")[0] || ""
                 });
 
                 setUsers(usersData);
+
+                console.log("Fetched task:", taskData);
+                console.log("Resolved assigned user:", assignedUser);
             } catch (error) {
                 console.error("Error fetching data:", error);
+                Swal.fire("Error!", "Could not load task", "error");
             }
         };
 
         fetchData();
     }, [id, taskId]);
 
+
     const handleUpdate = async () => {
         try {
             const updatePayload = {
                 ...task,
-                assignedTo: task.assignedTo ? { userId: task.assignedTo.id } : null,
-                priority: task.priority || "MEDIUM"
+                assignedTo: task.assignedTo ? { id: task.assignedTo.id } : null,
+                priority: task.priority || "MEDIUM",
             };
 
             const updateResponse = await fetch(
@@ -56,7 +66,7 @@ const TaskUpdate = () => {
                 {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(updatePayload)
+                    body: JSON.stringify(updatePayload),
                 }
             );
 
@@ -74,13 +84,13 @@ const TaskUpdate = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setTask(prev => ({ ...prev, [name]: value }));
+        setTask((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleAssigneeChange = (e) => {
         const selectedUserId = parseInt(e.target.value);
-        const selectedUser = users.find(u => u.id === selectedUserId) || null;
-        setTask(prev => ({ ...prev, assignedTo: selectedUser }));
+        const selectedUser = users.find((u) => u.id === selectedUserId) || null;
+        setTask((prev) => ({ ...prev, assignedTo: selectedUser }));
     };
 
     return (
@@ -95,7 +105,7 @@ const TaskUpdate = () => {
                         value={task.taskName}
                         onChange={handleInputChange}
                         className="form-input"
-                        style={{ color: 'black', backgroundColor: 'white' }}
+                        style={{ color: "black", backgroundColor: "white" }}
                     />
                 </div>
 
@@ -106,7 +116,7 @@ const TaskUpdate = () => {
                         value={task.description}
                         onChange={handleInputChange}
                         className="form-input h-32"
-                        style={{ color: 'black', backgroundColor: 'white' }}
+                        style={{ color: "black", backgroundColor: "white" }}
                     ></textarea>
                 </div>
 
@@ -118,7 +128,7 @@ const TaskUpdate = () => {
                         value={task.deadLine}
                         onChange={handleInputChange}
                         className="form-input"
-                        style={{ color: 'black', backgroundColor: 'white' }}
+                        style={{ color: "black", backgroundColor: "white" }}
                     />
                 </div>
 
@@ -129,15 +139,13 @@ const TaskUpdate = () => {
                         value={task.priority}
                         onChange={handleInputChange}
                         className="form-input"
-                        style={{ color: 'black', backgroundColor: 'white' }}
+                        style={{ color: "black", backgroundColor: "white" }}
                     >
                         <option value="HIGH">High</option>
                         <option value="MEDIUM">Medium</option>
                         <option value="LOW">Low</option>
                     </select>
                 </div>
-
-
 
                 <div className="form-group">
                     <label>Assign To</label>
@@ -147,11 +155,39 @@ const TaskUpdate = () => {
                         className="form-input"
                     >
                         <option value="">Unassigned</option>
-                        {users.map((user) => (
-                            <option key={user.id} value={user.id.toString()}>
-                                {user.userName}
-                            </option>
-                        ))}
+                        {users
+                            .filter((user) => {
+                                if (!user || !task.assignedBy) return false;
+
+                                const sameDepartment =
+                                    user.departmentId === task.assignedBy.departmentId;
+                                const sameFunction = task.assignedBy.functionId?.id
+                                    ? user.functionId?.id === task.assignedBy.functionId?.id
+                                    : true;
+
+                                if (task.assignedBy.role === "LCP") {
+                                    return ["LCVP", "Team_Leader", "Member"].includes(user.role);
+                                }
+
+                                if (task.assignedBy.role === "LCVP") {
+                                    return (
+                                        ["Team_Leader", "Member"].includes(user.role) &&
+                                        sameDepartment &&
+                                        sameFunction
+                                    );
+                                }
+
+                                if (task.assignedBy.role === "Team_Leader") {
+                                    return user.role === "Member" && sameDepartment && sameFunction;
+                                }
+
+                                return false;
+                            })
+                            .map((user) => (
+                                <option key={user.id} value={user.id.toString()}>
+                                    {user.userName} ({user.role})
+                                </option>
+                            ))}
                     </select>
                 </div>
             </div>
@@ -163,10 +199,7 @@ const TaskUpdate = () => {
                 >
                     Cancel
                 </button>
-                <button
-                    onClick={handleUpdate}
-                    className="btn-submit"
-                >
+                <button onClick={handleUpdate} className="btn-submit">
                     Save Changes
                 </button>
             </div>

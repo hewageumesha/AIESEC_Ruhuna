@@ -195,10 +195,12 @@ const CreateTask = () => {
                                 if (!loggedInUser) return false;
 
                                 const sameDepartment = user.departmentId === loggedInUser.departmentId;
-                                const sameFunction = (user.function || '') === (loggedInUser.function || '');
+                                const sameFunction = (!user.functionId?.id && !loggedInUser.functionId?.id)
+                                    || (user.functionId?.id === loggedInUser.functionId?.id);
 
-                                console.log(`Checking user ${user.userName}: role=${user.role}, department=${user.departmentId}, function=${user.function}`);
+                                console.log(`Checking user ${user.userName}: role=${user.role}, department=${user.departmentId}, function=${JSON.stringify(user.functionId)}`);
                                 console.log(`sameDepartment: ${sameDepartment}, sameFunction: ${sameFunction}`);
+                                console.log("LoggedInUser object:", JSON.stringify(loggedInUser));
 
                                 if (loggedInUser.role === "LCP") {
                                     return ["LCVP", "Team_Leader", "Member"].includes(user.role);
@@ -214,6 +216,8 @@ const CreateTask = () => {
 
                                 return false;
                             })
+
+
 
                             .map(user => (
                                 <option key={user.id} value={user.id}>
