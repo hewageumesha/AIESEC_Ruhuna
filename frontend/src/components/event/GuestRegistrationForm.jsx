@@ -11,12 +11,27 @@ const GuestRegistrationForm = ({ eventId, onSuccess }) => {
     setLoading(true);
     try {
       const payload = { ...values, eventId };
-      const { data } = await axios.post("/api/guest-registrations", payload);
+      console.log("Submitting guest registration:", payload);
+
+      const { data } = await axios.post(
+        "http://localhost:8080/api/guest-registrations",
+        payload
+      );
+
       message.success("Successfully registered!");
-      onSuccess?.(data); // Optional chaining used for safety
+      onSuccess?.(data); // Call success callback if provided
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Registration failed.";
-      message.error(errorMsg);
+      console.error("❌ Guest registration error:", err);
+
+      const resData = err.response?.data;
+
+      if (Array.isArray(resData)) {
+        message.error(resData.join(", "));
+      } else if (resData?.message) {
+        message.error(resData.message);
+      } else {
+        message.error("Registration failed.");
+      }
     } finally {
       setLoading(false);
     }

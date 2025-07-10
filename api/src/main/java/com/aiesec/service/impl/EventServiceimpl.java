@@ -1,6 +1,9 @@
 package com.aiesec.service.impl;
 
 import com.aiesec.dto.EventDTO;
+import com.aiesec.mapper.EventMapper;
+import com.aiesec.mapper.MerchandiseMapper;
+
 import com.aiesec.model.event.Event;
 import com.aiesec.mapper.EventMapper;
 import com.aiesec.repository.event.EventRepository;
@@ -26,23 +29,24 @@ public class EventServiceimpl implements EventService {
     public EventDTO createEvent(EventDTO eventDTO) {
         Event event = EventMapper.toEntity(eventDTO);
 
-        // Handle null value for hasTshirtOrder (if EventDTO uses Boolean)
-        if (eventDTO.getHasTshirtOrder() == null) {
-            event.setHasTshirtOrder(false); // default to false
+if (eventDTO.getHasMerchandise() == null) {
+    event.setHasMerchandise(false);
+
         } else {
-            event.setHasTshirtOrder(eventDTO.getHasTshirtOrder());
+            event.setHasMerchandise(eventDTO.getHasMerchandise());
         }
 
-        // Handle null or empty visibility
-        if (eventDTO.getVisibility() == null || eventDTO.getVisibility().isEmpty()) {
-            event.setVisibility("Private"); // default visibility
+// Use Boolean isPublic instead of String visibility
+if (eventDTO.getIsPublic() == null) {
+    event.setIsPublic(false); // Default to private
+
         } else {
-            event.setVisibility(eventDTO.getVisibility());
+            event.setIsPublic(eventDTO.getIsPublic());
         }
 
-        return EventMapper.toDTO(eventRepository.save(event));
+        Event savedEvent = eventRepository.save(event);
+        return EventMapper.toDTO(savedEvent);
     }
-
 
     @Override
     public EventDTO updateEvent(Long eventId, EventDTO updatedEvent) {
@@ -60,6 +64,7 @@ public class EventServiceimpl implements EventService {
             event.setIsPublic(updatedEvent.getIsPublic());
             event.setIsVirtual(updatedEvent.getIsVirtual());
             event.setVirtualLink(updatedEvent.getVirtualLink());
+            event.setHasMerchandise(updatedEvent.getHasMerchandise());
 
             return EventMapper.toDTO(eventRepository.save(event));
         }
@@ -77,9 +82,20 @@ public class EventServiceimpl implements EventService {
     @Override
     public EventDTO getEventById(Long id) {
         return eventRepository.findById(id)
-                .map(EventMapper::toDTO)
+                .map(event -> {
+                    EventDTO dto = EventMapper.toDTO(event);
+
+                    if (Boolean.TRUE.equals(dto.getHasMerchandise())) {
+                        merchandiseRepository.findByEventEventId(id).ifPresent(merch -> {
+                            dto.setMerchandise(MerchandiseMapper.toDTO(merch));
+                        });
+                    }
+
+                    return dto;
+                })
                 .orElse(null);
     }
+
 
     @Override
     public void deleteEvent(Long eventId) {
@@ -98,7 +114,33 @@ public class EventServiceimpl implements EventService {
     @Override
     public List<EventDTO> getPublicUpcomingEvents() {
         LocalDate now = LocalDate.now();
-        return eventRepository.findByIsPublicTrueAndStartDateAfter(now)
+        return eventRepository.findByIsPublicTrueAndStartDateGreaterThanEqual(now)
+                .stream()
+                .map(EventMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public List<EventDTO> getPrivateUpcomingEvents() {
+        LocalDate now = LocalDate.now();
+        return eventRepository.findByIsPublicFalseAndStartDateGreaterThanEqual(now)
+                .stream()
+                .map(EventMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EventDTO> getAllPublicEvents() {
+        return eventRepository.findByIsPublicTrue()
+                .stream()
+                .map(EventMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EventDTO> getAllPrivateEvents() {
+        return eventRepository.findByIsPublicFalse()
                 .stream()
                 .map(EventMapper::toDTO)
                 .collect(Collectors.toList());
@@ -108,24 +150,14 @@ public class EventServiceimpl implements EventService {
         Optional<Event> optionalEvent = eventRepository.findById(eventId);
         if (optionalEvent.isPresent()) {
             Event event = optionalEvent.get();
-            event.setHasTshirtOrder(Boolean.TRUE.equals(hasTshirtOrder));
+            event.setHasMerchandise(Boolean.TRUE.equals(hasTshirtOrder));
             eventRepository.save(event);
         } else {
             throw new RuntimeException("Event not found with ID: " + eventId);
         }
     }
 
-    @Override
-    public void updateEventVisibility(Long eventId, String visibility) {
-        Optional<Event> optionalEvent = eventRepository.findById(eventId);
-        if (optionalEvent.isPresent()) {
-            Event event = optionalEvent.get();
-            event.setVisibility(visibility != null && !visibility.isEmpty() ? visibility : "Private");
-            eventRepository.save(event);
-        } else {
-            throw new RuntimeException("Event not found with ID: " + eventId);
-        }
-    }
+
 
 
 

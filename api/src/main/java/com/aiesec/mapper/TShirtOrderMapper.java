@@ -19,7 +19,7 @@ public class TShirtOrderMapper {
                 .build();
     }
 
-    public static TShirtOrder toEntity(TshirtOrderDTO dto, Merchandise merchandise, User user, GuestUser guestUser) {
+    public static TShirtOrder toEntity(TshirtOrderDTO dto, Merchandise merchandise, User user, GuestEventRegistration guest) {
         if (dto == null) return null;
 
         return TShirtOrder.builder()

@@ -1,6 +1,7 @@
 package com.aiesec.service.impl;
 
 import com.aiesec.dto.GuestEventRegistrationDTO;
+import com.aiesec.dto.GuestRegistrationSummaryDTO;
 import com.aiesec.mapper.GuestEventRegistrationMapper;
 import com.aiesec.model.event.GuestEventRegistration;
 import com.aiesec.repository.event.GuestEventRegistrationRepository;
@@ -19,21 +20,29 @@ public class GuestEventRegistrationServiceImpl implements GuestEventRegistration
 
     @Override
     public GuestEventRegistrationDTO register(GuestEventRegistrationDTO dto) {
-        boolean exists = registrationRepository.existsByEventIdAndEmail(dto.getEventId(), dto.getEmail());
+        System.out.println("Registering guest: " + dto);
+        boolean exists = registrationRepository.existsByEvent_EventIdAndEmail(dto.getEventId(), dto.getEmail());
         if (exists) {
             throw new IllegalStateException("You have already registered for this event with this email.");
         }
-
         GuestEventRegistration entity = GuestEventRegistrationMapper.toEntity(dto);
+        System.out.println("Mapped entity: " + entity);
         GuestEventRegistration saved = registrationRepository.save(entity);
+        System.out.println("Saved entity: " + saved);
         return GuestEventRegistrationMapper.toDTO(saved);
     }
 
     @Override
     public List<GuestEventRegistrationDTO> getAllByEventId(Long eventId) {
-        return registrationRepository.findByEventId(eventId)
+        return registrationRepository.findByEvent_EventId(eventId)
                 .stream()
                 .map(GuestEventRegistrationMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<GuestRegistrationSummaryDTO> getSummaryByEvent() {
+        return registrationRepository.getGuestSummaryByEvent();
+    }
+
 }
