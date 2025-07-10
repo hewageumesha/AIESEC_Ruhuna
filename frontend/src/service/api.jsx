@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080/api", // Update this based on your backend
+  baseURL: "http://localhost:8080/api", 
 });
 
 // API functions for CRUD operations
