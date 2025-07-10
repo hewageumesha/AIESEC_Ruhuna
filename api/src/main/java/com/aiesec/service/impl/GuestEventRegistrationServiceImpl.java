@@ -9,7 +9,9 @@ import com.aiesec.service.interfaces.GuestEventRegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,7 +44,32 @@ public class GuestEventRegistrationServiceImpl implements GuestEventRegistration
 
     @Override
     public List<GuestRegistrationSummaryDTO> getSummaryByEvent() {
-        return registrationRepository.getGuestSummaryByEvent();
+        return registrationRepository.getGoingSummaryByEvent();
     }
+
+    @Override
+    public Map<String, Integer> getStatusSummaryByEvent(Long eventId) {
+        List<Object[]> results = registrationRepository.countByEventIdGroupByStatus(eventId);
+        System.out.println("DB results for guest status summary: " + results);  // optional debug log
+
+        Map<String, Integer> summary = new HashMap<>();
+        summary.put("GOING", 0);
+        summary.put("PENDING", 0);
+        summary.put("NOT_GOING", 0);
+
+        for (Object[] row : results) {
+            String status = row[0].toString();
+            Number count = (Number) row[1];
+            summary.put(status, count.intValue());
+
+            summary.put(status, count.intValue());
+        }
+
+        System.out.println("Guest summary map: " + summary); // optional debug log
+
+        return summary;
+    }
+
+
 
 }

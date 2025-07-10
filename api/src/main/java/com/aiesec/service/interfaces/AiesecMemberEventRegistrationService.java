@@ -4,6 +4,7 @@ import com.aiesec.dto.AiesecMemberEventRegistrationDTO;
 import com.aiesec.dto.EventRegistrationSummaryDTO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AiesecMemberEventRegistrationService {
     AiesecMemberEventRegistrationDTO register(AiesecMemberEventRegistrationDTO dto);
@@ -11,5 +12,7 @@ public interface AiesecMemberEventRegistrationService {
     boolean alreadyRegistered(Long userId, Long eventId);
     List<AiesecMemberEventRegistrationDTO> getByEventId(Long eventId);
     List<EventRegistrationSummaryDTO> getSummaryByEvent();
+    Map<String, Integer> getStatusSummaryByEvent(Long eventId);
+
 
 }

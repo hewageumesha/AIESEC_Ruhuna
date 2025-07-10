@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,8 +13,6 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 public class EventDTO {
-
-    private MerchandiseDTO merchandise;
 
     private Long eventId;
     private String eventName;
@@ -33,4 +32,5 @@ public class EventDTO {
     private Boolean isVirtual;
     private String virtualLink;
     private Boolean hasMerchandise;
+    private List<MerchandiseDTO> merchandise;
 }

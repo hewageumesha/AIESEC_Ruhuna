@@ -1,6 +1,5 @@
 package com.aiesec.controller;
 
-// Import required classes and annotations
 import com.aiesec.model.User;
 import com.aiesec.security.JwtUtil;
 import com.aiesec.service.UserService;
@@ -16,74 +15,58 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "*") // Allows requests from any origin (CORS policy)
-@RestController // Marks this class as a REST controller
-@RequestMapping("/api/auth") // Base URL for all endpoints in this controller
+@CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/api/auth")
 public class AuthController {
 
-     // Injecting the JWT utility class to generate tokens
     @Autowired
     private JwtUtil jwtUtil;
 
-    // Injecting the UserService to handle user-related operations
     @Autowired
-
-
     private UserService userService;
 
-    // Endpoint to sign in a user (Login)
     @PostMapping("/signin")
     public ResponseEntity<Object> signIn(@RequestBody User user) {
-        // Validate that email and password are provided
         if (user.getAiesecEmail() == null || user.getPassword() == null) {
-            return ResponseEntity
-                    .badRequest()  // 400 Bad Request
-                    .body("Email and password must be provided");
+            return ResponseEntity.badRequest().body("Email and password must be provided");
         }
 
-        // Get user from the database by AIESEC email
-        Optional<User> existingUser = userService.getUserByAiesecEmail(user.getAiesecEmail());
+        Optional<User> existingUserOpt = userService.getUserByAiesecEmail(user.getAiesecEmail());
 
-        // If no user is found with the given AIESEC email
-        if (existingUser == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)  // 404 Not Found
+        if (existingUserOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("User not found with email: " + user.getAiesecEmail());
         }
 
-        // Create a new instance of BCryptPasswordEncoder
+        User existingUser = existingUserOpt.get();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-        // Validate the password by comparing it to the hashed password in the database
-        if (!passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword())) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)  // 401 Unauthorized
+        if (!passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Invalid password");
         }
 
-        // If authentication is successful, generate a JWT token using the email
-        String token = jwtUtil.generateToken(existingUser.get().getAiesecEmail());
+        String token = jwtUtil.generateToken(existingUser.getAiesecEmail());
 
-        // Create a JSON object to return as the response
+        // ✅ Include ID and other user info in response
         JSONObject json = new JSONObject();
-        json.put("role", existingUser.get().getRole());
-        json.put("aiesecEmail", existingUser.get().getAiesecEmail());
+        json.put("id", existingUser.getId());
+        json.put("firstName", existingUser.getFirstName());
+        json.put("lastName", existingUser.getLastName());
+        json.put("aiesecEmail", existingUser.getAiesecEmail());
+        json.put("email", existingUser.getEmail());
+        json.put("phone", existingUser.getPhone());
+        json.put("role", existingUser.getRole());
         json.put("token", token);
 
-        // Return the token and user details with a 200 OK status
-        return ResponseEntity
-                .ok()  // 200 OK
-                .body(json.toString());
+        return ResponseEntity.ok(json.toString());
     }
 
-     // Endpoint to sign out a user (currently just sends a success message)
     @PostMapping("/signout")
     public ResponseEntity<Map<String, String>> signOut() {
-
-        // Since JWT is stateless, sign-out is handled on the client side
         Map<String, String> response = new HashMap<>();
         response.put("message", "Logged out successfully");
-        return ResponseEntity.ok(response); // Return 200 OK with the message
+        return ResponseEntity.ok(response);
     }
 }
-

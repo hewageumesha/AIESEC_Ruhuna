@@ -1,99 +1,264 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Calendar, Users, Download, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import axios from 'axios';  // Real axios import
+import { Calendar, Users, Filter } from 'lucide-react';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+const colorClasses = {
+  blue: { bg: "bg-blue-50", text: "text-blue-600" },
+  green: { bg: "bg-green-50", text: "text-green-600" },
+  gray: { bg: "bg-gray-50", text: "text-gray-600" },
+};
+
+const pieColors = {
+  GOING: '#4CAF50',
+  PENDING: '#FFC107',
+  NOT_GOING: '#F44336',
+};
 
 const EventAnalytics = () => {
   const [events, setEvents] = useState([]);
   const [registrations, setRegistrations] = useState([]);
-
   const [selectedEvent, setSelectedEvent] = useState('all');
-  const [registrationType] = useState('both');
+  const [selectedPieEvent, setSelectedPieEvent] = useState('');
+  const [loadingEvents, setLoadingEvents] = useState(false);
+  const [loadingRegs, setLoadingRegs] = useState(false);
+  const [loadingPieData, setLoadingPieData] = useState(false);
+  const [statusDistribution, setStatusDistribution] = useState(null);
+  const [pieError, setPieError] = useState(null);
 
-  // Fetch event list once on mount
+  // Fetch events list
   useEffect(() => {
-    axios.get('/analytics/events')
-      .then(res => setEvents(res.data))
-      .catch(err => console.error('Failed to fetch events:', err));
+    setLoadingEvents(true);
+    axios.get('/analytics/registrations/events')
+      .then(res => {
+        if (Array.isArray(res.data)) {
+          setEvents(res.data);
+        } else if (Array.isArray(res.data.data)) {
+          setEvents(res.data.data);
+        } else {
+          setEvents([]);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch events:', err);
+        setEvents([]);
+      })
+      .finally(() => setLoadingEvents(false));
   }, []);
 
-  // Fetch registrations whenever selectedEvent changes
+  // Fetch GOING registrations for summary cards
   useEffect(() => {
+    setLoadingRegs(true);
     const params = {
       eventId: selectedEvent === 'all' ? undefined : selectedEvent,
-      type: registrationType === 'both' ? 'all' : registrationType,
+      status: 'GOING'
     };
+    axios.get('/analytics/registrations/by-event', { params })
+      .then(res => {
+        setRegistrations(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch(err => {
+        console.error('Failed to fetch registrations:', err);
+        setRegistrations([]);
+      })
+      .finally(() => setLoadingRegs(false));
+  }, [selectedEvent]);
 
-    axios.get('/analytics/registrations', { params })
-      .then(res => setRegistrations(res.data))
-      .catch(err => console.error('Failed to fetch registrations:', err));
-  }, [selectedEvent, registrationType]);
+  // Fetch status distribution for pie chart
+  useEffect(() => {
+    if (!selectedPieEvent) {
+      setStatusDistribution(null);
+      setPieError(null);
+      return;
+    }
 
-  // Registration summary data
+    const event = events.find(e => e.id === parseInt(selectedPieEvent));
+    if (!event) {
+      setStatusDistribution(null);
+      setPieError('Event not found');
+      return;
+    }
+
+    setLoadingPieData(true);
+    setPieError(null);
+
+    if (event.isPublic) {
+      const memberPromise = axios.get(`/api/member-event-registrations/summary/status?eventId=${selectedPieEvent}`);
+      const guestPromise = axios.get(`/api/guest-registrations/analytics/summary/status?eventId=${selectedPieEvent}`);
+
+      Promise.all([memberPromise, guestPromise])
+        .then(([memberRes, guestRes]) => {
+          const fallback = { GOING: 0, PENDING: 0, NOT_GOING: 0 };
+          const combined = { ...fallback };
+
+          const memberData = memberRes.data || {};
+          const guestData = guestRes.data || {};
+
+          ['GOING', 'PENDING', 'NOT_GOING'].forEach(status => {
+            combined[status] = (memberData[status] || 0) + (guestData[status] || 0);
+          });
+
+          setStatusDistribution(combined);
+        })
+        .catch(err => {
+          console.error('Failed to fetch combined status distribution:', err);
+          setPieError('Failed to load status data');
+          setStatusDistribution(null);
+        })
+        .finally(() => setLoadingPieData(false));
+    } else {
+      axios.get(`/api/member-event-registrations/summary/status?eventId=${selectedPieEvent}`)
+        .then(res => {
+          const fallback = { GOING: 0, PENDING: 0, NOT_GOING: 0 };
+          const memberData = res.data || {};
+          const combined = { ...fallback, ...memberData };
+          setStatusDistribution(combined);
+        })
+        .catch(err => {
+          console.error('Failed to fetch member status distribution:', err);
+          setPieError('Failed to load status data');
+          setStatusDistribution(null);
+        })
+        .finally(() => setLoadingPieData(false));
+    }
+  }, [selectedPieEvent, events]);
+
+  // Compute summary card data
   const summaryData = useMemo(() => {
     const filteredRegs = selectedEvent === 'all'
       ? registrations
       : registrations.filter(reg => reg.eventId === parseInt(selectedEvent));
 
-    const memberCount = filteredRegs.filter(reg => reg.type === 'member').length;
-    const guestCount = filteredRegs.filter(reg => reg.type === 'guest').length;
+    const event = selectedEvent !== 'all'
+      ? events.find(e => e.id === parseInt(selectedEvent))
+      : null;
 
-    let publicCount = 0;
-    let memberOnlyCount = 0;
+    let memberCount = 0;
+    let guestCount = 0;
 
     if (selectedEvent === 'all') {
-      events.forEach(event => {
-        const eventRegs = filteredRegs.filter(reg => reg.eventId === event.id);
-        if (event.isPublic) publicCount += eventRegs.length;
-        else memberOnlyCount += eventRegs.length;
-      });
+      memberCount = filteredRegs.reduce((sum, reg) => sum + (reg.memberRegistrations || 0), 0);
+      guestCount = filteredRegs.reduce((sum, reg) => sum + (reg.guestRegistrations || 0), 0);
+    } else if (event?.isPublic) {
+      memberCount = filteredRegs.reduce((sum, reg) => sum + (reg.memberRegistrations || 0), 0);
+      guestCount = filteredRegs.reduce((sum, reg) => sum + (reg.guestRegistrations || 0), 0);
     } else {
-      const event = events.find(e => e.id === parseInt(selectedEvent));
-      if (event?.isPublic) publicCount = filteredRegs.length;
-      else memberOnlyCount = filteredRegs.length;
+      memberCount = filteredRegs.reduce((sum, reg) => sum + (reg.memberRegistrations || 0), 0);
+      guestCount = 0;
     }
 
     return {
       totalMembers: memberCount,
       totalGuests: guestCount,
-      publicEvents: publicCount,
-      memberOnlyEvents: memberOnlyCount,
       total: memberCount + guestCount
     };
   }, [selectedEvent, registrations, events]);
 
-  // Event table data
-  // (Removed unused eventTableData)
+  // Prepare pie chart data
+  const pieChartData = useMemo(() => {
+    if (!statusDistribution) return [];
 
-  // Export CSV helper (same as your existing one)
-  const exportCSV = (data, filename) => {
-    if (data.length === 0) {
-      alert("No data to export");
-      return;
-    }
+    return Object.entries(statusDistribution)
+      .map(([status, count]) => ({
+        name: status.replace('_', ' '),
+        value: count || 0,
+        originalStatus: status
+      }))
+      .filter(item => item.value > 0);
+  }, [statusDistribution]);
 
-    const csv = [
-      Object.keys(data[0]).join(','),
-      ...data.map(row => Object.values(row).join(','))
-    ].join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    window.URL.revokeObjectURL(url);
+  const SummaryCard = ({ label, value, icon: Icon, color }) => {
+    const classes = colorClasses[color] || colorClasses.gray;
+    return (
+      <div className={`${classes.bg} p-4 rounded-lg`}>
+        <div className="flex items-center">
+          <Icon className={`w-8 h-8 ${classes.text} mr-3`} />
+          <div>
+            <p className="text-sm text-gray-600">{label}</p>
+            <p className={`text-2xl font-bold ${classes.text}`}>{value}</p>
+          </div>
+        </div>
+      </div>
+    );
   };
 
-  // ... your existing JSX UI here, replacing mockEvents with events and mockRegistrations with registrations
+  const renderPieChart = () => {
+    if (loadingPieData) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <div className="text-gray-500">Loading chart data...</div>
+        </div>
+      );
+    }
+
+    if (pieError) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <div className="text-red-500">Error: {pieError}</div>
+        </div>
+      );
+    }
+
+    if (!selectedPieEvent) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <div className="text-gray-600">Select an event above to see interest status breakdown.</div>
+        </div>
+      );
+    }
+
+    if (!statusDistribution) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <div className="text-gray-500">No data available</div>
+        </div>
+      );
+    }
+
+    const total = Object.values(statusDistribution).reduce((a, b) => a + b, 0);
+    if (total === 0) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <div className="text-gray-600">No registration data available for this event.</div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={pieChartData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={120}
+              label={(entry) => `${entry.name}: ${entry.value}`}
+              labelLine={false}
+            >
+              {pieChartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={pieColors[entry.originalStatus] || '#8884d8'}
+                />
+              ))}
+            </Pie>
+            <Tooltip formatter={(value, name) => [value, name]} />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Event Analytics Dashboard</h1>
 
-        {/* Registration Summary */}
+        {/* Registration Summary Section */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-800">Registration Summary</h2>
@@ -101,8 +266,9 @@ const EventAnalytics = () => {
               <Filter className="w-5 h-5 text-gray-500" />
               <select
                 value={selectedEvent}
-                onChange={(e) => setSelectedEvent(e.target.value)}
+                onChange={e => setSelectedEvent(e.target.value)}
                 className="border border-gray-300 rounded-md px-3 py-2 bg-white"
+                disabled={loadingEvents}
               >
                 <option value="all">All Events</option>
                 {events.map(event => (
@@ -112,63 +278,51 @@ const EventAnalytics = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="flex items-center">
-                <Users className="w-8 h-8 text-blue-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Total Members</p>
-                  <p className="text-2xl font-bold text-blue-600">{summaryData.totalMembers}</p>
-                </div>
-              </div>
+          {loadingRegs ? (
+            <div className="text-gray-500 text-center py-10">Loading registrations...</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <SummaryCard
+                label="Total Members"
+                icon={Users}
+                value={summaryData.totalMembers}
+                color="blue"
+              />
+              <SummaryCard
+                label="Total Guests"
+                icon={Users}
+                value={summaryData.totalGuests}
+                color="green"
+              />
+              <SummaryCard
+                label="Total"
+                icon={Users}
+                value={summaryData.total}
+                color="gray"
+              />
             </div>
-
-            <div className="bg-green-50 p-4 rounded-lg">
-              <div className="flex items-center">
-                <Users className="w-8 h-8 text-green-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Total Guests</p>
-                  <p className="text-2xl font-bold text-green-600">{summaryData.totalGuests}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <div className="flex items-center">
-                <Calendar className="w-8 h-8 text-purple-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Public Events</p>
-                  <p className="text-2xl font-bold text-purple-600">{summaryData.publicEvents}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-orange-50 p-4 rounded-lg">
-              <div className="flex items-center">
-                <Calendar className="w-8 h-8 text-orange-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Member-Only</p>
-                  <p className="text-2xl font-bold text-orange-600">{summaryData.memberOnlyEvents}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-center">
-                <Users className="w-8 h-8 text-gray-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Total</p>
-                  <p className="text-2xl font-bold text-gray-600">{summaryData.total}</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
-        {/* Registrations by Event - truncated for brevity, just replace mockEvents with events and mockRegistrations with registrations */}
+        {/* Interest Status Pie Chart */}
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-gray-800">Interest Status Breakdown</h2>
+            <select
+              value={selectedPieEvent}
+              onChange={e => setSelectedPieEvent(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 bg-white"
+              disabled={loadingEvents}
+            >
+              <option value="">Select Event</option>
+              {events.map(event => (
+                <option key={event.id} value={event.id}>{event.name}</option>
+              ))}
+            </select>
+          </div>
 
-        {/* Continue rest of your component as before, replacing data sources */}
-
+          {renderPieChart()}
+        </div>
       </div>
     </div>
   );

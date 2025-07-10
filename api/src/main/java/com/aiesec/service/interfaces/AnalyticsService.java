@@ -9,10 +9,12 @@ import java.util.List;
 import java.util.Map;
 
 public interface AnalyticsService {
-    List<RegistrationAnalyticsDTO> getRegistrationsByEvent(String type);
+    List<RegistrationAnalyticsDTO> getRegistrationsByEvent(String type,Long eventID);
     List<TrendDTO> getTrendData(String type, int days);
     Map<String, Integer> getStatusDistribution(Long eventId, String type);
     void writeRegistrationsCsv(Writer writer, String type, Long eventId, String status) throws IOException;
+    List<Map<String, Object>> getAllEventsForAnalytics();
+
 
 
 

@@ -1,4 +1,4 @@
-// UPDATED CONTROLLER
+
 package com.aiesec.controller.event;
 
 import com.aiesec.dto.AiesecMemberEventRegistrationDTO;
@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/member-event-registrations")
@@ -21,6 +22,7 @@ public class AiesecMemberEventRegistrationController {
 
     @PostMapping("/register")
     public ResponseEntity<AiesecMemberEventRegistrationDTO> register(@RequestBody AiesecMemberEventRegistrationDTO dto) {
+        System.out.println("🚀 Incoming DTO: " + dto);
         try {
             AiesecMemberEventRegistrationDTO registered = registrationService.register(dto);
             return ResponseEntity.ok(registered);
@@ -28,6 +30,7 @@ public class AiesecMemberEventRegistrationController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
+
 
     @GetMapping("/user/{userId}/event/{eventId}")
     public ResponseEntity<List<AiesecMemberEventRegistrationDTO>> getRegistrationsByUserAndEvent(
@@ -51,4 +54,18 @@ public class AiesecMemberEventRegistrationController {
     public ResponseEntity<Boolean> checkIfRegistered(@RequestParam Long userId, @RequestParam Long eventId) {
         return ResponseEntity.ok(registrationService.alreadyRegistered(userId, eventId));
     }
+    @GetMapping("/summary/status")
+    public ResponseEntity<?> getStatusSummaryByEvent(@RequestParam Long eventId) {
+        try {
+            Map<String, Integer> summary = registrationService.getStatusSummaryByEvent(eventId);
+            return ResponseEntity.ok(summary);
+        } catch (Exception e) {
+            e.printStackTrace();  // Log the real error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Internal server error", "message", e.getMessage()));
+        }
+    }
+
+
+
 }

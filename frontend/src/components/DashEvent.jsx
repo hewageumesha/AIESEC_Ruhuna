@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Spin, Button, message, Tag, Popconfirm, Space } from 'antd';
+import { Card, Spin, Button, message, Tag, Popconfirm, Space, Modal } from 'antd';
 import { PlusOutlined, CloseOutlined, EditOutlined, DeleteOutlined, BarChartOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import AddEventForm from './event/AddEventForm';
 import EventFilterForm from './event/EventFilterForm';
+import GalleryUploader from './event/GalleryUploader';
 
 const { Meta } = Card;
 
@@ -13,6 +14,7 @@ const DashEvent = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showGalleryUpload, setShowGalleryUpload] = useState(false); // <-- Correctly declare both
   const [filters, setFilters] = useState({ search: '', status: '', date: '' });
   const navigate = useNavigate();
 
@@ -34,7 +36,7 @@ const DashEvent = () => {
         params,
       });
 
-      setEvents(response.data.content); // If it's a paginated response
+      setEvents(response.data.content); // If paginated response
     } catch (error) {
       console.error('Failed to fetch events:', error);
       message.error('Failed to load events.');
@@ -62,9 +64,9 @@ const DashEvent = () => {
     }
   };
 
-  //  handler for Analytics button
+  // Analytics button handler
   const handleViewAnalytics = () => {
-    navigate('/event-analytics'); //  analytics route path
+    navigate('/event-analytics');
   };
 
   useEffect(() => {
@@ -87,7 +89,6 @@ const DashEvent = () => {
               {showAddForm ? 'Close Form' : 'Create New Event'}
             </Button>
 
-            {/*  Analytics Button */}
             <Button
               type="default"
               icon={<BarChartOutlined />}
@@ -95,6 +96,15 @@ const DashEvent = () => {
               className="bg-gray-200 hover:bg-gray-300"
             >
               View Analytics
+            </Button>
+
+            <Button
+              type="dashed"
+              icon={<PlusOutlined />}
+              onClick={() => setShowGalleryUpload(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Gallery Images
             </Button>
           </Space>
         )}
@@ -164,8 +174,12 @@ const DashEvent = () => {
                 title={<span className="font-semibold text-lg text-gray-800">{event.eventName}</span>}
                 description={
                   <div className="text-gray-600 mt-2 space-y-1 text-sm">
-                    <p><strong>Date:</strong> {event.startDate} to {event.endDate}</p>
-                    <p><strong>Time:</strong> {event.eventTime} - {event.endTime}</p>
+                    <p>
+                      <strong>Date:</strong> {event.startDate} to {event.endDate}
+                    </p>
+                    <p>
+                      <strong>Time:</strong> {event.eventTime} - {event.endTime}
+                    </p>
                   </div>
                 }
               />
@@ -173,6 +187,18 @@ const DashEvent = () => {
           ))}
         </div>
       )}
+
+      {/* Gallery Upload Modal */}
+      <Modal
+        title="Upload Gallery Images"
+        open={showGalleryUpload}
+        onCancel={() => setShowGalleryUpload(false)}
+        footer={null}
+        destroyOnClose
+        width={600}
+      >
+        <GalleryUploader onClose={() => setShowGalleryUpload(false)} events={events} />
+      </Modal>
     </div>
   );
 };

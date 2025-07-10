@@ -1,12 +1,14 @@
 package com.aiesec.model.event;
 
-import com.aiesec.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -59,52 +61,21 @@ public class Event {
     @Column(name = "Virtual_Link", length = 500)
     private String virtualLink;
 
-    @Column(name = "Has_Merchandise")
+    @Column(name = "Has_Merchandise" ,nullable = false)
     private Boolean hasMerchandise = false;
 
-    // Foreign Key Relations
-    @ManyToOne
-    @JoinColumn(name = "LCP_ID")
-    private User lcp;
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Merchandise> merchandiseList = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "LCVP_ID")
-    private User lcvp;
-
-    @ManyToOne
-    @JoinColumn(name = "Series_ID")
-    private EventSeries series;
-
-    @ManyToOne
-    @JoinColumn(name = "Created_By_LCP")
-    private User createdByLcp;
-
-    @ManyToOne
-    @JoinColumn(name = "Approved_By_LCVP")
-    private User approvedByLcvp;
-
-    @OneToOne
-    @JoinColumn(name = "merchandise_id")
-    private Merchandise merchandise;
-
-    // Fixed getter and setter methods
-    public Boolean getIsPublic() {
-        return isPublic;
+    public List<Merchandise> getMerchandiseList() {
+        return merchandiseList;
     }
 
-    public void setIsPublic(Boolean isPublic) {
-        this.isPublic = isPublic;
+    public void setMerchandiseList(List<Merchandise> merchandiseList) {
+        this.merchandiseList = merchandiseList;
     }
 
-    public Boolean getIsVirtual() {
-        return isVirtual;
-    }
-
-    public void setIsVirtual(Boolean isVirtual) {
-        this.isVirtual = isVirtual;
-    }
-
-    // Keep other getters and setters as they were
     public Long getEventId() {
         return eventId;
     }
@@ -177,6 +148,22 @@ public class Event {
         this.imageUrl = imageUrl;
     }
 
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
+    }
+
+    public Boolean getVirtual() {
+        return isVirtual;
+    }
+
+    public void setVirtual(Boolean virtual) {
+        isVirtual = virtual;
+    }
+
     public String getVirtualLink() {
         return virtualLink;
     }
@@ -185,60 +172,11 @@ public class Event {
         this.virtualLink = virtualLink;
     }
 
-
     public Boolean getHasMerchandise() {
         return hasMerchandise;
     }
 
     public void setHasMerchandise(Boolean hasMerchandise) {
         this.hasMerchandise = hasMerchandise;
-    }
-
-    public User getLcp() {
-        return lcp;
-    }
-
-    public void setLcp(User lcp) {
-        this.lcp = lcp;
-    }
-
-    public User getLcvp() {
-        return lcvp;
-    }
-
-    public void setLcvp(User lcvp) {
-        this.lcvp = lcvp;
-    }
-
-    public EventSeries getSeries() {
-        return series;
-    }
-
-    public void setSeries(EventSeries series) {
-        this.series = series;
-    }
-
-    public User getCreatedByLcp() {
-        return createdByLcp;
-    }
-
-    public void setCreatedByLcp(User createdByLcp) {
-        this.createdByLcp = createdByLcp;
-    }
-
-    public User getApprovedByLcvp() {
-        return approvedByLcvp;
-    }
-
-    public void setApprovedByLcvp(User approvedByLcvp) {
-        this.approvedByLcvp = approvedByLcvp;
-    }
-
-    public Merchandise getMerchandise() {
-        return merchandise;
-    }
-
-    public void setMerchandise(Merchandise merchandise) {
-        this.merchandise = merchandise;
     }
 }

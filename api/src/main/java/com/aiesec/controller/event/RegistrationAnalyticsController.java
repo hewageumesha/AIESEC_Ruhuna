@@ -24,9 +24,10 @@ public class RegistrationAnalyticsController {
 
     @GetMapping("/by-event")
     public List<RegistrationAnalyticsDTO> getRegistrationsByEvent(
-            @RequestParam(defaultValue = "all") String type
+            @RequestParam(defaultValue = "all") String type,
+            @RequestParam(required = false) Long eventID
     ) {
-        return analyticsService.getRegistrationsByEvent(type.toLowerCase());
+        return analyticsService.getRegistrationsByEvent(type.toLowerCase(),eventID);
     }
 
     @GetMapping("/trends")
@@ -56,6 +57,12 @@ public class RegistrationAnalyticsController {
         response.setHeader("Content-Disposition", "attachment; filename=\"registrations.csv\"");
         analyticsService.writeRegistrationsCsv(response.getWriter(), type.toLowerCase(), eventId, status);
     }
+
+    @GetMapping("/events")
+    public List<Map<String, Object>> getAllEventsForAnalytics() {
+        return analyticsService.getAllEventsForAnalytics();
+    }
+
 
 
 

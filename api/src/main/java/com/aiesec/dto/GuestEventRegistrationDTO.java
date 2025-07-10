@@ -23,7 +23,6 @@ public class GuestEventRegistrationDTO {
     private Long eventId;
 
     private String eventName;
-
     @NotBlank(message = "Name is required")
     private String name;
 

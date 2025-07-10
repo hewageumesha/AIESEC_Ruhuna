@@ -4,15 +4,16 @@ import lombok.*;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class MerchandiseDTO {
-
-    private Long id;
-    private boolean available;
+    private Long merchandiseId;
+    private Long eventId;
+    private String type;
     private String description;
-    private List<String> imageUrls;
-    private Long eventId; // Link to the event
+    private List<String> images;
+    private boolean available;
 }

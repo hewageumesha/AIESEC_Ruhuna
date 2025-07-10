@@ -12,11 +12,17 @@ const MemberRegistrationForm = ({ eventId, onSuccess }) => {
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
+    console.log("Redux currentUser:", currentUser); // Debug log
+
     const fetchRegistration = async () => {
-      if (!currentUser?.id || !eventId) return;
+      // Extract userId safely
+      const userId = currentUser?.id ?? currentUser?.userId;
+
+      if (!userId || !eventId) return;
+
       try {
         const res = await axios.get(
-          `http://localhost:8080/api/member-event-registrations/user/${currentUser.id}/event/${eventId}`
+          `http://localhost:8080/api/member-event-registrations/user/${userId}/event/${eventId}`
         );
         if (res.data && res.data.length > 0) {
           setExistingRegistration(res.data[0]); // use the first registration
@@ -30,12 +36,21 @@ const MemberRegistrationForm = ({ eventId, onSuccess }) => {
   }, [currentUser, eventId]);
 
   const onFinish = async (values) => {
+    const userId = currentUser?.id ?? currentUser?.userId;
+
+    if (!userId) {
+      message.error("User ID not found. Please log in again.");
+      return;
+    }
+
     const payload = {
       eventId,
-      memberId: currentUser?.id,
+      userId, // use safe userId here
       interestStatus: values.interestStatus,
       comment: values.comment || "",
     };
+
+    console.log("sending payload:", payload);
 
     try {
       setLoading(true);
@@ -55,6 +70,10 @@ const MemberRegistrationForm = ({ eventId, onSuccess }) => {
       setLoading(false);
     }
   };
+
+  if (!currentUser) {
+    return <div>Please log in to register for this event.</div>;
+  }
 
   if (existingRegistration) {
     return (
@@ -90,10 +109,7 @@ const MemberRegistrationForm = ({ eventId, onSuccess }) => {
       </Form.Item>
 
       <Form.Item name="comment" label="Comment (optional)">
-        <Input.TextArea
-          rows={3}
-          placeholder="Leave a note or question..."
-        />
+        <Input.TextArea rows={3} placeholder="Leave a note or question..." />
       </Form.Item>
 
       <Form.Item>

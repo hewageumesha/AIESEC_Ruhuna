@@ -4,6 +4,7 @@ import com.aiesec.dto.EventDTO;
 import com.aiesec.mapper.EventMapper;
 import com.aiesec.mapper.MerchandiseMapper;
 import com.aiesec.model.event.Event;
+import com.aiesec.model.event.Merchandise;
 import com.aiesec.repository.event.EventRepository;
 import com.aiesec.repository.event.MerchandiseRepository;
 import com.aiesec.service.interfaces.EventService;
@@ -32,24 +33,31 @@ public class EventServiceimpl implements EventService {
 
     @Override
     public EventDTO createEvent(EventDTO eventDTO) {
+        // Convert DTO to Entity
         Event event = EventMapper.toEntity(eventDTO);
 
-        if (eventDTO.getHasMerchandise() == null) {
+        // Set isPublic with fallback to false
+        event.setIsPublic(Boolean.TRUE.equals(eventDTO.getIsPublic()));
+
+        // Check and attach merchandise
+        if (eventDTO.getMerchandise() != null && !eventDTO.getMerchandise().isEmpty()) {
+            List<Merchandise> merchList = eventDTO.getMerchandise().stream()
+                    .map(dto -> MerchandiseMapper.toEntity(dto, event)) // link unsaved event
+                    .collect(Collectors.toList());
+
+            event.setMerchandiseList(merchList);
+            event.setHasMerchandise(true);
+        } else {
             event.setHasMerchandise(false);
-        } else {
-            event.setHasMerchandise(eventDTO.getHasMerchandise());
         }
 
-        // Use Boolean isPublic instead of String visibility
-        if (eventDTO.getIsPublic() == null) {
-            event.setIsPublic(false); // Default to private
-        } else {
-            event.setIsPublic(eventDTO.getIsPublic());
-        }
-
+        // Save event — merchandise list is saved via CascadeType.ALL
         Event savedEvent = eventRepository.save(event);
+
+        // Return mapped DTO
         return EventMapper.toDTO(savedEvent);
     }
+
     @Override
     public EventDTO updateEvent(Long eventId, EventDTO updatedEvent) {
         Optional<Event> existing = eventRepository.findById(eventId);
@@ -88,9 +96,12 @@ public class EventServiceimpl implements EventService {
                     EventDTO dto = EventMapper.toDTO(event);
 
                     if (Boolean.TRUE.equals(dto.getHasMerchandise())) {
-                        merchandiseRepository.findByEventEventId(id).ifPresent(merch -> {
-                            dto.setMerchandise(MerchandiseMapper.toDTO(merch));
-                        });
+                        List<Merchandise> merchList = merchandiseRepository.findByEventEventId(id);
+                        dto.setMerchandise(
+                                merchList.stream()
+                                        .map(MerchandiseMapper::toDTO)
+                                        .collect(Collectors.toList())
+                        );
                     }
 
                     return dto;
@@ -99,15 +110,18 @@ public class EventServiceimpl implements EventService {
     }
 
 
+
     @Override
     @Transactional
     public void deleteEvent(Long eventId) {
-        // First delete merchandise related to this event
-        merchandiseRepository.deleteByEventEventId(eventId);
-
-        // Then delete the event
-        eventRepository.deleteById(eventId);
+        Optional<Event> optionalEvent = eventRepository.findById(eventId);
+        if (optionalEvent.isPresent()) {
+            eventRepository.delete(optionalEvent.get());
+        } else {
+            throw new RuntimeException("Event not found with ID: " + eventId);
+        }
     }
+
 
     @Override
     public List<EventDTO> getUpcomingEvents() {

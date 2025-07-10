@@ -1,169 +1,346 @@
-import React, { useState } from 'react';
-import { Filter, Calendar, Users, Award, Star } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Spin, Modal, Button } from 'antd';
+import { DeleteOutlined, SelectOutlined, EyeOutlined, DownloadOutlined, CloseOutlined } from '@ant-design/icons';
 
-const AiesecGallery = () => {
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [selectedEvent, setSelectedEvent] = useState(null);
+const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
+  const [images, setImages] = useState([]);
+  const [filteredImages, setFilteredImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [selectedImages, setSelectedImages] = useState(new Set());
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [fullViewImage, setFullViewImage] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const events = [
-    // ... (same event data as before)
+  const categoryOptions = [
+    { key: 'all', label: 'All Events' },
+    { key: 'SOUTHFEST', label: 'SouthFest' },
+    { key: 'YOUTHSPACE', label: 'YouthSpace' },
+    { key: 'ODEYSSEY', label: 'Odeyssey' },
+    { key: '', label: 'Other' },
   ];
 
-  const filterCategories = [
-    { id: 'all', label: 'All Events', icon: Filter },
-    { id: 'large-scale', label: 'Large Scale Events', icon: Star },
-    { id: 'lcm', label: 'LCM Events', icon: Users },
-    { id: 'induction', label: 'Induction Events', icon: Award },
-  ];
+  const canEdit = (currentUserRole === 'LCP' || currentUserRole === 'LCVP') && isLoggedIn;
 
-  const filteredEvents = activeFilter === 'all'
-    ? events
-    : events.filter(event => event.category === activeFilter);
+  useEffect(() => {
+    // Check if user is logged in based on userId
+    setIsLoggedIn(!!userId);
+  }, [userId]);
 
-  const getCategoryColor = (category) => {
-    switch (category) {
-      case 'large-scale': return 'from-blue-500 to-blue-700';
-      case 'lcm': return 'from-orange-500 to-orange-700';
-      case 'induction': return 'from-green-500 to-green-700';
-      default: return 'from-blue-500 to-blue-700';
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const res = await fetch('http://localhost:8080/api/gallery');
+        const data = await res.json();
+        setImages(data);
+        setFilteredImages(data);
+      } catch (error) {
+        console.error('Failed to fetch gallery images:', error);
+        console.log('Failed to load gallery images');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchImages();
+  }, []);
+
+  useEffect(() => {
+    if (categoryFilter === 'all') {
+      setFilteredImages(images);
+    } else {
+      const filtered = images.filter(img => img.category === categoryFilter);
+      setFilteredImages(filtered);
+    }
+    setSelectedImages(new Set()); // Clear selections when filter changes
+  }, [categoryFilter, images]);
+
+  const handleImageClick = (img) => {
+    if (canEdit) {
+      // Toggle selection in admin mode
+      const newSelected = new Set(selectedImages);
+      if (newSelected.has(img.id)) {
+        newSelected.delete(img.id);
+      } else {
+        newSelected.add(img.id);
+      }
+      setSelectedImages(newSelected);
+    } else {
+      // Show full view for regular users
+      setFullViewImage(img);
     }
   };
 
-  const getEventIcon = (category) => {
-    switch (category) {
-      case 'large-scale': return <Star className="w-6 h-6" />;
-      case 'lcm': return <Users className="w-6 h-6" />;
-      case 'induction': return <Award className="w-6 h-6" />;
-      default: return <Star className="w-6 h-6" />;
+  const handleSelectAll = () => {
+    if (!canEdit) return;
+    
+    if (selectedImages.size === filteredImages.length) {
+      setSelectedImages(new Set());
+    } else {
+      const allIds = new Set(filteredImages.map(img => img.id));
+      setSelectedImages(allIds);
     }
   };
+
+  const handleDeleteSelected = async () => {
+    if (selectedImages.size === 0) return;
+    
+    setDeleting(true);
+    try {
+      // Replace with your actual delete API endpoint
+      const res = await fetch('http://localhost:8080/api/gallery/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageIds: Array.from(selectedImages),
+          userId: userId
+        })
+      });
+      
+      if (!res.ok) throw new Error('Delete failed');
+      
+      // Remove deleted images from state
+      const updatedImages = images.filter(img => !selectedImages.has(img.id));
+      setImages(updatedImages);
+      setSelectedImages(new Set());
+      console.log(`${selectedImages.size} images deleted successfully`);
+    } catch (error) {
+      console.error('Failed to delete images:', error);
+      console.log('Failed to delete images');
+    } finally {
+      setDeleting(false);
+      setDeleteModalVisible(false);
+    }
+  };
+
+  const handleDownload = async (imageUrl, imageName) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = imageName || 'image.jpg';
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Failed to download image:', error);
+    }
+  };
+
+  const getCategoryLabel = (categoryKey) => {
+    const category = categoryOptions.find(opt => opt.key === categoryKey);
+    return category ? category.label : '';
+  };
+
+  // Masonry-like layout function
+  const createMasonryLayout = (images) => {
+    const columns = 4; // Number of columns
+    const imageColumns = Array.from({ length: columns }, () => []);
+    
+    images.forEach((img, index) => {
+      const columnIndex = index % columns;
+      imageColumns[columnIndex].push(img);
+    });
+    
+    return imageColumns;
+  };
+
+  const masonryColumns = createMasonryLayout(filteredImages);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <header className="bg-gradient-to-r from-blue-600 to-light-blue-500 text-white py-16 text-center">
-        <h1 className="text-5xl font-bold mb-4">AIESEC Ruhuna</h1>
-        <p className="text-xl text-blue-100 mb-2">Event Gallery</p>
-        <p className="text-blue-200">Showcasing our memorable moments and achievements</p>
-      </header>
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 text-white py-8 px-4 shadow-lg">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center mb-2">
+            <h1 className="text-4xl font-bold">AIESEC Sri Lanka</h1>
+          </div>
+          <p className="text-center text-blue-100 text-lg">Showcasing our memorable moments and achievements</p>
+        </div>
+      </div>
 
-      <main className="container mx-auto px-4 py-12">
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {filterCategories.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setActiveFilter(id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-300 ${
-                activeFilter === id
-                  ? 'bg-blue-600 text-white shadow-lg scale-105'
-                  : 'bg-white text-gray-600 hover:bg-blue-50 shadow-md'
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              {label}
-            </button>
-          ))}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Category Filter Tabs */}
+        <div className="mb-8">
+          <div className="flex flex-wrap gap-3 justify-center">
+            {categoryOptions.map(category => (
+              <button
+                key={category.key}
+                onClick={() => setCategoryFilter(category.key)}
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
+                  categoryFilter === category.key
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md border border-gray-200'
+                }`}
+              >
+                {category.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredEvents.map(event => (
-            <div key={event.id} className="group">
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden transition-transform duration-300 transform group-hover:scale-105">
-                <div className={`bg-gradient-to-r ${getCategoryColor(event.category)} p-4 text-white`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    {getEventIcon(event.category)}
-                    <h3 className="font-bold text-lg">{event.title}</h3>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm opacity-90">
-                    <Calendar className="w-4 h-4" />
-                    {event.date}
-                  </div>
+        {/* Admin Controls */}
+        {canEdit && (
+          <div className="mb-6 bg-white rounded-lg shadow-md p-4">
+            <div className="flex flex-wrap gap-4 items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <SelectOutlined className="text-blue-600" />
+                  <span>Admin Mode: {currentUserRole}</span>
                 </div>
-                <div className="p-4">
-                  <p className="text-gray-600 text-sm mb-3">{event.description}</p>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Users className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm text-gray-500">{event.participants} participants</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    {event.images.slice(0, 4).map(image => (
+                <div className="text-sm text-gray-600">
+                  {selectedImages.size} of {filteredImages.length} selected
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  type="default"
+                  icon={<SelectOutlined />}
+                  onClick={handleSelectAll}
+                  className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                >
+                  {selectedImages.size === filteredImages.length ? 'Deselect All' : 'Select All'}
+                </Button>
+                <Button
+                  type="primary"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => setDeleteModalVisible(true)}
+                  disabled={selectedImages.size === 0}
+                  className="bg-red-500 hover:bg-red-600"
+                >
+                  Delete Selected ({selectedImages.size})
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex flex-col justify-center items-center h-60">
+            <Spin size="large" />
+            <p className="mt-4 text-gray-600">Loading gallery images...</p>
+          </div>
+        ) : (
+          <>
+            {/* Images Grid - Masonry Layout */}
+            {filteredImages.length === 0 ? (
+              <div className="text-center py-12">
+                <EyeOutlined className="text-6xl text-gray-400 mb-4" />
+                <h3 className="text-xl text-gray-600 mb-2">No images found</h3>
+                <p className="text-gray-500">No images available for the selected category.</p>
+              </div>
+            ) : (
+              <div className="flex gap-1">
+                {masonryColumns.map((column, columnIndex) => (
+                  <div key={columnIndex} className="flex-1 flex flex-col gap-1">
+                    {column.map((img, index) => (
                       <div
-                        key={image.id}
-                        className="aspect-square bg-gradient-to-br from-blue-100 to-orange-100 rounded-lg flex items-center justify-center text-xs text-gray-600 hover:from-blue-200 hover:to-orange-200 cursor-pointer transition-all"
-                        onClick={() => setSelectedEvent(event)}
+                        key={img.id || index}
+                        className={`group relative overflow-hidden shadow-sm transition-all duration-300 hover:shadow-lg ${
+                          canEdit ? 'cursor-pointer' : 'cursor-zoom-in'
+                        } ${
+                          selectedImages.has(img.id) 
+                            ? 'ring-2 ring-blue-500 ring-opacity-50' 
+                            : ''
+                        }`}
+                        onClick={() => handleImageClick(img)}
                       >
-                        <span className="text-center px-2">{image.caption}</span>
+                        {/* Image */}
+                        <div className="relative bg-gray-100">
+                          <img
+                            src={img.imageUrl}
+                            alt={`Gallery image ${index + 1}`}
+                            className="w-full h-auto object-cover"
+                            loading="lazy"
+                          />
+                          
+                          {/* Download Button */}
+                          {!canEdit && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownload(img.imageUrl, `image_${img.id}.jpg`);
+                              }}
+                              className="absolute top-2 right-2 w-8 h-8 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-opacity-70"
+                            >
+                              <DownloadOutlined className="text-white text-sm" />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Selection Indicator */}
+                        {canEdit && selectedImages.has(img.id) && (
+                          <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+
+                        {/* Admin Mode Indicator */}
+                        {canEdit && !selectedImages.has(img.id) && (
+                          <div className="absolute top-2 right-2 w-6 h-6 bg-white bg-opacity-80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="w-3 h-3 border-2 border-blue-500 rounded-full"></div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
-                  <button
-                    onClick={() => setSelectedEvent(event)}
-                    className="w-full bg-gradient-to-r from-blue-500 to-orange-500 text-white py-2 rounded-lg font-medium hover:from-blue-600 hover:to-orange-600 transition"
-                  >
-                    View Gallery ({event.images.length} photos)
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </section>
-
-        {filteredEvents.length === 0 && (
-          <div className="text-center py-16">
-            <div className="text-gray-400 text-6xl mb-4">📸</div>
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">No events found</h3>
-            <p className="text-gray-500">Try selecting a different category</p>
-          </div>
-        )}
-      </main>
-
-      {selectedEvent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className={`bg-gradient-to-r ${getCategoryColor(selectedEvent.category)} p-6 text-white`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    {getEventIcon(selectedEvent.category)}
-                    <h2 className="text-2xl font-bold">{selectedEvent.title}</h2>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm opacity-90">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {selectedEvent.date}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      {selectedEvent.participants} participants
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelectedEvent(null)}
-                  className="text-white hover:text-gray-200 text-2xl"
-                >
-                  &times;
-                </button>
-              </div>
-              <p className="mt-4 text-blue-100">{selectedEvent.description}</p>
-            </div>
-
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {selectedEvent.images.map(image => (
-                  <div
-                    key={image.id}
-                    className="aspect-square bg-gradient-to-br from-blue-100 to-orange-100 rounded-lg flex items-center justify-center text-sm text-gray-600 hover:from-blue-200 hover:to-orange-200 transition p-4"
-                  >
-                    <span className="text-center">{image.caption}</span>
-                  </div>
                 ))}
               </div>
-            </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Full View Modal */}
+      {fullViewImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-4xl max-h-full">
+            <button
+              onClick={() => setFullViewImage(null)}
+              className="absolute top-4 right-4 w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors z-10"
+            >
+              <CloseOutlined className="text-white text-lg" />
+            </button>
+            <button
+              onClick={() => handleDownload(fullViewImage.imageUrl, `image_${fullViewImage.id}.jpg`)}
+              className="absolute top-4 left-4 w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors z-10"
+            >
+              <DownloadOutlined className="text-white text-lg" />
+            </button>
+            <img
+              src={fullViewImage.imageUrl}
+              alt="Full view"
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        title="Confirm Deletion"
+        open={deleteModalVisible}
+        onOk={handleDeleteSelected}
+        onCancel={() => setDeleteModalVisible(false)}
+        confirmLoading={deleting}
+        okText="Delete"
+        cancelText="Cancel"
+        okButtonProps={{ danger: true }}
+      >
+        <p>Are you sure you want to delete {selectedImages.size} selected image(s)?</p>
+        <p className="text-red-500 text-sm mt-2">This action cannot be undone.</p>
+      </Modal>
     </div>
   );
 };
 
-export default AiesecGallery;
+export default GalleryPage;

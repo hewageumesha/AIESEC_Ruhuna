@@ -15,15 +15,12 @@ public interface GuestEventRegistrationRepository extends JpaRepository<GuestEve
     boolean existsByEvent_EventIdAndEmail(Long eventId, String email);
     List<GuestEventRegistration> findByEvent_EventId(Long eventId);
     @Query("SELECT new com.aiesec.dto.GuestRegistrationSummaryDTO(" +
-            "g.event.eventId, " +
-            "g.event.eventName, " +
-            "COUNT(g), " +
-            "SUM(CASE WHEN g.interestStatus = com.aiesec.enums.InterestStatus.GOING THEN 1 ELSE 0 END), " +
-            "SUM(CASE WHEN g.interestStatus = com.aiesec.enums.InterestStatus.PENDING THEN 1 ELSE 0 END), " +
-            "SUM(CASE WHEN g.interestStatus = com.aiesec.enums.InterestStatus.NOT_GOING THEN 1 ELSE 0 END)) " +
+            "g.event.eventId, g.event.eventName, COUNT(g)) " +
             "FROM GuestEventRegistration g " +
+            "WHERE g.interestStatus = com.aiesec.enums.InterestStatus.GOING " +
             "GROUP BY g.event.eventId, g.event.eventName")
-    List<GuestRegistrationSummaryDTO> getGuestSummaryByEvent();
+    List<GuestRegistrationSummaryDTO> getGoingSummaryByEvent();
+
 
     int countByEvent_EventId(Long eventId);
 

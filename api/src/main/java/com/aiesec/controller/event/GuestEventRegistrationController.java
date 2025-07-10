@@ -13,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -72,4 +73,18 @@ public class GuestEventRegistrationController {
             return message;
         }
     }
+
+    @GetMapping("/analytics/summary/status")
+    public ResponseEntity<?> getStatusSummaryByEvent(@RequestParam Long eventId) {
+        try {
+            Map<String, Integer> summary = registrationService.getStatusSummaryByEvent(eventId);
+            return ResponseEntity.ok(summary);
+        } catch (Exception e) {
+            e.printStackTrace();  // Log the real error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Internal server error", "message", e.getMessage()));
+        }
+    }
+
+
 }
