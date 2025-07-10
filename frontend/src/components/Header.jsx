@@ -29,7 +29,7 @@ export default function Header() {
             <img src='/AiR_logo.png' alt="AIESEC UOR Logo" className="h-10 sm:h-12" />
         </Link>
         <div className='flex gap-3 md:order-2'>
-            <Button className='w-12 h-10 hidden sm:inline' color='gray' pill onClick={() => dispatch(toggleTheme())}>
+            <Button className='w-13 h-10 hidden sm:inline' color='gray' pill onClick={() => dispatch(toggleTheme())}>
                 {theme === 'light' ? <FaSun /> : <FaMoon />}
             </Button>
             {currentUser ? (
@@ -80,8 +80,8 @@ export default function Header() {
                 </Link>
             </Navbar.Link >
             <Navbar.Link active={path === '/funcion'} as={'div'}>
-                <Link to="/function" className='font-semibold'>
-                    Function
+                <Link to="/functional-area" className='font-semibold'>
+                    Functional Area
                 </Link>
             </Navbar.Link >
             <Navbar.Link active={path === '/public-event'} as={'div'}>

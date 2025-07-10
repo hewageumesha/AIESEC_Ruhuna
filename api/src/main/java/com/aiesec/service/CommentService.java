@@ -4,18 +4,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.aiesec.enums.UserRole;
-import com.aiesec.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.aiesec.dto.CommentDTO;
 import com.aiesec.model.Comment;
-
+import com.aiesec.enums.UserRole;
 import com.aiesec.model.User;
 import com.aiesec.repository.CommentRepository;
-
+import com.aiesec.repository.UserRepository;
 
 @Service
 public class CommentService {
@@ -39,8 +37,8 @@ public class CommentService {
 
         Comment comment = new Comment();
         comment.setContent(content);
-        comment.setMember(member);
-        comment.setCreatedBy(creator);
+        comment.setMember(member.getId());
+        comment.setCreatedBy(creator.getId());
         comment.setCreatedAt(LocalDateTime.now());
 
         return commentRepo.save(comment);
@@ -48,15 +46,17 @@ public class CommentService {
 
     public List<CommentDTO> getCommentsForMember(Long memberId, UserRole requesterRole) {
 
-          if (UserRole.LCVP.equals(requesterRole) || UserRole.LCP.equals(requesterRole)) {
-                    return commentRepo.findByMemberIdOrderByCreatedAtDesc(memberId)
+        if (UserRole.LCVP.equals(requesterRole) || UserRole.LCP.equals(requesterRole)) {
+                    return commentRepo.findByMemberOrderByCreatedAtDesc(memberId)
                 .stream()
                 .map(c -> new CommentDTO(c.getId(), c.getContent(),
-                      c.getCreatedBy(), c.getMember(),
+                        userRepo.getUserById(c.getCreatedBy()), userRepo.getUserById(c.getMember()),
                       c.getCreatedAt()))
                 .collect(Collectors.toList());
         }else{
-                throw new AccessDeniedException("Not authorized to view comments");
+            System.out.println("Not authorized to view comments");
+            throw new AccessDeniedException("Not authorized to view comments");
+
         }
 
     }
@@ -68,7 +68,7 @@ public class CommentService {
         User updater = userRepo.findByAiesecEmail(updaterEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
         
-        if (!comment.getCreatedBy().getAiesecEmail().equals(updaterEmail)) {
+        if (!userRepo.getUserById(comment.getCreatedBy()).getAiesecEmail().equals(updaterEmail)) {
             throw new AccessDeniedException("Only comment author can update the comment");
         }
         
@@ -76,19 +76,13 @@ public class CommentService {
         return commentRepo.save(comment);
     }
 
-    public void deleteComment(Long commentId, String deleterEmail) {
-        Comment comment = commentRepo.findById(commentId)
-            .orElseThrow(() -> new RuntimeException("Comment not found"));
-        
-        User deleter = userRepo.findByAiesecEmail(deleterEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        
-        if (!comment.getCreatedBy().getAiesecEmail().equals(deleterEmail) && 
-            !UserRole.LCVP.equals(deleter.getRole())) {
-            throw new AccessDeniedException("Not authorized to delete this comment");
+    public boolean deleteCommentById(Long id) {
+        if (commentRepo.existsById(id)) {
+            commentRepo.deleteById(id);
+            return true;
         }
-        
-        commentRepo.delete(comment);
+        return false;
     }
+
 }
 

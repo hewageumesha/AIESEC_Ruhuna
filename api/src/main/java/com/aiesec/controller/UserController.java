@@ -1,10 +1,11 @@
 package com.aiesec.controller;
 import com.aiesec.dto.CommentDTO;
+import com.aiesec.dto.PasswordUpdateRequest;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
-
+import com.aiesec.dto.UserRequestDTO;
+import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.UserRole;
-import com.aiesec.exception.ResourcesNotFoundException;
 import com.aiesec.model.User;
 
 import com.aiesec.repository.UserRepository;
@@ -12,11 +13,15 @@ import com.aiesec.security.UserDetailsImpl;
 import com.aiesec.service.CommentService;
 import com.aiesec.service.UserService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -34,64 +39,42 @@ public class UserController {
     private UserRepository userRepo;
 
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<User> getUser(@PathVariable Long id) {
-//        return ResponseEntity.ok(userRepo.getUserById(id));
-//    }
-//
-//    @GetMapping("/{id}/")
-//    public ResponseEntity<UserDto> GetUser( @PathVariable String id){
-//        UserDto user=this.userService.getUserById(Integer.valueOf(id));
-//        return new ResponseEntity<>(user, HttpStatus.CREATED);
-//    }
-
-    @GetMapping("/id/{id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable Integer id) {
-        UserDTO user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userRepo.getUserById(id));
     }
 
-    @GetMapping("/profile/id/{id}")
-    public ResponseEntity<Map<String, Object>> getProfileById(@PathVariable Integer id) {
-        User user = userRepo.findById(Long.valueOf(id))
-                .orElseThrow(() -> new ResourcesNotFoundException("User", "id", id));
+@Autowired
+private JavaMailSender mailSender;
 
-        Map<String, Object> simpleUser = new HashMap<>();
-        simpleUser.put("id", user.getId());
-        simpleUser.put("userName", user.getUserName());
-        simpleUser.put("role", user.getRole().toString());
-        simpleUser.put("departmentId", user.getDepartment() != null ? user.getDepartment().getId() : null);
+@GetMapping("/sendmail")
+public String senMail() {
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setTo("n.u.m.hewage@gmail.com");
+    message.setSubject("Test Mail");
+    message.setText("This is a test email from Spring Boot!");
 
-        // ✅ Add functionId as an object {id, name}
-        if (user.getFunction() != null) {
-            Map<String, Object> functionMap = new HashMap<>();
-            functionMap.put("id", user.getFunction().getId());
-            functionMap.put("name", user.getFunction().getName());
-            simpleUser.put("functionId", functionMap);
-        } else {
-            simpleUser.put("functionId", null);
-        }
+    mailSender.send(message);
 
-        return ResponseEntity.ok(simpleUser);
-    }
+    return "Mail sent successfully!";
+}
 
 
     @PostMapping("/add")
-    public User addUser(@RequestBody User user) {
-        return userService.addUser(user);
+    public User addUser(@RequestBody UserRequestDTO dto) {
+        return userService.addUser(dto);
     }
 
-    {/*
-    @PostMapping("/update")
-    public Optional<User> updateUser(@RequestBody UserDTO userDetails) {
-        return Optional.ofNullable(userService.updateUser(userDetails.getAiesecEmail(), userDetails));
+    @PostMapping("/update/{aiesecEmail}")
+    public User updateUser(@PathVariable String aiesecEmail, @RequestBody UserUpdateDTO dto) {
+        return userService.updateUser(aiesecEmail, dto);
     }
-    */}
+    
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{aiesecEmail}")
     public String deleteUser(@PathVariable String aiesecEmail) {
         userService.deleteUser(aiesecEmail);
-        return "User deleted successfully";
+        return "User deleted successfully!";
     }
 
     @GetMapping("/{aiesecEmail}")
@@ -134,34 +117,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getCommitteeHierarchy());
     }
 
-    /* 
-    @GetMapping("/hierarchy")
-    public ResponseEntity<List<UserHierarchyDTO>> getCommitteeHierarchy() {
-        return ResponseEntity.ok(userService.getCommitteeHierarchy());
+    @PostMapping("/update-password")
+    public String updatePassword(
+            @RequestParam String aiesecEmail, // you can pass this from logged-in user context instead of request param
+            @RequestBody PasswordUpdateRequest request
+    ) {
+        return userService.updatePassword(aiesecEmail, request);
     }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserDetails(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserDetails(id));
-    }
-
-    @PostMapping
-    @PreAuthorize("hasRole('LCP') or hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.createUser(userDTO));
-    }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('LCP') or hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.updateUser(id, userDTO));
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('LCP') or hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
-    }
-    */
 }

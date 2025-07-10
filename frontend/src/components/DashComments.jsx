@@ -104,8 +104,9 @@ export default function DashComments() {
         memberId: memberId,
         content: comment.content,
         author: {
-          firstName: comment.authorName.split(' ')[0],
-          lastName: comment.authorName.split(' ')[1] || '',
+          firstName: comment.createdBy.firstName,
+          lastName: comment.createdBy.lastName,
+          aiesecEmail: comment.createdBy.aiesecEmail,
           profilePicture: '' // Add if available
         },
         createdAt: comment.createdAt
@@ -166,11 +167,13 @@ export default function DashComments() {
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
+    console.log(currentUser);
+
     try {
       const res = await axios.post('http://localhost:8080/api/comments/add', {
         content: newComment,
         memberId: selectedMember.id,
-        creatorEmail: currentUser.email
+        creatorEmail: currentUser.aiesecEmail
       }, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
@@ -210,7 +213,7 @@ export default function DashComments() {
 
   const handleDeleteComment = async (id) => {
     try {
-      await axios.delete(`/api/comments/${id}`, {
+      await axios.delete(`http://localhost:8080/api/comments/${id}`, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
       
@@ -444,6 +447,7 @@ export default function DashComments() {
                       )}
                       <div>
                         <p className="font-medium dark:text-gray-200">{comment.author.firstName} {comment.author.lastName}</p>
+                        <p className="font-medium dark:text-gray-200">{comment.author.aiesecEmail}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {moment(comment.createdAt).format('MMMM D, YYYY [at] h:mm A')}
                         </p>

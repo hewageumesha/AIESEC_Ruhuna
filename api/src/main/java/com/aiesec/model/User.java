@@ -8,26 +8,23 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @NotEmpty
-    private String userName;
+    private String firstName;
 
     @NotEmpty
     private String lastName;
@@ -68,15 +65,15 @@ public class User {
     private String teamLeaderId;
     private int noOfTask=0;
 
+    private String s_department;
+
+    private String faculty;
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
-
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<Task> tasks=new ArrayList<>();
-
 
     @ManyToOne
     @JoinColumn(name = "function_id")
@@ -106,11 +103,14 @@ public class User {
         return passwordEncoder.encode(rawPassword);
     }
 
-    public Integer getId() {
+    @OneToOne(mappedBy = "user")
+    private ForgotPassword forgotPassword;
+
+    public Long getId() {
         return id;
     }
    
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -122,12 +122,12 @@ public class User {
         return email;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getLastName() {
@@ -282,4 +282,29 @@ public class User {
     public void setTeamLeaderId(String teamLeaderId) {
         this.teamLeaderId = teamLeaderId;
     }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getS_department() {
+        return s_department;
+    }
+
+    public void setS_department(String s_department) {
+        this.s_department = s_department;
+    }
+
+    public String getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(String faculty) {
+        this.faculty = faculty;
+    }
+    
 }

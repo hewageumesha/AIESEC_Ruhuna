@@ -48,10 +48,10 @@ const contact = () => {
                     className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
                   />
                 </div>
-                <h2 className="text-xl font-bold text-gray-800 text-center dark:text-blue-50">
+                <h2 className="text-l font-bold text-gray-800 text-center dark:text-blue-50">
                   {contact.name}
                 </h2>
-                <p className="text-blue-500 font-medium mt-2">{contact.position}</p>
+                <p className="text-blue-500 font-normal mt-2">{contact.position}</p>
                 <div className="mt-6 flex space-x-4">
                   <a href={`mailto:${contact.email}`} onClick={(e) => e.stopPropagation()} className="text-gray-400 hover:text-blue-500 transition-colors">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -70,12 +70,12 @@ const contact = () => {
                 </h3>
                 <div className="space-y-4 flex-grow">
                   <div className="bg-white/10 p-4 rounded-lg">
-                    <p className="text-sm font-medium opacity-80">Position</p>
-                    <p className="text-lg font-semibold">{contact.position}</p>
+                    <p className="text-sm font-normal opacity-80">Position</p>
+                    <p className="text-sm font-semibold">{contact.position}</p>
                   </div>
                   <div className="bg-white/10 p-4 rounded-lg">
                     <p className="text-sm font-medium opacity-80">Email</p>
-                    <a href={`mailto:${contact.email}`} className="text-lg font-semibold hover:underline break-words">
+                    <a href={`mailto:${contact.email}`} className="text-sm font-semibold hover:underline break-words">
                       {contact.email}
                     </a>
                   </div>
