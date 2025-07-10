@@ -63,6 +63,7 @@ public class User {
     private String teamLeaderAiesecEmail;
 
     private String teamLeaderId;
+    private int noOfTask=0;
 
     private String s_department;
 
@@ -105,7 +106,7 @@ public class User {
     @OneToOne(mappedBy = "user")
     private ForgotPassword forgotPassword;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
    

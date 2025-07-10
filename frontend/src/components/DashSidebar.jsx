@@ -18,6 +18,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { signoutSuccess } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
+import TaskDashboardLCP from "./Task/TaskDashboardLCVP.jsx";
 
 export default function DashSidebar({ tab, subtab }) {
   const location = useLocation();
@@ -223,26 +224,47 @@ export default function DashSidebar({ tab, subtab }) {
               </Link>
             </>
           )}
-          
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
-            <>
-              <Link to='/dashboard?tab=task'>
+
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' || currentUser.role === 'Member') && (
+              <>
                 <Sidebar.Item
-                  active={tab === 'task'}
-                  icon={HiNewspaper}
-                  as='div'
-                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  onClick={() => {
-                    setIsCommitteeExpanded(false);
-                    setIsProfileExpanded(false);
-                  }}
+                    active={tab === 'task'}
+                    icon={HiNewspaper}
+                    as='div'
+                    className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    onClick={() => {
+                      const currentUser = JSON.parse(localStorage.getItem("user"));
+                      console.log("🧭 Navigating for user:", currentUser);
+                      if (currentUser && currentUser.id) {
+                        switch(currentUser.role) {
+                          case "LCP":
+                            navigate(`/user/${currentUser.id}/TaskDashboard`);
+                            break;
+                          case "LCVP":
+                            navigate(`/user/${currentUser.id}/TaskDashboardLCVP`);
+                            break;
+                          case "Team_Leader":
+                            navigate(`/user/${currentUser.id}/TaskDashboardTL`);
+                            break;
+                          case "Member":
+                            navigate(`/user/${currentUser.id}/TaskDashboardMember`);
+                            break;
+                          default:
+                            navigate("/login");
+                        }
+                      } else {
+                        console.error("User not found in localStorage!");
+                        navigate("/login");
+                      }
+                    }}
+
                 >
                   <span className="font-medium">Tasks</span>
                 </Sidebar.Item>
-              </Link>
-            </>
+              </>
           )}
-              <Link to='/dashboard?tab=event'>
+
+          <Link to='/dashboard?tab=event'>
                 <Sidebar.Item
                   active={tab === 'event'}
                   icon={HiRectangleStack}
@@ -256,7 +278,7 @@ export default function DashSidebar({ tab, subtab }) {
                   <span className="font-medium">Events</span>
                 </Sidebar.Item>
               </Link>
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' ) && (
             <>
               <Link to='/dashboard?tab=birthday'>
                 <Sidebar.Item

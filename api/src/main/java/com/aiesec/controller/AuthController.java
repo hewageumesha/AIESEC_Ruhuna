@@ -69,6 +69,7 @@ public class AuthController {
         json.put("role", existingUser.get().getRole());
         json.put("aiesecEmail", existingUser.get().getAiesecEmail());
         json.put("token", token);
+        json.put("id",existingUser.get().getId());
 
         // Return the token and user details with a 200 OK status
         return ResponseEntity

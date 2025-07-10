@@ -10,6 +10,10 @@ public class Function {
     private Long id;
     private String name;
 
+    @ManyToOne
+    @JoinColumn(name = "depaprtment_id", nullable = false)
+    private Department department;
+
     public Long getId() {
         return id;
     }
@@ -26,5 +30,11 @@ public class Function {
         this.name = name;
     }
 
+    public Department getDepartment() {
+        return department;
+    }
 
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
 }

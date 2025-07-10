@@ -14,12 +14,12 @@ public class TShirtOrderMapper {
                 .merchandiseId(order.getMerchandise() != null ? order.getMerchandise().getId() : null)
                 .quantity(order.getQuantity())
                 .size(order.getSize().name())
-                .userId(order.getUser() != null ? order.getUser().getId() : null)
+                .userId(Long.valueOf(order.getUser() != null ? order.getUser().getId() : null))
                 //.guestUserId(order.getGuestUser() != null ? order.getGuestUser().getGuestUserId() : null)
                 .build();
     }
 
-    public static TShirtOrder toEntity(TshirtOrderDTO dto, Merchandise merchandise, User user, GuestUser guestUser) {
+    public static TShirtOrder toEntity(TshirtOrderDTO dto, Merchandise merchandise, User user, GuestEventRegistration guest) {
         if (dto == null) return null;
 
         return TShirtOrder.builder()

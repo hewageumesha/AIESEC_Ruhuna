@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Spin, Button, message, Tag, Popconfirm } from 'antd';
-import { PlusOutlined, CloseOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, Spin, Button, message, Tag, Popconfirm, Space } from 'antd';
+import { PlusOutlined, CloseOutlined, EditOutlined, DeleteOutlined, BarChartOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -53,24 +53,46 @@ const DashEvent = () => {
     }
   };
 
-  // Helper function to check if user can edit/delete
-  const canEditOrDelete = () => {
-    return currentUser && (currentUser.role === 'LCP' || currentUser.role === 'LCVP');
-  };
+// Helper function to check if user can edit/delete
+const canEditOrDelete = () => {
+  return currentUser && (currentUser.role === 'LCP' || currentUser.role === 'LCVP');
+};
+
+// handler for Analytics button
+const handleViewAnalytics = () => {
+  navigate('/event-analytics'); // analytics route path
+};
+
+useEffect(() => {
+  fetchFilteredEvents();
+}, []);
 
   return (
     <div className="p-8 min-h-screen bg-gray-50">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Event Management</h2>
+
         {canEditOrDelete() && (
-          <Button
-            type="primary"
-            icon={showAddForm ? <CloseOutlined /> : <PlusOutlined />}
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            {showAddForm ? 'Close Form' : 'Add Event'}
-          </Button>
+          <Space>
+            <Button
+              type="primary"
+              icon={showAddForm ? <CloseOutlined /> : <PlusOutlined />}
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {showAddForm ? 'Close Form' : 'Create New Event'}
+            </Button>
+
+            {/*  Analytics Button */}
+            <Button
+              type="default"
+              icon={<BarChartOutlined />}
+              onClick={handleViewAnalytics}
+              className="bg-gray-200 hover:bg-gray-300"
+            >
+              View Analytics
+            </Button>
+          </Space>
         )}
       </div>
 
@@ -79,6 +101,9 @@ const DashEvent = () => {
           <AddEventForm onEventAdded={fetchEvents} />
         </div>
       )}
+
+{/* Filter Form */}
+<EventFilterForm filters={filters} setFilters={setFilters} onFilter={fetchFilteredEvents} />
 
       {loading ? (
         <div className="flex justify-center items-center min-h-[200px]">
@@ -137,11 +162,6 @@ const DashEvent = () => {
                   <div className="text-gray-600 mt-2 space-y-1 text-sm">
                     <p><strong>Date:</strong> {event.startDate} to {event.endDate}</p>
                     <p><strong>Time:</strong> {event.eventTime} - {event.endTime}</p>
-                    {event.totalRegistrations !== undefined && (
-                      <p className="text-green-600 font-medium">
-                        {event.totalRegistrations} registered
-                      </p>
-                    )}
                   </div>
                 }
               />

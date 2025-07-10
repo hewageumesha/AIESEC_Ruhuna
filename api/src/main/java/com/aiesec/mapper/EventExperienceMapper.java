@@ -2,10 +2,10 @@ package com.aiesec.mapper;
 
 
 import com.aiesec.dto.EventExperienceDTO; 
-import com.aiesec.model.event.Event; 
-import com.aiesec.model.event.GuestUser; 
+import com.aiesec.model.event.Event;
 import com.aiesec.model.User;
 import com.aiesec.model.event.EventExperience;
+import com.aiesec.model.event.GuestEventRegistration;
 
 public class EventExperienceMapper {
 
@@ -13,7 +13,7 @@ public class EventExperienceMapper {
         return EventExperienceDTO.builder()
                 .experienceId(experience.getExperienceId())
                 .eventId(experience.getEvent().getEventId())
-                .userId(experience.getUser() != null ? experience.getUser().getId() : null)
+                .userId(Long.valueOf(experience.getUser() != null ? experience.getUser().getId() : null))
                 .guestUserId(experience.getGuestUser() != null ? experience.getGuestUser().getGuestUserId() : null)
                 .rating(experience.getRating())
                 .testimonial(experience.getTestimonial())
@@ -33,13 +33,13 @@ public class EventExperienceMapper {
         // Set User
         if (dto.getUserId() != null) {
             User user = new User();
-            user.setId(dto.getUserId());
+            user.setId(Math.toIntExact(dto.getUserId()));
             experience.setUser(user);
         }
 
         // Set GuestUser
         if (dto.getGuestUserId() != null) {
-            GuestUser guestUser = new GuestUser();
+            GuestEventRegistration guestUser = new GuestEventRegistration();
             guestUser.setGuestUserId(dto.getGuestUserId());
             experience.setGuestUser(guestUser);
         }
