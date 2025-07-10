@@ -1,17 +1,13 @@
 package com.aiesec.service;
 
 import com.aiesec.dto.UserDTO;
-import com.aiesec.dto.UserHierarchyDTO;
 import com.aiesec.enums.UserRole;
+import com.aiesec.exception.ResourcesNotFoundException;
+import com.aiesec.model.Function;
 import com.aiesec.model.User;
-import com.aiesec.repository.DepartmentRepo;
 import com.aiesec.repository.UserRepository;
 
-import io.jsonwebtoken.lang.Collections;
-import jakarta.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,7 +39,7 @@ public class UserService {
     public User updateUser(String aiesecEmail, User userDetails) {
         User user = userRepository.findByAiesecEmail(aiesecEmail)
             .orElseThrow(() -> new RuntimeException("User not found with email: " + aiesecEmail));
-        user.setFirstName(userDetails.getFirstName());
+        user.setUserName(userDetails.getUserName());
         user.setLastName(userDetails.getLastName());
         return userRepository.save(user);
     }
@@ -100,7 +96,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         //Update allowed fields
-        if (userDetails.getFirstName() != null) {
+        if (userDetails.getUserName() != null) {
             user.setAiesecEmail(userDetails.getAiesecEmail());
         }
         if (userDetails.getLastName() != null) {
@@ -158,7 +154,7 @@ public class UserService {
             // LCP section
             Map<String, Object> lcpDetails = new LinkedHashMap<>();
             lcpDetails.put("id", lcp.getId().toString());
-            lcpDetails.put("name", lcp.getFirstName() + " " + lcp.getLastName());
+            lcpDetails.put("name", lcp.getUserName() + " " + lcp.getLastName());
             lcpDetails.put("role", "lcp");
             lcpDetails.put("image", lcp.getProfilePicture());
             lcpDetails.put("email", lcp.getAiesecEmail());
@@ -170,7 +166,7 @@ public class UserService {
             for (User lcvp : findChildren(userList, lcp.getId(), UserRole.LCVP)) {
                 Map<String, Object> lcvpMap = new LinkedHashMap<>();
                 lcvpMap.put("id", lcvp.getId().toString());
-                lcvpMap.put("name", lcvp.getFirstName() + " " + lcvp.getLastName());
+                lcvpMap.put("name", lcvp.getUserName() + " " + lcvp.getLastName());
                 lcvpMap.put("role", "lcvp");
                 lcvpMap.put("image", lcvp.getProfilePicture());
                 lcvpMap.put("email", lcvp.getAiesecEmail());
@@ -181,7 +177,7 @@ public class UserService {
                 for (User tl : findChildren(userList, lcvp.getId(), UserRole.Team_Leader)) {
                     Map<String, Object> tlMap = new LinkedHashMap<>();
                     tlMap.put("id", tl.getId().toString());
-                    tlMap.put("name", tl.getFirstName() + " " + tl.getLastName());
+                    tlMap.put("name", tl.getUserName() + " " + tl.getLastName());
                     tlMap.put("role", "team_leader");
                     tlMap.put("image", tl.getProfilePicture());
                     tlMap.put("email", tl.getAiesecEmail());
@@ -191,7 +187,7 @@ public class UserService {
                     for (User member : findChildren(userList, tl.getId(), UserRole.Member)) {
                         Map<String, Object> memberMap = new LinkedHashMap<>();
                         memberMap.put("id", member.getId().toString());
-                        memberMap.put("name", member.getFirstName() + " " + member.getLastName());
+                        memberMap.put("name", member.getUserName() + " " + member.getLastName());
                         memberMap.put("role", "member");
                         memberMap.put("image", member.getProfilePicture());
                         memberMap.put("email", member.getAiesecEmail());
@@ -213,7 +209,7 @@ public class UserService {
         return hierarchyList;
     }
 
-    private List<User> findChildren(List<User> allUsers, Long parentId, UserRole role) {
+    private List<User> findChildren(List<User> allUsers, Integer parentId, UserRole role) {
         return allUsers.stream()
                 .filter(u -> u.getTeamLeaderId() != null)
                 .filter(u -> u.getTeamLeaderId().equals(parentId.toString()))
@@ -228,10 +224,50 @@ public class UserService {
         return startYear + "-" + (startYear + 1);
     }
 
+    public List<UserDTO> getAllUsers() {
+        List<User> users = this.userRepository.findAll();
+        if (users == null || users.isEmpty()) {
+            return Collections.emptyList(); // or return a new ArrayList<UserDto>()
+        }
+        return users.stream().map(this::userToDto).toList();
+    }
+
+    public UserDTO userToDto(User user){
+        UserDTO userDto = new UserDTO();
+        userDto.setId(Long.valueOf(user.getId()));
+        userDto.setUserName(user.getUserName());
+        userDto.setPassword(user.getPassword());
+        userDto.setNoOfTask(user.getNoOfTask());
+        userDto.setRole(user.getRole());
+
+        // Department
+        if (user.getDepartment() != null) {
+            userDto.setDepartmentId(user.getDepartment().getId());
+            userDto.setDepartmentName(user.getDepartment().getName());
+        }
+
+        // ✅ Function
+        if (user.getFunction() != null) {
+            Function func = new Function();
+            func.setId(user.getFunction().getId());
+            func.setName(user.getFunction().getName());
+            userDto.setFunctionId(func);
+        }
+
+        return userDto;
+    }
+
+
+    public UserDTO getUserById(Integer id) {
+
+        User user=this.userRepository.findById(Long.valueOf(id)).orElseThrow(()-> new ResourcesNotFoundException("User","User Id",(long)id));
+        return this.userToDto(user);
+    }
+
 
 
     /* 
-    private UserHierarchyDTO buildHierarchy(User user) {
+    private UserHierarchyDTO buildHierarchy(User user) {zz
         UserHierarchyDTO dto = new UserHierarchyDTO();
         dto.setId(user.getId());
         dto.setName(user.getFirstName() + " " + user.getLastName());

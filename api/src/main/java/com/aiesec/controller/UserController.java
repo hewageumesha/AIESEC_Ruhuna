@@ -2,19 +2,20 @@ package com.aiesec.controller;
 import com.aiesec.dto.CommentDTO;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
+
 import com.aiesec.enums.UserRole;
+import com.aiesec.exception.ResourcesNotFoundException;
 import com.aiesec.model.User;
+
 import com.aiesec.repository.UserRepository;
 import com.aiesec.security.UserDetailsImpl;
 import com.aiesec.service.CommentService;
 import com.aiesec.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,10 +34,47 @@ public class UserController {
     private UserRepository userRepo;
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        return ResponseEntity.ok(userRepo.getUserById(id));
+//    @GetMapping("/{id}")
+//    public ResponseEntity<User> getUser(@PathVariable Long id) {
+//        return ResponseEntity.ok(userRepo.getUserById(id));
+//    }
+//
+//    @GetMapping("/{id}/")
+//    public ResponseEntity<UserDto> GetUser( @PathVariable String id){
+//        UserDto user=this.userService.getUserById(Integer.valueOf(id));
+//        return new ResponseEntity<>(user, HttpStatus.CREATED);
+//    }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<UserDTO> getUser(@PathVariable Integer id) {
+        UserDTO user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
+
+    @GetMapping("/profile/id/{id}")
+    public ResponseEntity<Map<String, Object>> getProfileById(@PathVariable Integer id) {
+        User user = userRepo.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ResourcesNotFoundException("User", "id", id));
+
+        Map<String, Object> simpleUser = new HashMap<>();
+        simpleUser.put("id", user.getId());
+        simpleUser.put("userName", user.getUserName());
+        simpleUser.put("role", user.getRole().toString());
+        simpleUser.put("departmentId", user.getDepartment() != null ? user.getDepartment().getId() : null);
+
+        // ✅ Add functionId as an object {id, name}
+        if (user.getFunction() != null) {
+            Map<String, Object> functionMap = new HashMap<>();
+            functionMap.put("id", user.getFunction().getId());
+            functionMap.put("name", user.getFunction().getName());
+            simpleUser.put("functionId", functionMap);
+        } else {
+            simpleUser.put("functionId", null);
+        }
+
+        return ResponseEntity.ok(simpleUser);
+    }
+
 
     @PostMapping("/add")
     public User addUser(@RequestBody User user) {

@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/api/tshirt-orders")
 public class TShirtOrderController {
 
-
+    @Autowired
     private final TShirtOrderService tShirtOrderService;
 
 
@@ -59,12 +59,4 @@ public class TShirtOrderController {
         List<TshirtOrderDTO> tShirtOrders = tShirtOrderService.getAllTShirtOrders();
         return new ResponseEntity<>(tShirtOrders, HttpStatus.OK);
     }
-
-    // Get all T-shirt orders for a given merchandise
-    @GetMapping("/by-merchandise/{merchandiseId}")
-    public ResponseEntity<List<TshirtOrderDTO>> getOrdersByMerchandise(@PathVariable Long merchandiseId) {
-        List<TshirtOrderDTO> orders = tShirtOrderService.getOrdersByMerchandiseId(merchandiseId);
-        return new ResponseEntity<>(orders, HttpStatus.OK);
-    }
-
 }

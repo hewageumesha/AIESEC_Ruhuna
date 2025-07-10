@@ -13,7 +13,7 @@ public class EventExperienceMapper {
         return EventExperienceDTO.builder()
                 .experienceId(experience.getExperienceId())
                 .eventId(experience.getEvent().getEventId())
-                .userId(experience.getUser() != null ? experience.getUser().getId() : null)
+                .userId(Long.valueOf(experience.getUser() != null ? experience.getUser().getId() : null))
                 .guestUserId(experience.getGuestUser() != null ? experience.getGuestUser().getGuestUserId() : null)
                 .rating(experience.getRating())
                 .testimonial(experience.getTestimonial())
@@ -33,7 +33,7 @@ public class EventExperienceMapper {
         // Set User
         if (dto.getUserId() != null) {
             User user = new User();
-            user.setId(dto.getUserId());
+            user.setId(Math.toIntExact(dto.getUserId()));
             experience.setUser(user);
         }
 

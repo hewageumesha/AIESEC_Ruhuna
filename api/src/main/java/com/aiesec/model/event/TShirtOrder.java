@@ -2,7 +2,7 @@ package com.aiesec.model.event;
 
 
 import com.aiesec.enums.TshirtSize;
-import com.aiesec.model.User; 
+import com.aiesec.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +17,7 @@ public class TShirtOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
+    @Column(name = "order_iD")
     private Long orderId;
 
     @ManyToOne
@@ -35,9 +35,10 @@ public class TShirtOrder {
     @JoinColumn
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "Guest_ID")
-    private GuestEventRegistration guest_event_id;
+@ManyToOne
+@JoinColumn(name = "Guest_ID")
+private GuestEventRegistration guest_event_id;
+
 
 
 }

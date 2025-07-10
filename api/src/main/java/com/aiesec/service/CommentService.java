@@ -51,7 +51,7 @@ public class CommentService {
           if (UserRole.LCVP.equals(requesterRole) || UserRole.LCP.equals(requesterRole)) {
                     return commentRepo.findByMemberIdOrderByCreatedAtDesc(memberId)
                 .stream()
-                .map(c -> new CommentDTO(c.getId(), c.getContent(), 
+                .map(c -> new CommentDTO(c.getId(), c.getContent(),
                       c.getCreatedBy(), c.getMember(),
                       c.getCreatedAt()))
                 .collect(Collectors.toList());

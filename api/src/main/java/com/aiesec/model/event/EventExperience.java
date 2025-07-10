@@ -2,7 +2,7 @@ package com.aiesec.model.event;
 
 
 
-import com.aiesec.model.User; 
+import com.aiesec.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 

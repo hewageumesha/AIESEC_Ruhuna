@@ -35,26 +35,27 @@ public class TShirtOrderServiceImpl implements TShirtOrderService {
 
     @Override
     public TshirtOrderDTO createTShirtOrder(TshirtOrderDTO dto) {
-        if (dto.getMerchandiseId() == null) {
-            throw new IllegalArgumentException("Merchandise ID cannot be null");
-        }
+if (dto.getMerchandiseId() == null) {
+    throw new IllegalArgumentException("Merchandise ID cannot be null");
+}
 
-        Merchandise merchandise = merchandiseRepository.findById(dto.getMerchandiseId())
-                .orElseThrow(() -> new IllegalArgumentException("Merchandise with ID " + dto.getMerchandiseId() + " not found"));
+Merchandise merchandise = merchandiseRepository.findById(dto.getMerchandiseId())
+        .orElseThrow(() -> new IllegalArgumentException("Merchandise with ID " + dto.getMerchandiseId() + " not found"));
 
-        User user = null;
-        if (dto.getUserId() != null) {
-            user = userRepository.findById(dto.getUserId())
-                    .orElseThrow(() -> new IllegalArgumentException("User with ID " + dto.getUserId() + " not found"));
-        }
+User user = null;
+if (dto.getUserId() != null) {
+    user = userRepository.findById(dto.getUserId())
+            .orElseThrow(() -> new IllegalArgumentException("User with ID " + dto.getUserId() + " not found"));
+}
 
-        GuestEventRegistration guestEventRegistration = null;
-        if (dto.getGuestUserId() != null) {
-            guestEventRegistration = guestEventRegistrationRepository.findById(dto.getGuestUserId())
-                    .orElseThrow(() -> new IllegalArgumentException("GuestUser with ID " + dto.getGuestUserId() + " not found"));
-        }
+GuestEventRegistration guestEventRegistration = null;
+if (dto.getGuestUserId() != null) {
+    guestEventRegistration = guestEventRegistrationRepository.findById(dto.getGuestUserId())
+            .orElseThrow(() -> new IllegalArgumentException("GuestUser with ID " + dto.getGuestUserId() + " not found"));
+}
 
-        TShirtOrder order = TShirtOrderMapper.toEntity(dto, merchandise, user, guestEventRegistration);
+TShirtOrder order = TShirtOrderMapper.toEntity(dto, merchandise, user, guestEventRegistration);
+
         return TShirtOrderMapper.toDTO(tshirtOrderRepository.save(order));
     }
 
@@ -65,13 +66,15 @@ public class TShirtOrderServiceImpl implements TShirtOrderService {
 
         Merchandise merchandise = merchandiseRepository.findById(dto.getMerchandiseId()).orElseThrow();
         User user = dto.getUserId() != null ? userRepository.findById(dto.getUserId()).orElse(null) : null;
-        GuestEventRegistration guest = dto.getGuestUserId() != null ? guestEventRegistrationRepository.findById(dto.getGuestUserId()).orElse(null) : null;
+GuestEventRegistration guest = dto.getGuestUserId() != null ? guestEventRegistrationRepository.findById(dto.getGuestUserId()).orElse(null) : null;
+
 
         existingOrder.setMerchandise(merchandise);
         existingOrder.setQuantity(dto.getQuantity());
         existingOrder.setSize(Enum.valueOf(com.aiesec.enums.TshirtSize.class, dto.getSize()));
         existingOrder.setUser(user);
-        existingOrder.setGuest_event_id(guest);
+existingOrder.setGuest_event_id(guest);
+
 
         return TShirtOrderMapper.toDTO(tshirtOrderRepository.save(existingOrder));
     }
@@ -94,13 +97,4 @@ public class TShirtOrderServiceImpl implements TShirtOrderService {
                 .map(TShirtOrderMapper::toDTO)
                 .collect(Collectors.toList());
     }
-
-    @Override
-    public List<TshirtOrderDTO> getOrdersByMerchandiseId(Long merchandiseId) {
-        return tshirtOrderRepository.findByMerchandise_Id(merchandiseId)
-                .stream()
-                .map(TShirtOrderMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
 }

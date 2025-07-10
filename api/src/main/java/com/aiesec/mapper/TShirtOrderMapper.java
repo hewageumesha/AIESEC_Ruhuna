@@ -1,7 +1,6 @@
 package com.aiesec.mapper;
 
 import com.aiesec.dto.TshirtOrderDTO;
-import com.aiesec.enums.TshirtSize;
 import com.aiesec.model.event.*;
 import com.aiesec.model.User;
 
@@ -15,7 +14,7 @@ public class TShirtOrderMapper {
                 .merchandiseId(order.getMerchandise() != null ? order.getMerchandise().getId() : null)
                 .quantity(order.getQuantity())
                 .size(order.getSize().name())
-                .userId(order.getUser() != null ? order.getUser().getId() : null)
+                .userId(Long.valueOf(order.getUser() != null ? order.getUser().getId() : null))
                 //.guestUserId(order.getGuestUser() != null ? order.getGuestUser().getGuestUserId() : null)
                 .build();
     }
@@ -35,15 +34,6 @@ public class TShirtOrderMapper {
 
     public static TShirtOrder toEntity(TshirtOrderDTO dto, Merchandise merchandise) {
         return TShirtOrderMapper.toEntity(dto, merchandise, null, null);
-    }
-
-    // ✅ Safe enum parsing with error message
-    private static TshirtSize parseSizeEnum(String sizeStr) {
-        try {
-            return TshirtSize.valueOf(sizeStr.trim().toUpperCase());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            throw new RuntimeException("Invalid T-shirt size: " + sizeStr);
-        }
     }
 }
 
