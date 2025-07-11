@@ -20,12 +20,7 @@ const DashEvent = () => {
 
   const currentUser = useSelector((state) => state.user.currentUser);
 
-  const canEditOrDelete = () => {
-    return currentUser && (currentUser.role === 'LCP' || currentUser.role === 'LCVP');
-  };
-
-  const fetchFilteredEvents = async () => {
-    setLoading(true);
+  const fetchEvents = async () => {
     try {
       const params = {};
       if (filters.search) params.search = filters.search;
@@ -45,10 +40,16 @@ const DashEvent = () => {
     }
   };
 
-  const handleCardClick = (eventId) => navigate(`/event/${eventId}`);
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const handleCardClick = (eventId) => {
+    navigate(`/event/${eventId}`);
+  };
 
   const handleEdit = (eventId, e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Prevent triggering card click
     navigate(`/edit-event/${eventId}`);
   };
 
@@ -57,7 +58,7 @@ const DashEvent = () => {
     try {
       await axios.delete(`http://localhost:8080/api/events/${eventId}`);
       message.success('Event deleted successfully');
-      fetchFilteredEvents();
+      setEvents((prev) => prev.filter((event) => event.eventId !== eventId));
     } catch (error) {
       console.error('Failed to delete event:', error);
       message.error('Failed to delete event');
@@ -68,9 +69,14 @@ const DashEvent = () => {
     navigate('/event-analytics');
   };
 
-  useEffect(() => {
-    fetchFilteredEvents();
-  }, []);
+// handler for Analytics button
+const handleViewAnalytics = () => {
+  navigate('/event-analytics'); // analytics route path
+};
+
+useEffect(() => {
+  fetchFilteredEvents();
+}, []);
 
   // Custom styles for AIESEC branding
   const aiesecButtonStyle = {

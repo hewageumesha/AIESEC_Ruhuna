@@ -1,28 +1,31 @@
 package com.aiesec.service;
 
+import com.aiesec.dto.PasswordUpdateRequest;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
-
+import com.aiesec.dto.UserRequestDTO;
+import com.aiesec.dto.UserUpdateDTO;
+import com.aiesec.enums.UserRole;
+import com.aiesec.model.Department;
+import com.aiesec.model.Function;
 import com.aiesec.model.User;
 import com.aiesec.repository.DepartmentRepo;
-
-
 import com.aiesec.repository.UserRepository;
+import com.aiesec.repository.FunctionRepo;
+
 import io.jsonwebtoken.lang.Collections;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -35,35 +38,93 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    @Autowired
+    private DepartmentRepo departmentRepository;
+
+    @Autowired
+    private FunctionRepo functionRepository;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
     // Method to add a new user
-    public User addUser(User user) {
-        Optional<User> existingUser = userRepository.findByAiesecEmail(user.getAiesecEmail());
-        if (existingUser.isPresent()) {
-            throw new RuntimeException("User with email " + user.getAiesecEmail() + " already exists.");
+    public User addUser(UserRequestDTO dto) {
+    User user = new User();
+    user.setAiesecEmail(dto.getAiesecEmail());
+    user.setEmail(dto.getEmail());
+    user.setFirstName(dto.getFirstName());
+    user.setLastName(dto.getLastName());
+    user.setRole(dto.getRole());
+
+    Department department = departmentRepository.findById(dto.getDepartmentId())
+            .orElseThrow(() -> new RuntimeException("Department not found"));
+    user.setDepartment(department);
+
+    Function function = functionRepository.findById(dto.getFunctionId())
+            .orElseThrow(() -> new RuntimeException("Function not found"));
+    user.setFunction(function);
+
+    // Check team leader if role == Member
+    if (dto.getRole() == UserRole.Member) {
+        if (dto.getTeamLeaderAiesecEmail() == null || dto.getTeamLeaderAiesecEmail().isEmpty()) {
+            throw new RuntimeException("teamLeaderAiesecEmail is required for MEMBER role");
         }
 
-        return userRepository.save(user);
+        User teamLeader = userRepository.findByAiesecEmail(dto.getTeamLeaderAiesecEmail())
+                .orElseThrow(() -> new RuntimeException("Team leader not found"));
+
+        if (teamLeader.getRole() != UserRole.Team_Leader) {
+            throw new RuntimeException("Provided team leader email does not belong to a TEAM_LEADER");
+        }
+
+        user.setTeamLeaderAiesecEmail(dto.getTeamLeaderAiesecEmail());
+        user.setTeamLeaderId(String.valueOf(teamLeader.getId())); // Optional, if you want
     }
 
+    String tempPassword = generateTempPassword();
+    user.setPassword(tempPassword);
+
+    userRepository.save(user);
+
+    sendTempPasswordEmail(user.getAiesecEmail(), tempPassword);
+
+    return user;
+}
+
+
     // Method to update user details
-    public User updateUser(String aiesecEmail, UserDTO userDetails) {
+    @Transactional
+    public User updateUser(String aiesecEmail, UserUpdateDTO dto) {
         User user = userRepository.findByAiesecEmail(aiesecEmail)
-            .orElseThrow(() -> new RuntimeException("User not found with email: " + aiesecEmail));
-        user.setFirstName(userDetails.getFirstName());
-        user.setLastName(userDetails.getLastName());
-        user.setStateORProvince(userDetails.getStateORProvince());
-        user.setCity(userDetails.getCity());
-        user.setStreetAddress(userDetails.getStreetAddress());
-        user.setZIPORPostalCode(userDetails.getZIPORPostalCode());
-        user.setPhone(userDetails.getPhone());
-        user.setAbout(userDetails.getAbout());
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (dto.getDepartmentId() != null) {
+            Department department = departmentRepository.findById(dto.getDepartmentId())
+                    .orElseThrow(() -> new RuntimeException("Department not found"));
+            user.setDepartment(department);
+        }
+
+        if (dto.getFunctionId() != null) {
+            Function function = functionRepository.findById(dto.getFunctionId())
+                    .orElseThrow(() -> new RuntimeException("Function not found"));
+            user.setFunction(function);
+        }
+
+        if (dto.getRole() != null) {
+            user.setRole(dto.getRole());
+        }
+
         return userRepository.save(user);
     }
 
     // Method to delete a user
     public void deleteUser(String aiesecEmail) {
         User user = userRepository.findByAiesecEmail(aiesecEmail)
-            .orElseThrow(() -> new RuntimeException("User not found with email: " + aiesecEmail));
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         userRepository.delete(user);
     }
 
@@ -139,6 +200,12 @@ public class UserService {
         if (userDetails.getZIPORPostalCode() != null) {
             user.setZIPORPostalCode(userDetails.getZIPORPostalCode());
         }
+        if (userDetails.getS_department() != null) {
+            user.setS_department(userDetails.getS_department());
+        }
+        if (userDetails.getFaculty() != null) {
+            user.setFaculty(userDetails.getFaculty());
+        }
 
         return userRepository.save(user);
    }
@@ -147,129 +214,134 @@ public class UserService {
         return userRepository.findByAiesecEmail(aiesecEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
     }
-
-    /* 
-    public List<UserHierarchyDTO> getCommitteeHierarchy() {
-        User lcp = userRepository.findByRole(Role.LCP).stream()
-            .findFirst()
-            .orElseThrow(() -> new ResourceNotFoundException("LCP not found"));
-        
-        return List.of(buildHierarchy(lcp));
+    
+    public List<Map<String, Object>>  getCommitteeHierarchy() {
+        List<User> userList = userRepository.findAll();
+        return buildAiesecHierarchy(userList);
     }
 
-    private UserHierarchyDTO buildHierarchy(User user) {
-        UserHierarchyDTO dto = new UserHierarchyDTO();
-        dto.setId(user.getId());
-        dto.setName(user.getFirstName() + " " + user.getLastName());
-        dto.setAiesecEmail(user.getAiesecEmail());
-        dto.setRole(user.getRole());
-        dto.setProfilePicture(user.getProfilePicture());
-        
-        if (user.getDepartment() != null) {
-            dto.setDepartmentName(user.getDepartment().getName());
-        }
-        
-        if (user.getFunction() != null) {
-            dto.setFunctionName(user.getFunction().getName());
+    public List<Map<String, Object>> buildAiesecHierarchy(List<User> userList) {
+        Map<String, User> userById = userList.stream()
+                .collect(Collectors.toMap(u -> u.getId().toString(), u -> u));
+
+        // Find all LCPs (top-level users)
+        List<User> lcps = userList.stream()
+                .filter(u -> u.getRole().equals(UserRole.LCP) && u.getTeamLeaderId() == null)
+                .toList();
+
+        List<Map<String, Object>> hierarchyList = new ArrayList<>();
+
+        for (User lcp : lcps) {
+            Map<String, Object> lcpMap = new LinkedHashMap<>();
+
+            // LCP section
+            Map<String, Object> lcpDetails = new LinkedHashMap<>();
+            lcpDetails.put("id", lcp.getId().toString());
+            lcpDetails.put("name", lcp.getFirstName() + " " + lcp.getLastName());
+            lcpDetails.put("role", "lcp");
+            lcpDetails.put("image", lcp.getProfilePicture());
+            lcpDetails.put("email", lcp.getAiesecEmail());
+            lcpDetails.put("phoneNumber", lcp.getPhoneNumber());
+            lcpDetails.put("tenure", getTenureString(lcp.getJoinedDate()));
+            lcpMap.put("lcp", lcpDetails);
+
+            // LCVPs
+            List<Map<String, Object>> lcvpList = new ArrayList<>();
+            for (User lcvp : findChildren(userList, lcp.getId(), UserRole.LCVP)) {
+                Map<String, Object> lcvpMap = new LinkedHashMap<>();
+                lcvpMap.put("id", lcvp.getId().toString());
+                lcvpMap.put("name", lcvp.getFirstName() + " " + lcvp.getLastName());
+                lcvpMap.put("role", "lcvp");
+                lcvpMap.put("image", lcvp.getProfilePicture());
+                lcvpMap.put("email", lcvp.getAiesecEmail());
+                lcvpMap.put("phoneNumber", lcvp.getPhoneNumber());
+                lcvpMap.put("tenure", getTenureString(lcvp.getJoinedDate()));
+
+                // Team Leaders
+                List<Map<String, Object>> teamLeaders = new ArrayList<>();
+                for (User tl : findChildren(userList, lcvp.getId(), UserRole.Team_Leader)) {
+                    Map<String, Object> tlMap = new LinkedHashMap<>();
+                    tlMap.put("id", tl.getId().toString());
+                    tlMap.put("name", tl.getFirstName() + " " + tl.getLastName());
+                    tlMap.put("role", "team_leader");
+                    tlMap.put("image", tl.getProfilePicture());
+                    tlMap.put("email", tl.getAiesecEmail());
+                    tlMap.put("phoneNumber", tl.getPhoneNumber());
+
+                    // Members
+                    List<Map<String, Object>> memberList = new ArrayList<>();
+                    for (User member : findChildren(userList, tl.getId(), UserRole.Member)) {
+                        Map<String, Object> memberMap = new LinkedHashMap<>();
+                        memberMap.put("id", member.getId().toString());
+                        memberMap.put("name", member.getFirstName() + " " + member.getLastName());
+                        memberMap.put("role", "member");
+                        memberMap.put("image", member.getProfilePicture());
+                        memberMap.put("email", member.getAiesecEmail());
+                        memberMap.put("phoneNumber", member.getPhoneNumber());
+                        memberList.add(memberMap);
+                    }
+
+                    tlMap.put("members", memberList);
+                    teamLeaders.add(tlMap);
+                }
+
+                lcvpMap.put("tls", teamLeaders);
+                lcvpList.add(lcvpMap);
+            }
+
+            lcpMap.put("lcvps", lcvpList);
+            hierarchyList.add(lcpMap);
         }
 
-        List<User> children;
-        if (user.getRole() == Role.LCP) {
-            children = userRepository.findByRole(Role.LCVP);
-        } else if (user.getRole() == Role.LCVP) {
-            children = userRepository.findByRoleAndTeamLeaderId(Role.Team_Leader, user.getId());
-        } else if (user.getRole() == Role.Team_Leader) {
-            children = userRepository.findByTeamLeaderId(user.getId());
-        } else {
-            children = Collections.emptyList();
-        }
-
-        if (!children.isEmpty()) {
-            dto.setChildren(children.stream()
-                .map(this::buildHierarchy)
-                .collect(Collectors.toList()));
-        }
-
-        return dto;
+        return hierarchyList;
     }
 
-    public UserDTO getUserDetails(Long id) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return convertToDTO(user);
+    private List<User> findChildren(List<User> allUsers, Long parentId, UserRole role) {
+        return allUsers.stream()
+                .filter(u -> u.getTeamLeaderId() != null)
+                .filter(u -> u.getTeamLeaderId().equals(parentId.toString()))
+                .filter(u -> u.getRole().equals(role))
+                .collect(Collectors.toList());
     }
 
-    /* 
-    private UserDTO convertToDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setAiesecEmail(user.getAiesecEmail());
-        dto.setBirthday(user.getBirthday());
-        dto.setJoinedDate(user.getJoinedDate());
-        dto.setProfilePicture(user.getProfilePicture());
-        dto.setRole(user.getRole());
-        dto.setStatus(user.getStatus());
-        
-        if (user.getFunction() != null) {
-            dto.setFunctionId(user.getFunction().getId());
-            dto.setFunctionName(user.getFunction().getName());
+    private String getTenureString(Date joinedDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(joinedDate);
+        int startYear = cal.get(Calendar.YEAR);
+        return startYear + "-" + (startYear + 1);
+    }
+
+    public String updatePassword(String aiesecEmail, PasswordUpdateRequest request) {
+        User user = userRepository.findByAiesecEmail(aiesecEmail)
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            return "Current password is incorrect!";
         }
-        
-        if (user.getDepartment() != null) {
-            dto.setDepartmentId(user.getDepartment().getId());
-            dto.setDepartmentName(user.getDepartment().getName());
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            return "New password and confirm password do not match!";
         }
-        
-        if (user.getTeamLeader() != null) {
-            dto.setTeamLeaderId(user.getTeamLeader().getId());
-            dto.setTeamLeaderName(user.getTeamLeader().getFirstName() + " " + user.getTeamLeader().getLastName());
-        }
-        
-        if (!user.getTeamMembers().isEmpty()) {
-            dto.setTeamMembers(user.getTeamMembers().stream()
-                .map(this::convertToSimpleDTO)
-                .collect(Collectors.toList()));
-        }
-        
-        return dto;
+
+        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+
+        return "Password updated successfully!";
     }
 
-    private UserDTO convertToSimpleDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setAiesecEmail(user.getAiesecEmail());
-        dto.setRole(user.getRole());
-        dto.setProfilePicture(user.getProfilePicture());
-        return dto;
+    private String generateTempPassword() {
+        return UUID.randomUUID().toString().substring(0, 8);
     }
 
-    @Transactional
-    public UserDTO createUser(UserDTO userDTO) {
-        User user = new User();
-        // Set all fields from DTO
-        // Handle relationships
-        User savedUser = userRepository.save(user);
-        return convertToDTO(savedUser);
-    }
+    private void sendTempPasswordEmail(String toEmail, String tempPassword) {
+        String subject = "Your Temporary AIESEC Password";
+        String text = "Hello,\n\nYour temporary password is: " + tempPassword + "\n\nPlease log in and change it as soon as possible.";
 
-    @Transactional
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        // Update fields from DTO
-        User updatedUser = userRepository.save(user);
-        return convertToDTO(updatedUser);
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject(subject);
+        message.setText(text);
+        mailSender.send(message);
     }
-
-    @Transactional
-    public void deleteUser(Long id) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        userRepository.delete(user);
-    }
-    */
 }

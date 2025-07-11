@@ -1,6 +1,7 @@
 package com.aiesec.service.interfaces;
 
 import com.aiesec.dto.AiesecMemberEventRegistrationDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import com.aiesec.dto.EventRegistrationSummaryDTO;
 import com.aiesec.dto.RegistrationDTO;
 import com.aiesec.model.event.AiesecMemberEventRegistration;

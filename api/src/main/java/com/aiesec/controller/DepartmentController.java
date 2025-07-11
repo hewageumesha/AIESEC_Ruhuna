@@ -1,6 +1,6 @@
 package com.aiesec.controller;
 
-import com.aiesec.model.Department;
+import com.aiesec.dto.DepartmentDTO;
 import com.aiesec.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +22,8 @@ public class DepartmentController {
      * Response: Created Department object
      */
     @PostMapping("/add")
-    public Department addDepartment(@RequestBody Department department) {
-        return departmentService.addDepartment(department);
+    public DepartmentDTO addDepartment(@RequestBody DepartmentDTO dto) {
+        return departmentService.addDepartment(dto);
     }
 
     /**
@@ -32,7 +32,7 @@ public class DepartmentController {
      * Response: List of all departments
      */
     @GetMapping("/")
-    public List<Department> getAllDepartments() {
+    public List<DepartmentDTO> getAllDepartments() {
         return departmentService.getAllDepartments();
     }
 
@@ -43,7 +43,7 @@ public class DepartmentController {
      * Response: Department object with the given ID
      */
     @GetMapping("/{id}")
-    public Department getDepartmentById(@PathVariable Long id) {
+    public DepartmentDTO getDepartmentById(@PathVariable Long id) {
         return departmentService.getDepartmentById(id);
     }
 
@@ -55,8 +55,13 @@ public class DepartmentController {
      */
     @DeleteMapping("/delete/{id}")
     public String deleteDepartment(@PathVariable Long id) {
-        departmentService.deleteDepartment(id); // Call service to perform deletion
-        return "Department deleted successfully"; // Return confirmation message
+        departmentService.deleteDepartment(id);
+        return "Department deleted successfully with id: " + id;
+    }
+
+    @PutMapping("/update/{id}")
+    public DepartmentDTO updateDepartment(@PathVariable Long id, @RequestBody DepartmentDTO dto) {
+        return departmentService.updateDepartment(id, dto);
     }
 }
 

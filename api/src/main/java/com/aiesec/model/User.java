@@ -1,27 +1,26 @@
 package com.aiesec.model;
 
-import com.aiesec.enums.Gender;
-import com.aiesec.enums.UserRole;
-import com.aiesec.enums.UserStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
-import java.time.LocalDate;
-import java.util.Date;
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.aiesec.enums.Gender;
+import com.aiesec.enums.UserRole;
+import com.aiesec.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
     @NotEmpty
@@ -42,18 +41,16 @@ public class User {
     private String password;
 
     @Temporal(TemporalType.DATE)
-    private LocalDate birthday;
+    private Date birthday;
 
     private Gender gender;
 
     @Temporal(TemporalType.DATE)
-    private LocalDate joinedDate;
+    private Date joinedDate;
 
     private String profilePicture;
 
-    private String about;
-
-    private String phone;
+    private String phoneNumber;
 
     private String streetAddress;
 
@@ -64,6 +61,15 @@ public class User {
     private String ZIPORPostalCode;
 
     private String teamLeaderAiesecEmail;
+
+    private String teamLeaderId;
+    private int noOfTask=0;
+
+    private String s_department;
+
+    private String faculty;
+
+    private String phone;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
@@ -99,6 +105,24 @@ public class User {
         return passwordEncoder.encode(rawPassword);
     }
 
+    @OneToOne(mappedBy = "user")
+    private ForgotPassword forgotPassword;
+
+    public Long getId() {
+        return id;
+    }
+   
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -116,14 +140,6 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getAiesecEmail() {
         return aiesecEmail;
     }
@@ -139,22 +155,7 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public LocalDate getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday;
-    }
-
-    public LocalDate getJoinedDate() {
-        return joinedDate;
-    }
-
-    public void setJoinedDate(LocalDate joinedDate) {
-        this.joinedDate = joinedDate;
-    }
+    
 
     public String getProfilePicture() {
         return profilePicture;
@@ -196,21 +197,21 @@ public class User {
         this.department = department;
     }
 
-    //public Date getBirthday() {
-    //  return birthday;
-    //}
+    public Date getBirthday() {
+        return birthday;
+    }
 
-    //public void setBirthday(Date birthday) {
-    // this.birthday = birthday;
-    // }
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
 
-    //public Date getJoinedDate() {
-    //    return joinedDate;
-    // }
+    public Date getJoinedDate() {
+        return joinedDate;
+    }
 
-    //public void setJoinedDate(Date joinedDate) {
-    //   this.joinedDate = joinedDate;
-    // }
+    public void setJoinedDate(Date joinedDate) {
+        this.joinedDate = joinedDate;
+    }
 
     public List<Comment> getCommentsForUser() {
         return commentsForUser;
@@ -276,30 +277,63 @@ public class User {
         this.gender = gender;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getTeamLeaderId() {
+        return teamLeaderId;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAbout() {
-        return about;
-    }
-
-    public void setAbout(String about) {
-        this.about = about;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public void setTeamLeaderId(String teamLeaderId) {
+        this.teamLeaderId = teamLeaderId;
     }
 
 
+    public Date getBirthday() {
+    return birthday;
+}
+
+public void setBirthday(Date birthday) {
+    this.birthday = birthday;
+}
+
+public Date getJoinedDate() {
+    return joinedDate;
+}
+
+public void setJoinedDate(Date joinedDate) {
+    this.joinedDate = joinedDate;
+}
+
+public String getPhone(){
+
+    return phone;
+}
+public void setPhone(String phone){
+    this.phone=phone;
+}
+
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getS_department() {
+        return s_department;
+    }
+
+    public void setS_department(String s_department) {
+        this.s_department = s_department;
+    }
+
+    public String getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(String faculty) {
+        this.faculty = faculty;
+    }
+    
 
 }

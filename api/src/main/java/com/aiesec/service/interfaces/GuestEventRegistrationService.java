@@ -1,7 +1,6 @@
 package com.aiesec.service.interfaces;
 
 import com.aiesec.dto.GuestEventRegistrationDTO;
-import com.aiesec.dto.GuestRegistrationSummaryDTO;
 
 import java.util.List;
 import java.util.Map;

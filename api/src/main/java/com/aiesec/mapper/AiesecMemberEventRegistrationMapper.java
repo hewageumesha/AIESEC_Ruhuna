@@ -2,7 +2,6 @@ package com.aiesec.mapper;
 
 import com.aiesec.dto.AiesecMemberEventRegistrationDTO;
 import com.aiesec.model.event.AiesecMemberEventRegistration;
-import com.aiesec.model.event.Event;
 
 import java.time.LocalDateTime;
 

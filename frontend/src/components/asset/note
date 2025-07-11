@@ -1,0 +1,99 @@
+ 8. Use Radio Buttons for Priority
+
+<div className="form-group">
+  <label><Flag className="icon" /> Priority</label>
+  <div>
+    {["HIGH", "MEDIUM", "LOW"].map(p => (
+      <label key={p}>
+        <input
+          type="radio"
+          name="priority"
+          value={p}
+          checked={priority === p}
+          onChange={() => setPriority(p)}
+        />
+        {p}
+      </label>
+    ))}
+  </div>
+</div>
+
+----------------------
+
+ <button
+
+            className="btn-clear"
+            onClick={() => {
+              setTaskName('');
+              setDescription('');
+              setDeadline('');
+              setPriority('MEDIUM');
+              setStatus('');
+              setAssignTo('');
+            }}
+        >
+          Clear
+        </button>
+------------------------------------------------
+
+✅ 1. Add a new column: "Created Date"
+Task: Show task created date in the table
+
+Update the Task interface:
+createdDate: string;
+
+In the table header:
+<th className="py-4 px-6">Created Date</th>
+
+In the row render:
+<td className="px-6 py-3 text-gray-700">
+  {new Date(task.createdDate).toLocaleDateString()}
+</td>
+
+
+-------------------------------
+
+✅ 3. Highlight overdue tasks
+
+<tr
+  key={task.taskId}
+  className={`border-t border-gray-100 transition ${
+    new Date(task.deadLine) < new Date() && task.workOfStatus !== "completed"
+      ? "bg-red-50"
+      : "hover:bg-indigo-50"
+  }`}
+>
+
+----------------------------------
+
+✅ 4. Add pagination (e.g., 5 tasks per page)
+
+State:
+
+const [currentPage, setCurrentPage] = useState(1);
+const tasksPerPage = 5;
+
+Get visible tasks:
+
+const indexOfLast = currentPage * tasksPerPage;
+const indexOfFirst = indexOfLast - tasksPerPage;
+const currentTasks = filteredTasks.slice(indexOfFirst, indexOfLast);
+Replace filteredTasks.map with currentTasks.map
+
+Add pagination buttons:
+
+<div className="flex justify-center mt-4 gap-3">
+  {Array.from({ length: Math.ceil(filteredTasks.length / tasksPerPage) }, (_, i) => (
+    <button
+      key={i}
+      onClick={() => setCurrentPage(i + 1)}
+      className={`px-4 py-2 rounded-full text-sm ${
+        currentPage === i + 1 ? "bg-indigo-500 text-white" : "bg-gray-200 text-gray-800"
+      }`}
+    >
+      {i + 1}
+    </button>
+  ))}
+</div>
+
+----------------------------------------------------------
