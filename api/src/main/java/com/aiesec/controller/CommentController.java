@@ -1,28 +1,33 @@
 package com.aiesec.controller;
+
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.aiesec.enums.UserRole;
-import com.aiesec.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 import com.aiesec.dto.CommentDTO;
-import com.aiesec.enums.UserRole;
 import com.aiesec.model.Comment;
+import com.aiesec.enums.UserRole;
 import com.aiesec.model.User;
+import com.aiesec.repository.CommentRepository;
+import com.aiesec.repository.UserRepository;
+import com.aiesec.security.UserDetailsImpl;
 import com.aiesec.service.CommentService;
 
-@CrossOrigin(origins = "*") // Allow cross-origin requests from any origin
-@RestController // Mark this class as a REST controller
-@RequestMapping("/api/comments") // Base path for all comment-related APIs
+@CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/api/comments")
 public class CommentController {
 
-    // Injecting the CommentService to delegate business logic
     @Autowired
     private CommentService commentService;
 
-    // Injecting the UserRepo to access user-related DB operations
     @Autowired
     private UserRepository userRepo;
 
@@ -33,17 +38,14 @@ public class CommentController {
     @PostMapping("/add")
     public Comment addComment(@RequestBody Map<String, Object> requestBody) {
 
-        // Extract fields from the incoming request body
         String content = (String) requestBody.get("content");
         Long memberId = Long.valueOf(requestBody.get("memberId").toString());
         String creatorEmail = (String) requestBody.get("creatorEmail");
 
-        // Print for debugging purposes
         System.out.println(content);
         System.out.println(memberId);
         System.out.println(creatorEmail);
 
-        // Call the service to create and save the comment
         return commentService.addComment(content, memberId, creatorEmail);
     }
 
@@ -53,12 +55,11 @@ public class CommentController {
      */
     @GetMapping("/member/{memberId}/{requesterRole}")
     public ResponseEntity<List<CommentDTO>> getCommentsForMember(
-            @PathVariable Long memberId, // ID of the member whose comments to fetch
-            @PathVariable String requesterRole // Role of the requester (to filter comments by access)
+            @PathVariable Long memberId,
+            @PathVariable String requesterRole
     ) {
-        // Convert the role from String to Enum
         List<CommentDTO> comments = commentService.getCommentsForMember(memberId, UserRole.valueOf(requesterRole));
-        return ResponseEntity.ok(comments); // Return the filtered comment list
+        return ResponseEntity.ok(comments);
     }
 
     /**
@@ -67,7 +68,17 @@ public class CommentController {
      */
     @GetMapping("/members")
     public ResponseEntity<List<User>> getAllMembersWithComments() {
-        List<User> members = userRepo.findByRole(UserRole.Member); // Fetch users with Member role
-        return ResponseEntity.ok(members); // Return list of members
+        List<User> members = userRepo.findByRole(UserRole.Member);
+        return ResponseEntity.ok(members);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteComment(@PathVariable Long id) {
+        boolean deleted = commentService.deleteCommentById(id);
+        if (deleted) {
+            return ResponseEntity.ok("Comment deleted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Comment not found");
+        }
     }
 }

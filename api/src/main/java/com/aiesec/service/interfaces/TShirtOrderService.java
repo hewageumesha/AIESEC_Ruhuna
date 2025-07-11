@@ -12,6 +12,4 @@ public interface TShirtOrderService {
     void deleteTShirtOrder(Long orderId);
     TshirtOrderDTO getTShirtOrderById(Long orderId);
     List<TshirtOrderDTO> getAllTShirtOrders();
-    List<TshirtOrderDTO> getOrdersByMerchandiseId(Long merchandiseId);
-
 }

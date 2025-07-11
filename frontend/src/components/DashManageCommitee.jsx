@@ -1,82 +1,85 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-
-// Mock authentication context
-const AuthContext = React.createContext();
+import { useNavigate, useLocation } from 'react-router-dom';
+import DashManageMember from './DashManageMember';
+import DashManageDepartment from './DashManageDepartment';
+import DashManageFunction from './DashManageFunction';
 
 const OrgTable = () => {
-
   const [organization, setOrganization] = useState({});
-  const [subOrganization, setsubOrganization] = useState({});
+  const [subOrganization, setSubOrganization] = useState({});
+  const [expandedRows, setExpandedRows] = useState({ lcvps: [], tls: [] });
+
+  const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const location = useLocation();
+  const urlParams = new URLSearchParams(location.search);
+  const subtab = urlParams.get("subtab");
 
-  // State for expanded rows
-  const [expandedRows, setExpandedRows] = useState({
-    lcvps: [],
-    tls: []
-  });
+  const currentYear = new Date().getFullYear();
+  const nextYear = currentYear + 1;
+  const termString = `${currentYear}-${nextYear} Team`;
 
-  const { currentUser} = useSelector((state) => state.user);
-
-  // Simulate login (in a real app, this would be handled by auth system)
   useEffect(() => {
     fetchOrganizationData();
-  }, [currentUser, navigate]);
+  }, [currentUser]);
 
-   const fetchOrganizationData = async () => {
-      try {
-        const data = await axios.get(`http://localhost:8080/api/users/hierarchy`, {
-          headers: { Authorization: `Bearer ${currentUser.token}` }
-        });
-          const main = data.data[0];
-          setOrganization(main);
-          if(data.data.length > 1){
-            const sub = data.data[1];
-            setsubOrganization(sub);
-          }
-          return data.data;
-      } catch (error) {
-        console.error('Error fetching profile data:', error);
+  const fetchOrganizationData = async () => {
+    try {
+      const data = await axios.get(`http://localhost:8080/api/users/hierarchy`, {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      });
+      const main = data.data[0];
+      setOrganization(main);
+      if (data.data.length > 1) {
+        const sub = data.data[1];
+        setSubOrganization(sub);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
+  };
 
   const toggleLcvp = (index) => {
-    setExpandedRows(prev => ({
+    setExpandedRows((prev) => ({
       ...prev,
-      lcvps: prev.lcvps.includes(index) 
-        ? prev.lcvps.filter(i => i !== index)
+      lcvps: prev.lcvps.includes(index)
+        ? prev.lcvps.filter((i) => i !== index)
         : [...prev.lcvps, index],
-      tls: prev.lcvps.includes(index) 
-        ? prev.tls.filter(tlIndex => !tlIndex.startsWith(`${index}-`))
-        : prev.tls
+      tls: prev.lcvps.includes(index)
+        ? prev.tls.filter((tlIndex) => !tlIndex.startsWith(`${index}-`))
+        : prev.tls,
     }));
   };
 
   const toggleTl = (index) => {
-    setExpandedRows(prev => ({
+    setExpandedRows((prev) => ({
       ...prev,
-      tls: prev.tls.includes(index) 
-        ? prev.tls.filter(i => i !== index)
-        : [...prev.tls, index]
+      tls: prev.tls.includes(index)
+        ? prev.tls.filter((i) => i !== index)
+        : [...prev.tls, index],
     }));
   };
 
-  // Role badge component
+  // Placeholder permission function
+  const canAdd = (currentRole, targetRole) => {
+    return currentRole === 'lcp' || currentRole === 'lcvp';
+  };
+
   const RoleBadge = ({ role }) => {
-    let bgColor = 'bg-gray-100 text-gray-800';
-    if (role === 'lcp') bgColor = 'bg-blue-100 text-blue-800';
-    else if (role === 'lcvp') bgColor = 'bg-green-100 text-green-800';
-    else if (role === 'team_leader') bgColor = 'bg-purple-100 text-purple-800';
-    
+    let bgColor = 'bg-gray-100 text-gray-800 dark:bg-gray-100 dark:text-gray-500';
+    if (role === 'lcp') bgColor = 'bg-blue-100 text-blue-800 dark:bg-gray-400 dark:text-gray-900';
+    else if (role === 'lcvp') bgColor = 'bg-green-100 text-green-800 dark:bg-gray-300 dark:text-gray-700';
+    else if (role === 'team_leader') bgColor = 'bg-purple-100 text-purple-800 dark:bg-gray-200 dark:text-gray-600';
+
     const roleDisplay = {
-      'lcp': 'LCP',
-      'lcvp': 'LCVP',
-      'team_leader': 'Team Leader',
-      'member': 'Member'
+      lcp: 'LCP',
+      lcvp: 'LCVP',
+      team_leader: 'Team Leader',
+      member: 'Member',
     };
-    
+
     return (
       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${bgColor}`}>
         {roleDisplay[role] || role}
@@ -84,24 +87,17 @@ const OrgTable = () => {
     );
   };
 
-  // Add member button with permission check
-  const AddMemberButton = ({ targetRole, onClick }) => {
-    if (!canAdd(currentUser?.role, targetRole)) return null;
-    
-    return (
-      <button 
-        onClick={onClick}
-        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-        </svg>
-        Add {targetRole === 'member' ? 'Member' : targetRole.toUpperCase()}
-      </button>
-    );
-  };
-
   if (!currentUser) return <div className="p-8 text-center">Loading...</div>;
+
+  if (subtab === 'member') {
+    return <DashManageMember />;
+  }
+  if (subtab === 'department') {
+    return <DashManageDepartment />;
+  }
+  if (subtab === 'function') {
+    return <DashManageFunction />;
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -120,14 +116,14 @@ const OrgTable = () => {
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-200">Role</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-200">Profile</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-200">Contact</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 ">
             { organization ?.lcp &&
-            <tr className="bg-blue-50 hover:bg-blue-100 ">
+            <tr className="bg-blue-50 hover:bg-blue-100 dark:bg-gray-500 dark:hover:bg-gray-600 ">
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
                   <div className="bg-blue-100 p-2 rounded-lg mr-3">
@@ -137,7 +133,7 @@ const OrgTable = () => {
                   </div>
                   <div>
                     <RoleBadge role={organization.lcp.role} />
-                    <div className="text-xs text-gray-500 mt-1">2023-2024 Term</div>
+                    <div className="text-xs text-gray-500 mt-1 dark:text-gray-400">{termString}</div>
                   </div>
                 </div>
               </td>
@@ -147,20 +143,20 @@ const OrgTable = () => {
                     <img className="h-10 w-10 rounded-full" src={organization.lcp.image} alt={organization.lcp.name} />
                   </div>
                   <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">{organization.lcp.name}</div>
-                    <div className="text-sm text-gray-500">Local Committee President</div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-900">{organization.lcp.name}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Local Committee President</div>
                   </div>
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{organization.lcp.email}</div>
-                <div className="text-sm text-gray-500">+1 (555) 123-4567</div>
+                <div className="text-sm text-gray-900 dark:text-gray-900">{organization.lcp.email}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{organization.lcp.phoneNumber}</div>
               </td>
             </tr>
             }
 
             { subOrganization ?.lcp &&
-            <tr className="bg-blue-50 hover:bg-blue-100 ">
+            <tr className="bg-blue-50 hover:bg-blue-100  dark:bg-gray-500 dark:hover:bg-gray-600">
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
                   <div className="bg-blue-100 p-2 rounded-lg mr-3">
@@ -170,7 +166,7 @@ const OrgTable = () => {
                   </div>
                   <div>
                     <RoleBadge role={subOrganization.lcp.role} />
-                    <div className="text-xs text-gray-500 mt-1">2023-2024 Term</div>
+                    <div className="text-xs text-gray-500 mt-1  dark:text-gray-400">{termString}</div>
                   </div>
                 </div>
               </td>
@@ -180,14 +176,14 @@ const OrgTable = () => {
                     <img className="h-10 w-10 rounded-full" src={subOrganization.lcp.image} alt={subOrganization.lcp.name} />
                   </div>
                   <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">{subOrganization.lcp.name}</div>
-                    <div className="text-sm text-gray-500">Local Committee President</div>
+                    <div className="text-sm font-medium text-gray-900  dark:text-gray-900">{subOrganization.lcp.name}</div>
+                    <div className="text-sm text-gray-500  dark:text-gray-400">Local Committee President</div>
                   </div>
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{subOrganization.lcp.email}</div>
-                <div className="text-sm text-gray-500">+1 (555) 123-4567</div>
+                <div className="text-sm text-gray-900  dark:text-gray-900">{subOrganization.lcp.email}</div>
+                <div className="text-sm text-gray-500  dark:text-gray-400">{organization.lcp.phoneNumber}</div>
               </td>
             </tr>
             }
@@ -195,7 +191,7 @@ const OrgTable = () => {
             {organization?.lcvps && organization.lcvps.map((lcvp, lcvpIndex) => (
               <React.Fragment key={lcvpIndex}>
                 <tr 
-                  className="bg-green-50 hover:bg-green-100 cursor-pointer"
+                  className="bg-green-50 hover:bg-green-100 cursor-pointer dark:bg-gray-400 dark:hover:bg-gray-500"
                   onClick={() => toggleLcvp(lcvpIndex)}
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -204,7 +200,7 @@ const OrgTable = () => {
                         <svg
                           className={`h-5 w-5 text-green-600 transform ${expandedRows.lcvps.includes(lcvpIndex) ? 'rotate-90' : ''}`}
                           viewBox="0 0 20 20"
-                          fill="currentColor"
+                          fill="currentColor dark:gray-400"
                         >
                           <path
                             fillRule="evenodd"
@@ -215,7 +211,7 @@ const OrgTable = () => {
                       </div>
                       <div>
                         <RoleBadge role={lcvp.role} />
-                        <div className="text-xs text-gray-500 mt-1">2023-2024 Term</div>
+                        <div className="text-xs text-gray-500 mt-1  dark:text-gray-300">{termString}</div>
                       </div>
                     </div>
                   </td>
@@ -225,14 +221,14 @@ const OrgTable = () => {
                         <img className="h-10 w-10 rounded-full" src={lcvp.image} alt={lcvp.name} />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{lcvp.name}</div>
-                        <div className="text-sm text-gray-500">Vice President</div>
+                        <div className="text-sm font-medium text-gray-900  dark:text-gray-900">{lcvp.name}</div>
+                        <div className="text-sm text-gray-500  dark:text-gray-300">Vice President</div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{lcvp.email}</div>
-                    <div className="text-sm text-gray-500">+1 (555) 987-6543</div>
+                    <div className="text-sm text-gray-900  dark:text-gray-900">{lcvp.email}</div>
+                    <div className="text-sm text-gray-500  dark:text-gray-300">{lcvp.phoneNumber}</div>
                   </td>
                 </tr>
 
@@ -240,7 +236,7 @@ const OrgTable = () => {
                 {expandedRows.lcvps.includes(lcvpIndex) && lcvp.tls.map((tl, tlIndex) => (
                   <React.Fragment key={tlIndex}>
                     <tr 
-                      className="bg-purple-50 hover:bg-purple-100 cursor-pointer"
+                      className="bg-purple-50 hover:bg-purple-100 cursor-pointer dark:bg-gray-300 dark:hover:bg-gray-400"
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleTl(`${lcvpIndex}-${tlIndex}`);
@@ -280,7 +276,7 @@ const OrgTable = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{tl.email}</div>
-                        <div className="text-sm text-gray-500">+1 (555) 456-7890</div>
+                        <div className="text-sm text-gray-500">{tl.phoneNumber}</div>
                       </td>
                     </tr>
 
@@ -288,7 +284,7 @@ const OrgTable = () => {
                     {expandedRows.tls.includes(`${lcvpIndex}-${tlIndex}`) && tl.members.map((member, memberIndex) => (
                       <tr 
                         key={memberIndex} 
-                        className="bg-gray-50 hover:bg-gray-100"
+                        className="bg-gray-50 hover:bg-gray-100 dark:bg-gray-200 dark:hover:bg-gray-300"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <td className="px-20 py-4 whitespace-nowrap">
@@ -317,7 +313,7 @@ const OrgTable = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">{member.email}</div>
-                          <div className="text-sm text-gray-500">Member</div>
+                          <div className="text-sm text-gray-500">{member.phoneNumber}</div>
                         </td>
                       </tr>
                     ))}

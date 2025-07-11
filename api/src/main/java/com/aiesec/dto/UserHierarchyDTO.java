@@ -1,7 +1,9 @@
 package com.aiesec.dto;
 
 import com.aiesec.enums.UserRole;
+
 import java.util.List;
+
 
 public class UserHierarchyDTO {
     private Long id;
@@ -11,6 +13,7 @@ public class UserHierarchyDTO {
     private String departmentName;
     private String functionName;
     private String profilePicture;
+    private String phoneNumber;
     private List<UserHierarchyDTO> children;
     public Long getId() {
         return id;
@@ -60,6 +63,10 @@ public class UserHierarchyDTO {
     public void setChildren(List<UserHierarchyDTO> children) {
         this.children = children;
     }
-
-    
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }    
 }

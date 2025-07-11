@@ -1,9 +1,13 @@
 package com.aiesec.controller;
 import com.aiesec.dto.CommentDTO;
+import com.aiesec.dto.PasswordUpdateRequest;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
+import com.aiesec.dto.UserRequestDTO;
+import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.UserRole;
 import com.aiesec.model.User;
+
 import com.aiesec.repository.UserRepository;
 import com.aiesec.security.UserDetailsImpl;
 import com.aiesec.service.CommentService;
@@ -16,6 +20,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -38,22 +44,37 @@ public class UserController {
         return ResponseEntity.ok(userRepo.getUserById(id));
     }
 
+@Autowired
+private JavaMailSender mailSender;
+
+@GetMapping("/sendmail")
+public String senMail() {
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setTo("n.u.m.hewage@gmail.com");
+    message.setSubject("Test Mail");
+    message.setText("This is a test email from Spring Boot!");
+
+    mailSender.send(message);
+
+    return "Mail sent successfully!";
+}
+
+
     @PostMapping("/add")
-    public User addUser(@RequestBody User user) {
-        return userService.addUser(user);
+    public User addUser(@RequestBody UserRequestDTO dto) {
+        return userService.addUser(dto);
     }
 
-    {/*
-    @PostMapping("/update")
-    public Optional<User> updateUser(@RequestBody UserDTO userDetails) {
-        return Optional.ofNullable(userService.updateUser(userDetails.getAiesecEmail(), userDetails));
+    @PostMapping("/update/{aiesecEmail}")
+    public User updateUser(@PathVariable String aiesecEmail, @RequestBody UserUpdateDTO dto) {
+        return userService.updateUser(aiesecEmail, dto);
     }
-    */}
+    
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{aiesecEmail}")
     public String deleteUser(@PathVariable String aiesecEmail) {
         userService.deleteUser(aiesecEmail);
-        return "User deleted successfully";
+        return "User deleted successfully!";
     }
 
     @GetMapping("/{aiesecEmail}")
@@ -96,34 +117,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getCommitteeHierarchy());
     }
 
-    /* 
-    @GetMapping("/hierarchy")
-    public ResponseEntity<List<UserHierarchyDTO>> getCommitteeHierarchy() {
-        return ResponseEntity.ok(userService.getCommitteeHierarchy());
+    @PostMapping("/update-password")
+    public String updatePassword(
+            @RequestParam String aiesecEmail, // you can pass this from logged-in user context instead of request param
+            @RequestBody PasswordUpdateRequest request
+    ) {
+        return userService.updatePassword(aiesecEmail, request);
     }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserDetails(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserDetails(id));
-    }
-
-    @PostMapping
-    @PreAuthorize("hasRole('LCP') or hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.createUser(userDTO));
-    }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('LCP') or hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.updateUser(id, userDTO));
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('LCP') or hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
-    }
-    */
 }

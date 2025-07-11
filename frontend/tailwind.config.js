@@ -2,6 +2,7 @@ import flowbite from "flowbite-react/tailwind";
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html", 
     "./src/**/*.{js,ts,jsx,tsx}", 
@@ -12,5 +13,5 @@ export default {
       scrollBehavior: ['smooth'],
     },
   },
-  plugins: [import("flowbite/plugin")],
+  plugins: [flowbite.plugin()], 
 };

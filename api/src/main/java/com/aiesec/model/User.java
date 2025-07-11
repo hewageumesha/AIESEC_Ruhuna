@@ -63,6 +63,11 @@ public class User {
     private String teamLeaderAiesecEmail;
 
     private String teamLeaderId;
+    private int noOfTask=0;
+
+    private String s_department;
+
+    private String faculty;
 
     private String phone;
 
@@ -99,6 +104,9 @@ public class User {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.encode(rawPassword);
     }
+
+    @OneToOne(mappedBy = "user")
+    private ForgotPassword forgotPassword;
 
     public Long getId() {
         return id;
@@ -189,6 +197,22 @@ public class User {
         this.department = department;
     }
 
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public Date getJoinedDate() {
+        return joinedDate;
+    }
+
+    public void setJoinedDate(Date joinedDate) {
+        this.joinedDate = joinedDate;
+    }
+
     public List<Comment> getCommentsForUser() {
         return commentsForUser;
     }
@@ -261,6 +285,7 @@ public class User {
         this.teamLeaderId = teamLeaderId;
     }
 
+
     public Date getBirthday() {
     return birthday;
 }
@@ -284,5 +309,31 @@ public String getPhone(){
 public void setPhone(String phone){
     this.phone=phone;
 }
+
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getS_department() {
+        return s_department;
+    }
+
+    public void setS_department(String s_department) {
+        this.s_department = s_department;
+    }
+
+    public String getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(String faculty) {
+        this.faculty = faculty;
+    }
+    
 
 }

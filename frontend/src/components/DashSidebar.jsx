@@ -18,22 +18,23 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { signoutSuccess } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
+import TaskDashboardLCP from "./Task/TaskDashboardLCVP.jsx";
 
-export default function DashSidebar() {
+export default function DashSidebar({ tab, subtab }) {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { currentUser } = useSelector((state) => state.user);
-  const [tab, setTab] = useState('');
+  const { currentUser } = useSelector((state) => state.user)
   const [isCommitteeExpanded, setIsCommitteeExpanded] = useState(false);
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get('tab');
     if (tabFromUrl) {
-      setTab(tabFromUrl);
       // Close menus if another tab is selected
       if (tabFromUrl !== 'manageCommittee') {
         setIsCommitteeExpanded(false);
@@ -151,11 +152,11 @@ export default function DashSidebar() {
             {(isCommitteeExpanded || (!isMobile && tab === 'manageCommittee')) && (
               <div className="md:ml-6 md:pl-2 md:border-l-2 md:border-blue-200 dark:md:border-gray-600 space-y-1 mt-1">
                 {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
-                  <Link to='/dashboard?tab=manageCommittee&subtab=members'>
+                  <Link to='/dashboard?tab=manageCommittee&subtab=member'>
                     <Sidebar.Item
-                      active={tab === 'manageCommittee' && location.search.includes('subtab=members')}
+                      active={tab === 'manageCommittee' && location.search.includes('subtab=member')}
                       as='div'
-                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=members') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
+                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=member') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
                       onClick={() => isMobile && setIsCommitteeExpanded(false)}
                     >
                       Members
@@ -164,21 +165,21 @@ export default function DashSidebar() {
                 )}
                 {(currentUser.role === 'LCP') && (
                 <>
-                  <Link to='/dashboard?tab=manageCommittee&subtab=teams'>
+                  <Link to='/dashboard?tab=manageCommittee&subtab=department'>
                     <Sidebar.Item
-                      active={tab === 'manageCommittee' && location.search.includes('subtab=teams')}
+                      active={tab === 'manageCommittee' && location.search.includes('subtab=department')}
                       as='div'
-                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=teams') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
+                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=department') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
                       onClick={() => isMobile && setIsCommitteeExpanded(false)}
                     >
                       Department
                     </Sidebar.Item>
                   </Link>
-                  <Link to='/dashboard?tab=manageCommittee&subtab=roles'>
+                  <Link to='/dashboard?tab=manageCommittee&subtab=function'>
                     <Sidebar.Item
-                      active={tab === 'manageCommittee' && location.search.includes('subtab=roles')}
+                      active={tab === 'manageCommittee' && location.search.includes('subtab=function')}
                       as='div'
-                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=roles') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
+                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=function') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
                       onClick={() => isMobile && setIsCommitteeExpanded(false)}
                     >
                       Functions
@@ -223,26 +224,47 @@ export default function DashSidebar() {
               </Link>
             </>
           )}
-          
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
-            <>
-              <Link to='/dashboard?tab=task'>
+
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' || currentUser.role === 'Member') && (
+              <>
                 <Sidebar.Item
-                  active={tab === 'task'}
-                  icon={HiNewspaper}
-                  as='div'
-                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  onClick={() => {
-                    setIsCommitteeExpanded(false);
-                    setIsProfileExpanded(false);
-                  }}
+                    active={tab === 'task'}
+                    icon={HiNewspaper}
+                    as='div'
+                    className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    onClick={() => {
+                      const currentUser = JSON.parse(localStorage.getItem("user"));
+                      console.log("🧭 Navigating for user:", currentUser);
+                      if (currentUser && currentUser.id) {
+                        switch(currentUser.role) {
+                          case "LCP":
+                            navigate(`/user/${currentUser.id}/TaskDashboard`);
+                            break;
+                          case "LCVP":
+                            navigate(`/user/${currentUser.id}/TaskDashboardLCVP`);
+                            break;
+                          case "Team_Leader":
+                            navigate(`/user/${currentUser.id}/TaskDashboardTL`);
+                            break;
+                          case "Member":
+                            navigate(`/user/${currentUser.id}/TaskDashboardMember`);
+                            break;
+                          default:
+                            navigate("/login");
+                        }
+                      } else {
+                        console.error("User not found in localStorage!");
+                        navigate("/login");
+                      }
+                    }}
+
                 >
                   <span className="font-medium">Tasks</span>
                 </Sidebar.Item>
-              </Link>
-            </>
+              </>
           )}
-              <Link to='/dashboard?tab=event'>
+
+          <Link to='/dashboard?tab=event'>
                 <Sidebar.Item
                   active={tab === 'event'}
                   icon={HiRectangleStack}
@@ -256,7 +278,7 @@ export default function DashSidebar() {
                   <span className="font-medium">Events</span>
                 </Sidebar.Item>
               </Link>
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' ) && (
             <>
               <Link to='/dashboard?tab=birthday'>
                 <Sidebar.Item
@@ -300,18 +322,16 @@ export default function DashSidebar() {
             
             {(isProfileExpanded || (!isMobile && tab === 'profile')) && (
               <div className="md:ml-6 md:pl-2 md:border-l-2 md:border-blue-200 dark:md:border-gray-600 space-y-1 mt-1">
-                <Link to='/dashboard?tab=profile&subtab=password'>
-                  <Sidebar.Item
-                    active={tab === 'profile' && location.search.includes('subtab=password')}
-                    as='div'
-                    className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'profile' && location.search.includes('subtab=password') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
-                    onClick={() => isMobile && setIsProfileExpanded(false)}
-                  >
-                  {/*<Link to="/change-password"> */}
-                    Update Password
-                  {/*</Link> */}
-                  </Sidebar.Item>
-                </Link>
+                <Link to="/dashboard?tab=profile&subtab=password">
+                    <Sidebar.Item
+                      active={tab === 'profile' && subtab === 'password' }
+                      as='div'
+                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'profile' && subtab === 'password' ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
+                      onClick={() => isMobile && setIsProfileExpanded(false)}
+                    >
+                      Update Password
+                    </Sidebar.Item>
+                  </Link>
               </div>
             )}
           </div>
