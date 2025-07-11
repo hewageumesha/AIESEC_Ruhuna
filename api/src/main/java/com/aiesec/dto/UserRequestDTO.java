@@ -1,5 +1,8 @@
 package com.aiesec.dto;
 
+import java.util.Date;
+
+import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 
 public class UserRequestDTO {
@@ -9,8 +12,10 @@ public class UserRequestDTO {
     private String lastName;
     private UserRole role;
     private Long functionId;
-    private Long departmentId;
     private String teamLeaderAiesecEmail;
+    private Gender gender;
+    private Date birthday;
+    private Date joinedDate;
 
     public String getAiesecEmail() {
         return aiesecEmail;
@@ -48,16 +53,28 @@ public class UserRequestDTO {
     public void setFunctionId(Long functionId) {
         this.functionId = functionId;
     }
-    public Long getDepartmentId() {
-        return departmentId;
-    }
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
-    }
     public String getTeamLeaderAiesecEmail() {
         return teamLeaderAiesecEmail;
     }
     public void setTeamLeaderAiesecEmail(String teamLeaderAiesecEmail) {
         this.teamLeaderAiesecEmail = teamLeaderAiesecEmail;
+    }
+    public Gender getGender() {
+        return gender;
+    }
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+    public Date getBirthday() {
+        return birthday;
+    }
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+    public Date getJoinedDate() {
+        return joinedDate;
+    }
+    public void setJoinedDate(Date joinedDate) {
+        this.joinedDate = joinedDate;
     } 
 }
