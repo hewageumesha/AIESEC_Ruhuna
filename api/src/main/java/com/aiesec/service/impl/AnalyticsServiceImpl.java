@@ -1,20 +1,25 @@
 package com.aiesec.service.impl;
 
 
+import com.aiesec.dto.EventRegistrationSummaryDTO;
+import com.aiesec.dto.GuestRegistrationSummaryDTO;
 import com.aiesec.dto.RegistrationAnalyticsDTO;
 import com.aiesec.dto.TrendDTO;
 import com.aiesec.enums.InterestStatus;
 import com.aiesec.model.User;
 import com.aiesec.model.event.AiesecMemberEventRegistration;
+import com.aiesec.model.event.Event;
 import com.aiesec.model.event.GuestEventRegistration;
 import com.aiesec.repository.event.AiesecMemberEventRegistrationRepository;
 import com.aiesec.repository.event.EventRepository;
 import com.aiesec.repository.event.GuestEventRegistrationRepository;
 import com.aiesec.service.interfaces.AnalyticsService;
-import org.springframework.stereotype.Service;
-
+import com.aiesec.service.interfaces.EventService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.time.LocalDate;
@@ -29,6 +34,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final AiesecMemberEventRegistrationRepository memberRepo;
     private final GuestEventRegistrationRepository guestRepo;
 
+    @Autowired
+    private EventService eventService;
+
     public AnalyticsServiceImpl(EventRepository eventRepository,
                                 AiesecMemberEventRegistrationRepository memberRepo,
                                 GuestEventRegistrationRepository guestRepo) {
@@ -38,28 +46,79 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Override
-    public List<RegistrationAnalyticsDTO> getRegistrationsByEvent(String type) {
-        List<Object[]> eventData = eventRepository.findBasicEventInfo(); // [id, name, date]
-
+    public List<RegistrationAnalyticsDTO> getRegistrationsByEvent(String type, Long eventId) {
         List<RegistrationAnalyticsDTO> result = new ArrayList<>();
 
-        for (Object[] row : eventData) {
-            Long eventId = (Long) row[0];
-            String eventName = (String) row[1];
-            LocalDate eventDate = (LocalDate) row[2];
+        if (eventId == null) {
+            // All events: summarize GOING members + guests
+            List<EventRegistrationSummaryDTO> memberSummaries = memberRepo.getGoingSummaryByEvent();
+            List<GuestRegistrationSummaryDTO> guestSummaries = guestRepo.getGoingSummaryByEvent();
 
-            int memberCount = type.equals("guest") ? 0 : memberRepo.countByEvent_EventId(eventId);
-            int guestCount = type.equals("member") ? 0 : guestRepo.countByEvent_EventId(eventId);
+            // Map to combine data
+            Map<Long, RegistrationAnalyticsDTO> map = new HashMap<>();
+
+            for (EventRegistrationSummaryDTO dto : memberSummaries) {
+                map.put(dto.getEventId(), new RegistrationAnalyticsDTO(
+                        dto.getEventId(),
+                        dto.getEventName(),
+                        eventRepository.findById(dto.getEventId()).map(Event::getStartDate).orElse(null),
+                        Math.toIntExact(dto.getGoingCount()),
+                        0
+                ));
+            }
+
+            for (GuestRegistrationSummaryDTO dto : guestSummaries) {
+                map.computeIfAbsent(dto.getEventId(), id -> new RegistrationAnalyticsDTO(
+                        dto.getEventId(),
+                        dto.getEventName(),
+                        eventRepository.findById(dto.getEventId()).map(Event::getStartDate).orElse(null),
+                        0,
+                        0
+                )).setGuestRegistrations(Math.toIntExact(dto.getGoingCount()));
+            }
+
+            result = new ArrayList<>(map.values());
+        } else {
+            // Specific event selected
+            int memberCount = type.equals("guest") ? 0 : memberRepo.findFiltered(eventId, InterestStatus.GOING).size();
+            int guestCount = type.equals("member") ? 0 : guestRepo.findFiltered(eventId, InterestStatus.GOING).size();
+
+            String eventName = eventRepository.findById(eventId)
+                    .map(e -> e.getEventName())
+                    .orElse("Unknown Event");
+
+            LocalDate eventDate = eventRepository.findById(eventId)
+                    .map(e -> e.getStartDate())
+                    .orElse(null);
 
             result.add(new RegistrationAnalyticsDTO(
-                    eventId, eventName, eventDate, memberCount, guestCount
+                    eventId,
+                    eventName,
+                    eventDate,
+                    memberCount,
+                    guestCount
             ));
         }
 
         return result.stream()
-                .sorted(Comparator.comparing(RegistrationAnalyticsDTO::getEventDate).reversed())
+                .sorted(Comparator.comparing(RegistrationAnalyticsDTO::getEventDate, Comparator.nullsLast(Comparator.reverseOrder())))
                 .collect(Collectors.toList());
-    }  // <-- close this method properly
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllEventsForAnalytics() {
+        List<Event> events = eventRepository.findAll();
+
+        return events.stream().map(event -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", event.getEventId());
+            map.put("name", event.getEventName());
+            map.put("isPublic", event.getIsPublic());
+            return map;
+        }).collect(Collectors.toList());
+    }
+
+
 
     @Override
     public List<TrendDTO> getTrendData(String type, int days) {
@@ -82,7 +141,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         }
 
         for (Object[] row : memberCounts) {
-            LocalDate date = ((java.sql.Date) row[0]).toLocalDate();  // sometimes you get java.sql.Date
+            LocalDate date = ((java.sql.Date) row[0]).toLocalDate();
             int count = ((Number) row[1]).intValue();
 
             TrendDTO dto = dateMap.get(date);
@@ -103,6 +162,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         return new ArrayList<>(dateMap.values());
     }
+
     @Override
     public Map<String, Integer> getStatusDistribution(Long eventId, String type) {
         Map<String, Integer> statusCounts = new HashMap<>();
@@ -110,24 +170,23 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         if (type.equals("member") || type.equals("all")) {
             List<Object[]> memberStatusCounts = memberRepo.countByEventIdGroupByStatus(eventId);
             memberStatusCounts.forEach(row -> {
-                String status = (String) row[0];
+                InterestStatus status = (InterestStatus) row[0];
                 int count = ((Number) row[1]).intValue();
-                statusCounts.merge(status, count, Integer::sum);
+                statusCounts.merge(status.name(), count, Integer::sum);
             });
         }
 
         if (type.equals("guest") || type.equals("all")) {
             List<Object[]> guestStatusCounts = guestRepo.countByEventIdGroupByStatus(eventId);
             guestStatusCounts.forEach(row -> {
-                String status = (String) row[0];
+                InterestStatus status = (InterestStatus) row[0];
                 int count = ((Number) row[1]).intValue();
-                statusCounts.merge(status, count, Integer::sum);
+                statusCounts.merge(status.name(), count, Integer::sum);
             });
         }
 
-        // If no registrations found for a status, ensure all statuses are present
-        for (String status : List.of("Going", "Interested", "Not Going")) {
-            statusCounts.putIfAbsent(status, 0);
+        for (InterestStatus status : InterestStatus.values()) {
+            statusCounts.putIfAbsent(status.name(), 0);
         }
 
         return statusCounts;
@@ -135,7 +194,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     @Override
     public void writeRegistrationsCsv(Writer writer, String type, Long eventId, String status) throws IOException {
-        // Convert status string to InterestStatus enum
         InterestStatus interestStatus = null;
         if (status != null && !status.isBlank()) {
             try {
@@ -145,16 +203,13 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             }
         }
 
-        // Create CSV printer
         CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(
                 "Event ID", "Event Name", "Registrant Name", "Email", "Phone", "Interest Status", "Registration Type", "Registered At"
         ));
 
-        // ===== AIESEC MEMBER REGISTRATIONS =====
         if (type.equals("member") || type.equals("all")) {
             List<AiesecMemberEventRegistration> memberRegs = memberRepo.findFiltered(eventId, interestStatus);
             for (AiesecMemberEventRegistration reg : memberRegs) {
-                // Join with User table
                 User user = reg.getUser();
 
                 String name = user != null ? user.getUserName() + " " + user.getLastName() : "N/A";
@@ -174,7 +229,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             }
         }
 
-        // ===== GUEST REGISTRATIONS =====
         if (type.equals("guest") || type.equals("all")) {
             List<GuestEventRegistration> guestRegs = guestRepo.findFiltered(eventId, interestStatus);
             for (GuestEventRegistration reg : guestRegs) {
@@ -193,8 +247,4 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         csvPrinter.flush();
     }
-
-
-
-
 }

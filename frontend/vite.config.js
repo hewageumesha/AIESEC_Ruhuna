@@ -8,14 +8,27 @@ export default defineConfig(({ mode }) => {
   return {
     server: {
       port: 5173,
-      proxy: {
-        '/api': {
-          target: env.VITE_API_URL || 'http://localhost:8080',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ''),
-          secure: false,
-        }
-      },
+     proxy: {
+  '/api': {
+    target: 'http://localhost:8080', // ✅ point to Spring Boot backend
+    changeOrigin: true,
+    rewrite: (path) => path.replace(/^\/api/, ''),
+    secure: false,
+  },
+  '/users': {
+    target: 'http://localhost:8080', // ✅ same here
+    changeOrigin: true,
+    secure: false,
+  },
+  '/analytics': {
+    target: 'http://localhost:8080',
+    changeOrigin: true,
+    secure: false,
+  },
+}
+
+
+
     },
     resolve: {
       alias: {

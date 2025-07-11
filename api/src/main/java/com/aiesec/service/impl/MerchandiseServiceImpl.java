@@ -4,47 +4,49 @@ import com.aiesec.dto.MerchandiseDTO;
 import com.aiesec.mapper.MerchandiseMapper;
 import com.aiesec.model.event.Event;
 import com.aiesec.model.event.Merchandise;
+
 import com.aiesec.repository.event.EventRepository;
 import com.aiesec.repository.event.MerchandiseRepository;
 import com.aiesec.service.interfaces.MerchandiseService;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
-@RequiredArgsConstructor
 public class MerchandiseServiceImpl implements MerchandiseService {
 
-    private final MerchandiseRepository merchandiseRepository;
-    private final EventRepository eventRepository;
-    private final MerchandiseMapper mapper;
+    @Autowired
+    private MerchandiseRepository merchandiseRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
 
     @Override
     public MerchandiseDTO createMerchandise(MerchandiseDTO dto) {
         Event event = eventRepository.findById(dto.getEventId())
-                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
+                .orElseThrow(() -> new RuntimeException("Event not found with ID: " + dto.getEventId()));
 
-        Merchandise merchandise = mapper.toEntity(dto, event);
-        return mapper.toDTO(merchandiseRepository.save(merchandise));
+        Merchandise saved = merchandiseRepository.save(
+                MerchandiseMapper.toEntity(dto, event)
+        );
+
+        return MerchandiseMapper.toDTO(saved);
     }
 
     @Override
-    public MerchandiseDTO getMerchandiseByEventId(Long eventId) {
-        Merchandise merchandise = merchandiseRepository.findByEventEventId(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("Merchandise not found for event ID: " + eventId));
-
-        return mapper.toDTO(merchandise); // Will include images + description in DTO
+    public List<MerchandiseDTO> getMerchandiseByEventId(Long eventId) {
+        return merchandiseRepository.findByEventEventId(eventId)
+                .stream()
+                .map(MerchandiseMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public MerchandiseDTO updateMerchandise(Long id, MerchandiseDTO dto) {
-        Merchandise existing = merchandiseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Merchandise not found"));
-
-        existing.setAvailable(dto.isAvailable());
-        existing.setDescription(dto.getDescription());
-        existing.setImageUrls(dto.getImageUrls());
-
-        return mapper.toDTO(merchandiseRepository.save(existing));
+    public void deleteByEventId(Long eventId) {
+        merchandiseRepository.deleteByEventId(eventId);
     }
+
+
 }

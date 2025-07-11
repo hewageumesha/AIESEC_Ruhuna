@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,6 +30,6 @@ public class EventDTO {
     private Boolean isPublic;
     private Boolean isVirtual;
     private String virtualLink;
-    private String visibility;
-    private Boolean hasTshirtOrder;
+    private Boolean hasMerchandise;
+    private List<MerchandiseDTO> merchandise;
 }

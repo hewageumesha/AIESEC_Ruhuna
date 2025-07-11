@@ -12,8 +12,18 @@ public class AiesecMemberEventRegistrationMapper {
 
         AiesecMemberEventRegistration entity = new AiesecMemberEventRegistration();
         entity.setId(dto.getId());
+
+        // ✅ Set primitive foreign keys directly
         entity.setUserId(dto.getUserId());
         entity.setEventId(dto.getEventId());
+
+        // Optional: set full Event object for lazy loading if needed
+        if (dto.getEventId() != null) {
+            Event event = new Event();
+            event.setEventId(dto.getEventId());
+            entity.setEvent(event);
+        }
+
         entity.setInterestStatus(dto.getInterestStatus());
         entity.setComment(dto.getComment());
         entity.setRegisteredAt(dto.getRegisteredAt() != null ? dto.getRegisteredAt() : LocalDateTime.now());
@@ -27,7 +37,7 @@ public class AiesecMemberEventRegistrationMapper {
         return AiesecMemberEventRegistrationDTO.builder()
                 .id(entity.getId())
                 .userId(entity.getUserId())
-                .eventId(entity.getEventId())
+                .eventId(entity.getEventId()) // ✅ Directly from primitive field
                 .interestStatus(entity.getInterestStatus())
                 .comment(entity.getComment())
                 .registeredAt(entity.getRegisteredAt())
