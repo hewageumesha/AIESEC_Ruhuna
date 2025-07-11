@@ -26,7 +26,7 @@ export default function DashFinance() {
       <h1 className="text-3xl font-bold mb-4">Finance Dashboard</h1>
 
       <div className="mb-6 p-4 bg-blue-100 rounded shadow">
-        <h2 className="text-xl mb-2">Total Expenses: LKR {totalExpenses.toFixed(2)}</h2>
+        <h2 className="text-xl mb-2 text-black">Total Expenses: LKR {totalExpenses.toFixed(2)}</h2>
         <Link
           to="/expense/add"
           className="inline-block bg-green-500 text-black px-4 py-2 rounded hover:bg-green-600"

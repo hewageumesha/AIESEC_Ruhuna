@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Spin, Button, message, Tag, Popconfirm } from 'antd';
 import { PlusOutlined, CloseOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, Spin, Button, message, Tag, Popconfirm, Space } from 'antd';
+import { PlusOutlined, CloseOutlined, EditOutlined, DeleteOutlined, BarChartOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -62,6 +64,11 @@ const DashEvent = () => {
     }
   };
 
+  //  handler for Analytics button
+  const handleViewAnalytics = () => {
+    navigate('/event-analytics'); //  analytics route path
+  };
+
   useEffect(() => {
     fetchFilteredEvents();
   }, []);
@@ -79,6 +86,28 @@ const DashEvent = () => {
           >
             {showAddForm ? 'Close Form' : 'Add Event'}
           </Button>
+
+        {canEditOrDelete() && (
+          <Space>
+            <Button
+              type="primary"
+              icon={showAddForm ? <CloseOutlined /> : <PlusOutlined />}
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {showAddForm ? 'Close Form' : 'Create New Event'}
+            </Button>
+
+            {/*  Analytics Button */}
+            <Button
+              type="default"
+              icon={<BarChartOutlined />}
+              onClick={handleViewAnalytics}
+              className="bg-gray-200 hover:bg-gray-300"
+            >
+              View Analytics
+            </Button>
+          </Space>
         )}
       </div>
 
@@ -89,6 +118,7 @@ const DashEvent = () => {
       )}
 
       {/* 🔍 Filter Form */}
+      {/* Filter Form */}
       <EventFilterForm filters={filters} setFilters={setFilters} onFilter={fetchFilteredEvents} />
 
       {loading ? (

@@ -86,6 +86,8 @@ export default function Header() {
             </Navbar.Link >
             <Navbar.Link active={path === '/event'} as={'div'}>
                 <Link to="event" className='font-semibold'>
+            <Navbar.Link active={path === '/public-event'} as={'div'}>
+                <Link to="/public-event" className='font-semibold'>
                     Event
                 </Link>
             </Navbar.Link>

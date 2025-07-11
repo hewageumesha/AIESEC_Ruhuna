@@ -64,6 +64,8 @@ public class User {
 
     private String teamLeaderId;
 
+    private String phone;
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
@@ -273,6 +275,14 @@ public Date getJoinedDate() {
 
 public void setJoinedDate(Date joinedDate) {
     this.joinedDate = joinedDate;
+}
+
+public String getPhone(){
+
+    return phone;
+}
+public void setPhone(String phone){
+    this.phone=phone;
 }
 
 }
