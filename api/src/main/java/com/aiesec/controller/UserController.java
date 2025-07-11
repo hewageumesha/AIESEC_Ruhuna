@@ -61,7 +61,34 @@ public String senMail() {
 
 
     @PostMapping("/add")
-    public User addUser(@RequestBody UserRequestDTO dto) {
+    public User addUser(@RequestBody Map<String, Object> body) {
+        String aiesecEmail = (String) body.get("aiesecEmail");
+        String email = (String) body.get("email");
+        Date birthday = (Date) body.get("birthday");
+        Long function = (Long) body.get("function");
+        String firstName = (String) body.get("firstName");
+        String lastName = (String) body.get("lastName");
+        Gender gender = (Gender) body.get("gender");
+        Date joinedDate = (Date) body.get("joinedDate");
+        UserRole role = (UserRole) body.get("role");
+        String team_leader_aiesecEmail = (String) body.get("teamLeaderAiesecEmail");
+
+        UserRequestDTO dto  = new UserRequestDTO();
+        dto.setAiesecEmail(aiesecEmail);
+        dto.setEmail(email);
+        dto.setFunctionId(function);
+        dto.setRole(role);
+        dto.setFirstName(firstName);
+        dto.setLastName(lastName);
+        dto.setTeamLeaderAiesecEmail(aiesecEmail);
+        dto.setBirthday(birthday);
+        dto.setJoinedDate(joinedDate);
+        dto.setGender(gender);
+        dto.setTeamLeaderAiesecEmail(team_leader_aiesecEmail);
+
+        String tempString = userService.generateTempPassword();
+        userService.sendTempPasswordEmail(email, tempString);
+
         return userService.addUser(dto);
     }
 
@@ -97,6 +124,13 @@ public String senMail() {
     @GetMapping("/members")
     public List<User> getAllMembers() {
        List<User> members =  userRepo.findByRole(UserRole.Member);
+       System.out.println(members.size());
+        return members;
+    }
+
+    @GetMapping("/getall")
+    public List<User> getAll() {
+       List<User> members =  userRepo.findAll();
        System.out.println(members.size());
         return members;
     }

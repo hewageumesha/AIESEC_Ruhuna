@@ -59,10 +59,6 @@ public class UserService {
     user.setLastName(dto.getLastName());
     user.setRole(dto.getRole());
 
-    Department department = departmentRepository.findById(dto.getDepartmentId())
-            .orElseThrow(() -> new RuntimeException("Department not found"));
-    user.setDepartment(department);
-
     Function function = functionRepository.findById(dto.getFunctionId())
             .orElseThrow(() -> new RuntimeException("Function not found"));
     user.setFunction(function);
@@ -330,11 +326,11 @@ public class UserService {
         return "Password updated successfully!";
     }
 
-    private String generateTempPassword() {
+    public String generateTempPassword() {
         return UUID.randomUUID().toString().substring(0, 8);
     }
 
-    private void sendTempPasswordEmail(String toEmail, String tempPassword) {
+    public void sendTempPasswordEmail(String toEmail, String tempPassword) {
         String subject = "Your Temporary AIESEC Password";
         String text = "Hello,\n\nYour temporary password is: " + tempPassword + "\n\nPlease log in and change it as soon as possible.";
 
