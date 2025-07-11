@@ -1,8 +1,6 @@
-// UPDATED CONTROLLER
 package com.aiesec.controller.event;
 
 import com.aiesec.dto.AiesecMemberEventRegistrationDTO;
-import com.aiesec.dto.EventRegistrationSummaryDTO;
 import com.aiesec.service.interfaces.AiesecMemberEventRegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,22 +33,15 @@ public class AiesecMemberEventRegistrationController {
     public ResponseEntity<List<AiesecMemberEventRegistrationDTO>> getRegistrationsByUserAndEvent(
             @PathVariable Long userId,
             @PathVariable Long eventId) {
-        return ResponseEntity.ok(registrationService.getByUserIdAndEventId(userId, eventId));
+        List<AiesecMemberEventRegistrationDTO> registrations = registrationService.getByUserIdAndEventId(userId, eventId);
+        return ResponseEntity.ok(registrations);
     }
-
-    @GetMapping("/event/{eventId}")
-    public ResponseEntity<List<AiesecMemberEventRegistrationDTO>> getRegistrationsByEventId(@PathVariable Long eventId) {
-        return ResponseEntity.ok(registrationService.getByEventId(eventId));
-    }
-
-    @GetMapping("/summary")
-    public ResponseEntity<List<EventRegistrationSummaryDTO>> getSummaryByEvent() {
-        return ResponseEntity.ok(registrationService.getSummaryByEvent());
-    }
-
 
     @GetMapping("/exists")
-    public ResponseEntity<Boolean> checkIfRegistered(@RequestParam Long userId, @RequestParam Long eventId) {
-        return ResponseEntity.ok(registrationService.alreadyRegistered(userId, eventId));
+    public ResponseEntity<Boolean> checkIfRegistered(
+            @RequestParam Long userId,
+            @RequestParam Long eventId) {
+        boolean exists = registrationService.alreadyRegistered(userId, eventId);
+        return ResponseEntity.ok(exists);
     }
 }

@@ -17,6 +17,15 @@ import React from 'react';
 import Contact from './pages/Contact';
 import EventDetails from "./pages/EventDetails";
 import EditEvent from "./components/event/EditEvent";
+import HomeB from './pages/HomeB';
+import AddBirthday from './pages/AddBirthday';
+import DashBirthday from './components/DashBirthday';
+import AddExpensePage from "./pages/AddExpensePage";
+import EditExpensePage from "./pages/EditExpensePage";
+import HomeExpensePage from "./pages/HomeExpensePage";
+import DashFinance from "./components/DashFinance";
+
+
 import Function from "./pages/FunctionalArea";
 import TaskDashboard from "./components/Task/TaskDashboard.jsx";
 import TaskList from "./components/Task/TaskList.jsx";
@@ -38,6 +47,7 @@ const NotificationsWrapper = () => {
   if (!id) return <div>User ID missing</div>;
   return <Notifications id={id}></Notifications>;
 };
+
 
 function App() {
   console.log("👀 current user from localStorage:", JSON.parse(localStorage.getItem("user")));
@@ -61,6 +71,14 @@ function App() {
         <Route path="/become-member" element={<BecomeMember />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/edit-event/:id" element={<EditEvent />} />
+         <Route path="/add-birthday" element={<AddBirthday />} />
+        <Route path="/homeB-birthday" element={<HomeB />} />
+         <Route path="/expense" element={<HomeExpensePage />} />
+        <Route path="/expense/add" element={<AddExpensePage />} />
+        <Route path="/expense/edit/:id" element={<EditExpensePage />} />
+        <Route path="/dashboard/birthday/*" element={<DashBirthday />} />
+        <Route path="/dashboard/finance/*" element={<DashFinance />} />
+
         <Route path="/functional-area" element={<Function />} />
 <Route path="/das" element={<EventDetails />} />
 
@@ -85,6 +103,7 @@ function App() {
 <Route path="/public-event" element={<PublicEventsPage />} />
 <Route path="/public-event/:id" element={<EventDetails />} />
 <Route path="/event-analytics" element={<EventAnalytics />} />
+
 
       </Routes>
     <Footer/>

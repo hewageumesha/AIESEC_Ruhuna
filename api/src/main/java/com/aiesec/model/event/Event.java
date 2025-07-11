@@ -1,12 +1,16 @@
 package com.aiesec.model.event;
 
+
+
 import com.aiesec.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
+
 
 @Getter
 @Setter
@@ -15,6 +19,7 @@ import java.time.LocalTime;
 @Builder
 @Entity
 @Table(name = "event")
+
 public class Event {
 
     @Id
@@ -44,8 +49,9 @@ public class Event {
     @Column(name = "End_Time")
     private LocalTime endTime;
 
-    @Column(name = "Location", length = 255)
+    @Column(name = "Location", length = 255)  // Remove nullable=false
     private String location;
+
 
     @Column(name = "Image_URL", length = 255)
     private String imageUrl;
@@ -53,58 +59,43 @@ public class Event {
     @Column(name = "Is_Public")
     private Boolean isPublic = false;
 
+
     @Column(name = "Is_Virtual")
     private Boolean isVirtual = false;
+
 
     @Column(name = "Virtual_Link", length = 500)
     private String virtualLink;
 
-    @Column(name = "Has_Merchandise")
-    private Boolean hasMerchandise = false;
+    private String visibility;
+    private Boolean hasTshirtOrder=false;
 
-    // Foreign Key Relations
+     //Foreign Key Relations (assuming LCP and LCVP are users)
     @ManyToOne
     @JoinColumn(name = "LCP_ID")
     private User lcp;
 
-    @ManyToOne
-    @JoinColumn(name = "LCVP_ID")
-    private User lcvp;
+        @ManyToOne
+       @JoinColumn(name = "LCVP_ID")
+        private User lcvp;
 
-    @ManyToOne
-    @JoinColumn(name = "Series_ID")
-    private EventSeries series;
+        @ManyToOne
+       @JoinColumn(name = "Series_ID")
+       private EventSeries series;
 
-    @ManyToOne
-    @JoinColumn(name = "Created_By_LCP")
-    private User createdByLcp;
+       @ManyToOne
+       @JoinColumn(name = "Created_By_LCP")
+       private User createdByLcp;
 
-    @ManyToOne
-    @JoinColumn(name = "Approved_By_LCVP")
-    private User approvedByLcvp;
+       @ManyToOne
+         @JoinColumn(name = "Approved_By_LCVP")
+       private User approvedByLcvp;
 
     @OneToOne
     @JoinColumn(name = "merchandise_id")
     private Merchandise merchandise;
 
-    // Fixed getter and setter methods
-    public Boolean getIsPublic() {
-        return isPublic;
-    }
 
-    public void setIsPublic(Boolean isPublic) {
-        this.isPublic = isPublic;
-    }
-
-    public Boolean getIsVirtual() {
-        return isVirtual;
-    }
-
-    public void setIsVirtual(Boolean isVirtual) {
-        this.isVirtual = isVirtual;
-    }
-
-    // Keep other getters and setters as they were
     public Long getEventId() {
         return eventId;
     }
@@ -177,6 +168,22 @@ public class Event {
         this.imageUrl = imageUrl;
     }
 
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
+    }
+
+    public Boolean getVirtual() {
+        return isVirtual;
+    }
+
+    public void setVirtual(Boolean virtual) {
+        isVirtual = virtual;
+    }
+
     public String getVirtualLink() {
         return virtualLink;
     }
@@ -185,13 +192,20 @@ public class Event {
         this.virtualLink = virtualLink;
     }
 
-
-    public Boolean getHasMerchandise() {
-        return hasMerchandise;
+    public String getVisibility() {
+        return visibility;
     }
 
-    public void setHasMerchandise(Boolean hasMerchandise) {
-        this.hasMerchandise = hasMerchandise;
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
+    }
+
+    public boolean isHasTshirtOrder() {
+        return hasTshirtOrder;
+    }
+
+    public void setHasTshirtOrder(boolean hasTshirtOrder) {
+        this.hasTshirtOrder = hasTshirtOrder;
     }
 
     public User getLcp() {
@@ -232,13 +246,5 @@ public class Event {
 
     public void setApprovedByLcvp(User approvedByLcvp) {
         this.approvedByLcvp = approvedByLcvp;
-    }
-
-    public Merchandise getMerchandise() {
-        return merchandise;
-    }
-
-    public void setMerchandise(Merchandise merchandise) {
-        this.merchandise = merchandise;
     }
 }

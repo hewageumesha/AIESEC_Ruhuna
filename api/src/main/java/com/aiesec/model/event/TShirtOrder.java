@@ -35,9 +35,13 @@ public class TShirtOrder {
     @JoinColumn
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "Guest_ID")
+
 @ManyToOne
 @JoinColumn(name = "Guest_ID")
 private GuestEventRegistration guest_event_id;
+
 
 
 

@@ -19,13 +19,12 @@ public class GuestEventRegistration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long guestUserId;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Event_ID", referencedColumnName = "Event_ID")
-    private Event event;
+    private Long eventId;
 
     private String name;
     private String email;
     private String phone;
+    //private LocalDateTime registrationDate;
     @Enumerated(EnumType.STRING)
     private InterestStatus interestStatus;
     private String comment;

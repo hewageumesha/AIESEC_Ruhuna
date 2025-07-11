@@ -12,9 +12,6 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 public class EventDTO {
-
-    private MerchandiseDTO merchandise;
-
     private Long eventId;
     private String eventName;
     private String description;
@@ -32,5 +29,6 @@ public class EventDTO {
     private Boolean isPublic;
     private Boolean isVirtual;
     private String virtualLink;
-    private Boolean hasMerchandise;
+    private String visibility;
+    private Boolean hasTshirtOrder;
 }

@@ -69,6 +69,8 @@ public class User {
 
     private String faculty;
 
+    private String phone;
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
@@ -283,6 +285,32 @@ public class User {
         this.teamLeaderId = teamLeaderId;
     }
 
+
+    public Date getBirthday() {
+    return birthday;
+}
+
+public void setBirthday(Date birthday) {
+    this.birthday = birthday;
+}
+
+public Date getJoinedDate() {
+    return joinedDate;
+}
+
+public void setJoinedDate(Date joinedDate) {
+    this.joinedDate = joinedDate;
+}
+
+public String getPhone(){
+
+    return phone;
+}
+public void setPhone(String phone){
+    this.phone=phone;
+}
+
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -307,4 +335,5 @@ public class User {
         this.faculty = faculty;
     }
     
+
 }

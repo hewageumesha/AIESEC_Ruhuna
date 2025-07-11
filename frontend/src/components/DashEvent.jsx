@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { Card, Spin, Button, message, Tag, Popconfirm } from 'antd';
+import { PlusOutlined, CloseOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Card, Spin, Button, message, Tag, Popconfirm, Space } from 'antd';
 import { PlusOutlined, CloseOutlined, EditOutlined, DeleteOutlined, BarChartOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -71,6 +73,15 @@ useEffect(() => {
     <div className="p-8 min-h-screen bg-gray-50">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Event Management</h2>
+        {canEditOrDelete() && (
+          <Button
+            type="primary"
+            icon={showAddForm ? <CloseOutlined /> : <PlusOutlined />}
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {showAddForm ? 'Close Form' : 'Add Event'}
+          </Button>
 
         {canEditOrDelete() && (
           <Space>
@@ -102,8 +113,14 @@ useEffect(() => {
         </div>
       )}
 
+
+      {/* 🔍 Filter Form */}
+      {/* Filter Form */}
+      <EventFilterForm filters={filters} setFilters={setFilters} onFilter={fetchFilteredEvents} />
+
 {/* Filter Form */}
 <EventFilterForm filters={filters} setFilters={setFilters} onFilter={fetchFilteredEvents} />
+
 
       {loading ? (
         <div className="flex justify-center items-center min-h-[200px]">
@@ -162,6 +179,11 @@ useEffect(() => {
                   <div className="text-gray-600 mt-2 space-y-1 text-sm">
                     <p><strong>Date:</strong> {event.startDate} to {event.endDate}</p>
                     <p><strong>Time:</strong> {event.eventTime} - {event.endTime}</p>
+                    {event.totalRegistrations !== undefined && (
+                      <p className="text-green-600 font-medium">
+                        {event.totalRegistrations} registered
+                      </p>
+                    )}
                   </div>
                 }
               />

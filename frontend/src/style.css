@@ -1,0 +1,228 @@
+/* General Page Styling */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #0CB9C1;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  flex-direction: column;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Expense List Container */
+.expense-list-container {
+  width: 90%;
+  max-width: 1000px;
+  background-color: #52565E;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(224, 214, 214, 0.1);
+  margin: 20px auto;
+}
+
+/* Table Styles */
+.expense-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+
+.expense-table th, .expense-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.expense-table th {
+  background-color: #52565E;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.expense-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Header Styles */
+h1, h2 {
+  color: #f5f5f5;
+  font-size: 2.8rem;
+}
+
+/* App Container */
+.app-container {
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* Parent Container */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #eaf4ff;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Form */
+form {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 500px;
+  background-color: #52565E;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+form:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Input Fields */
+input, select, textarea {
+  margin: 10px 0;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Subtle blue shadow on focus */
+}
+
+/* Labels */
+label {
+  text-align: left;
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 14px;
+  display: block;
+}
+
+/* Button Styles */
+button {
+  background-color: #52565E;
+  color: white;
+  border: none;
+  padding: 20px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  margin-right: 10px;
+}
+
+button:hover {
+  background-color: #4a617f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+button i {
+  margin-right: 4px;
+}
+
+/* Edit Button */
+button.edit-btn {
+  background-color: #28a745;
+}
+
+button.edit-btn:hover {
+  background-color: #218838;
+}
+
+/* Delete Button */
+button.delete-btn {
+  background-color: #dc3545;
+}
+
+button.delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+  .expense-table {
+    font-size: 14px;
+  }
+
+  button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  form {
+    width: 100%;
+    padding: 20px;
+  }
+
+  input, select, textarea {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 992px) {
+  .app-container {
+    padding: 20px;
+  }
+
+  form {
+    width: 100%;
+    max-width: none;
+  }
+
+  input, select, textarea {
+    padding: 14px;
+  }
+
+  button {
+    padding: 10px;
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 993px) {
+  .app-container {
+    max-width: 800px;
+    margin: auto;
+  }
+
+  form {
+    width: 70%;
+    max-width: 500px;
+  }
+}
+
+/* Icons (FontAwesome) */
+button i {
+  font-size: 18px;
+  margin-right: 8px;
+}

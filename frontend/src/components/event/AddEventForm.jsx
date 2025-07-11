@@ -93,10 +93,11 @@ const AddEventForm = () => {
           return;
         }
         if (merchImages.length < 1) {
-          message.error('Please upload at least one merchandise image.');
+          message.error('Please upload at least one merchandise images.');
           setIsSubmitting(false);
           return;
         }
+        // Merchandise details are handled below when posting to /api/merchandise
       }
 
       const payload = {
@@ -109,9 +110,10 @@ const AddEventForm = () => {
         imageUrl: eventImageUrl,
         isPublic: values.visibility === 'public',
         isVirtual: eventType === 'virtual',
-        location: eventType === 'virtual' ? '' : values.location,
+        location: eventType === 'virtual' ? values.location : values.location,
         virtualLink: eventType === 'virtual' ? values.location : '',
         hasTshirtOrder: tshirtAvailable,
+   
       };
 
       const response = await axios.post('http://localhost:8080/api/events', payload);
@@ -127,17 +129,13 @@ const AddEventForm = () => {
         await axios.post('http://localhost:8080/api/merchandise', merchPayload);
       }
 
-      message.success('✅ Event published successfully!');
+      message.success('Event published successfully!');
       form.resetFields();
       setEventImageUrl('');
       setTshirtAvailable(false);
       setMerchDesc('');
       setMerchImages([]);
-
-      // ✅ Redirect based on public/private
-navigate(values.visibility === 'public' ? `/public-event` : `/event/${eventId}`);
-
-
+      navigate(`/event/${eventId}`);
     } catch (error) {
       console.error(error);
       message.error('❌ Failed to publish event.');
@@ -221,6 +219,8 @@ navigate(values.visibility === 'public' ? `/public-event` : `/event/${eventId}`)
           )}
         </Form.Item>
 
+       
+
         <Form.Item label="T-shirt Order Available?">
           <Radio.Group
             onChange={(e) => setTshirtAvailable(e.target.value === 'yes')}
@@ -256,16 +256,16 @@ navigate(values.visibility === 'public' ? `/public-event` : `/event/${eventId}`)
           </>
         )}
 
-        <Form.Item
-          name="visibility"
-          label="Event Visibility"
-          rules={[{ required: true, message: 'Please select event visibility' }]}
-        >
-          <Radio.Group className="flex gap-6">
-            <Radio value="private">Private (AIESEC members only)</Radio>
-            <Radio value="public">Public (Guests can register)</Radio>
-          </Radio.Group>
-        </Form.Item>
+        <Form.Item name="visibility"
+    label="Event Visibility"
+    rules={[{ required: true, message: 'Please select event visibility' }]}
+>
+  <Radio.Group className="flex gap-6">
+    <Radio value="private">Private (AIESEC members only)</Radio>
+    <Radio value="public">Public (Guests can register)</Radio>
+  </Radio.Group>
+</Form.Item>
+
 
         <Form.Item>
           <Button

@@ -38,7 +38,7 @@ public class EventController {
         return (event != null) ? new ResponseEntity<>(event, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    // Get All Events (Admin only)
+    // Get All Events
     @GetMapping
     public ResponseEntity<List<EventDTO>> getAllEvents() {
         List<EventDTO> events = eventService.getAllEvents();
@@ -49,14 +49,18 @@ public class EventController {
     @GetMapping("/{eventId}")
     public ResponseEntity<EventDTO> getEventById(@PathVariable String eventId) {
         try {
-            Long id = Long.valueOf(eventId);
+            // Ensure the eventId is a valid Long
+            Long id = Long.valueOf(eventId);  // Try converting the string to Long
             EventDTO event = eventService.getEventById(id);
             return (event != null) ? new ResponseEntity<>(event, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (NumberFormatException e) {
+            // Log the error and return a bad request if the ID is invalid
             System.err.println("Invalid eventId: " + eventId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Return bad request for invalid ID
         }
     }
+
+
 
     // Delete Event
     @DeleteMapping("/{eventId}")
@@ -102,5 +106,20 @@ public ResponseEntity<List<EventDTO>> getAllPrivateEvents() {
     List<EventDTO> privateEvents = eventService.getAllPrivateEvents();
     return new ResponseEntity<>(privateEvents, HttpStatus.OK);
 }
+
+
+    //Search filter
+    @GetMapping("/filter")
+    public ResponseEntity<Page<EventDTO>> filterEvents(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String date,
+            Pageable pageable) {
+
+        Page<EventDTO> results = eventService.filterEvents(search, status, date, pageable);
+        return ResponseEntity.ok(results);
+    }
+
+
 
 }

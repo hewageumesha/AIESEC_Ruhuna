@@ -29,7 +29,7 @@ public class EventExperience {
 
     @ManyToOne
     @JoinColumn(name = "Guest_ID")
-    private GuestEventRegistration guestUser; // Guest – nullable
+    private GuestUser guestUser; // Guest – nullable
 
     @Column(name = "Rating")
     private Integer rating; // 1 to 5 scale

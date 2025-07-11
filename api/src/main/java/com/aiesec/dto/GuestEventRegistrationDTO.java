@@ -22,8 +22,6 @@ public class GuestEventRegistrationDTO {
     @NotNull(message = "Event ID is required")
     private Long eventId;
 
-    private String eventName;
-
     @NotBlank(message = "Name is required")
     private String name;
 

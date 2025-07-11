@@ -2,7 +2,6 @@ package com.aiesec.mapper;
 
 import com.aiesec.dto.AiesecMemberEventRegistrationDTO;
 import com.aiesec.model.event.AiesecMemberEventRegistration;
-import com.aiesec.model.event.Event;
 
 import java.time.LocalDateTime;
 
@@ -14,11 +13,7 @@ public class AiesecMemberEventRegistrationMapper {
         AiesecMemberEventRegistration entity = new AiesecMemberEventRegistration();
         entity.setId(dto.getId());
         entity.setUserId(dto.getUserId());
-        if (dto.getEventId() != null) {
-            Event event = new Event();
-            event.setEventId(dto.getEventId());
-            entity.setEvent(event); // ✅ not setEventId()
-        }
+        entity.setEventId(dto.getEventId());
         entity.setInterestStatus(dto.getInterestStatus());
         entity.setComment(dto.getComment());
         entity.setRegisteredAt(dto.getRegisteredAt() != null ? dto.getRegisteredAt() : LocalDateTime.now());
@@ -32,7 +27,7 @@ public class AiesecMemberEventRegistrationMapper {
         return AiesecMemberEventRegistrationDTO.builder()
                 .id(entity.getId())
                 .userId(entity.getUserId())
-                .eventId(entity.getEvent() != null ? entity.getEvent().getEventId() : null)
+                .eventId(entity.getEventId())
                 .interestStatus(entity.getInterestStatus())
                 .comment(entity.getComment())
                 .registeredAt(entity.getRegisteredAt())

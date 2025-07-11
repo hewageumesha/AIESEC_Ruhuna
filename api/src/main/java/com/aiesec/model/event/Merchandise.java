@@ -18,9 +18,9 @@ public class Merchandise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private boolean available;
+    private boolean available; // Is T-shirt order available?
 
-    private String description;
+    private String description; // Small description about the T-shirt
 
     @ElementCollection
     @CollectionTable(name = "merchandise_images", joinColumns = @JoinColumn(name = "merchandise_id"))
