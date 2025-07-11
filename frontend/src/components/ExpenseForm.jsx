@@ -1,3 +1,5 @@
+import React from "react";
+
 import { useState, useEffect } from "react";
 import { createExpense, updateExpense, deleteExpense } from "../service/api";
 import { FaEdit, FaTrash, FaTimes } from "react-icons/fa"; 
@@ -121,8 +123,9 @@ const ExpenseForm = ({ refreshExpenses, editingExpense, setEditingExpense }) => 
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="p-4 bg-white shadow-lg rounded-lg w-full max-w-md mx-auto">
-        <h2 className="text-xl font-bold text-center mb-4">{editingExpense ? "Edit Expense" : "Add Expense"}</h2>
+      <form onSubmit={handleSubmit} className="p-4 bg-white text-black shadow-lg rounded-lg w-full max-w-md mx-auto">
+        <h2 className="text-xl font-bold text-center mb-4 text-black">{editingExpense ? "Edit Expense" : "Add Expense"}</h2>
+
 
         <input
           type="number"

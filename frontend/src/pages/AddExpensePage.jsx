@@ -1,3 +1,5 @@
+import React from "react";
+
 import { useNavigate } from "react-router-dom";
 import ExpenseForm from "../components/ExpenseForm";
 
@@ -5,7 +7,7 @@ const AddExpensePage = () => {
   const navigate = useNavigate();
 
   const refreshExpenses = () => {
-    navigate("/"); // Redirect to homepage after adding
+    navigate("/dashboard/finance/*"); // Redirect to homepage after adding
   };
 
   return (

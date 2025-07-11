@@ -1,3 +1,5 @@
+import React from "react";
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "../service/api";
@@ -13,7 +15,7 @@ const EditExpensePage = () => {
   }, [id]);
 
   const refreshExpenses = () => {
-    navigate("/"); // Navigate back after update
+    navigate("/dashboard/finance/*"); // Navigate back after update
   };
 
   if (!editingExpense) return <p>Loading...</p>; // Optional loading state

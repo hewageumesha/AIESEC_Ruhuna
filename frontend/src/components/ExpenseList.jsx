@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../service/api"; // Adjust path if needed
@@ -30,15 +31,15 @@ const ExpenseList = ({ refreshExpenses }) => {
       <h1 className="text-xl font-bold mb-4">Expense List</h1>
       <table className="expense-table w-full border-collapse border border-gray-300">
         <thead className="bg-gray-200">
-          <tr>
-            <th className="p-4 border">Date</th>
-            <th className="p-2 border">Amount (LKR)</th>
-            <th className="p-2 border">Description</th>
-            <th className="p-2 border">Category</th>
-            <th className="p-2 border">Payment Method</th>
-            <th className="p-2 border">Actions</th>
-          </tr>
-        </thead>
+        <tr>
+          <th className="p-4 border text-black">Date</th>
+          <th className="p-2 border text-black">Amount (LKR)</th>
+          <th className="p-2 border text-black">Description</th>
+          <th className="p-2 border text-black">Category</th>
+          <th className="p-2 border text-black">Payment Method</th>
+          <th className="p-2 border text-black">Actions</th>
+        </tr>
+      </thead>
         <tbody>
           {expenses.map((exp) => (
             <tr key={exp.id} className="text-center">
