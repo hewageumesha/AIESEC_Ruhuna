@@ -1,6 +1,5 @@
 package com.aiesec.service;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -9,24 +8,18 @@ import org.springframework.stereotype.Service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import com.aiesec.model.BirthdayPerson;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
-
-import com.aiesec.Record.MailBody;
-
 
 @Service
 public class EmailService {
-
 
     @Autowired
     private JavaMailSender mailSender;
 
     public void sendFlyerEmail(BirthdayPerson person) throws MessagingException {
-        String to = "sajiyaroshan2001@gmail.com";  // Recipient
-        String from = "personalmyproject2025@gmail.com";  // <-- Very important (verified sender in SendGrid)
+        String[] to = {
+        "lakshitha.wijethunga@aiesec.net",
+        "tharukafernando@aiesec.net"
+    };
         String subject = "Reminder: Please Create Flyer for " + person.getName() + "'s Birthday Tomorrow";
     
         String htmlContent = "<html><body style='font-family:Arial, sans-serif; background-color:#f8f9fa; text-align:center; padding:30px;'>" +
@@ -58,25 +51,3 @@ public class EmailService {
     }
 }
     
-
-    private final JavaMailSender mailSender;
-
-    @Value("${spring.mail.username}")
-    private String fromEmail;
-
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
-
-
-    public void sendPasswordResetEmail(MailBody mailBody) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromEmail);
-        message.setTo(mailBody.to());
-        message.setSubject(mailBody.subject());
-        message.setText(mailBody.text());
-
-        mailSender.send(message);
-    }
-}
-
