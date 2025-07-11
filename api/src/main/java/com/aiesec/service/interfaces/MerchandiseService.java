@@ -7,7 +7,9 @@ import java.util.List;
 public interface MerchandiseService {
     MerchandiseDTO createMerchandise(MerchandiseDTO dto);
     List<MerchandiseDTO> getMerchandiseByEventId(Long eventId);
-
-
     void deleteByEventId(Long eventId);
+
+
+
+
 }

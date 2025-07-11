@@ -25,4 +25,11 @@ public class MerchandiseController {
     public List<MerchandiseDTO> getMerchandiseByEventId(@PathVariable Long eventId) {
         return merchandiseService.getMerchandiseByEventId(eventId);
     }
+
+    @DeleteMapping("/event/{eventId}")
+    public void deleteMerchandiseByEventId(@PathVariable Long eventId) {
+        merchandiseService.deleteByEventId(eventId);
+    }
+
+
 }

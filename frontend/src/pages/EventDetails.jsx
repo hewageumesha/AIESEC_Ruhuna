@@ -491,7 +491,7 @@ const EventSidebar = ({ event }) => (
         </div>
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-          <span className="text-sm text-gray-700">Certificate of participation</span>
+          <span className="text-sm text-gray-700">Global Exposure</span>
         </div>
         {event.hasMerchandise && (
           <div className="flex items-center gap-2">

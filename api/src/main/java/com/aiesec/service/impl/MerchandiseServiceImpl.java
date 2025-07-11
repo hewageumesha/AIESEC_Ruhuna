@@ -45,7 +45,7 @@ public class MerchandiseServiceImpl implements MerchandiseService {
 
     @Override
     public void deleteByEventId(Long eventId) {
-        merchandiseRepository.deleteByEventEventId(eventId);
+        merchandiseRepository.deleteByEventId(eventId);
     }
 
 

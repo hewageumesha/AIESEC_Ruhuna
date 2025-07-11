@@ -256,7 +256,7 @@ const EventAnalytics = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Event Analytics Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Event Analytics </h1>
 
         {/* Registration Summary Section */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -267,7 +267,7 @@ const EventAnalytics = () => {
               <select
                 value={selectedEvent}
                 onChange={e => setSelectedEvent(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 bg-white"
+                className="border border-gray-300 rounded-md px-3 py-2 bg-white text-black"
                 disabled={loadingEvents}
               >
                 <option value="all">All Events</option>
@@ -304,7 +304,8 @@ const EventAnalytics = () => {
           )}
         </div>
 
-        {/* Interest Status Pie Chart */}
+        {/* Interest Status Pie Chart - COMMENTED OUT */}
+        {/*
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-800">Interest Status Breakdown</h2>
@@ -323,6 +324,7 @@ const EventAnalytics = () => {
 
           {renderPieChart()}
         </div>
+        */}
       </div>
     </div>
   );

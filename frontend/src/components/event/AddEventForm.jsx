@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import {
-  Form, Input, DatePicker, TimePicker, Button, Upload, Radio, message, Select
+  Form, Input, DatePicker, TimePicker, Button, Upload, Radio, message, Select, notification
 } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
+import { InboxOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
@@ -23,10 +23,29 @@ const AddEventForm = () => {
 
   const navigate = useNavigate();
 
+  const showSuccessNotification = (eventName, isPublic) => {
+    notification.success({
+      message: 'Event Created Successfully! 🎉',
+      description: (
+        <div>
+          <p><strong>{eventName}</strong> has been created and is now {isPublic ? 'publicly available' : 'private to AIESEC members'}.</p>
+          <p>Your event is ready to receive registrations!</p>
+        </div>
+      ),
+      placement: 'topRight',
+      duration: 4,
+      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+      style: {
+        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+      },
+    });
+  };
+
   const uploadFile = async (file) => {
     try {
       const fileName = `${Date.now()}_${file.name}`;
-      const bucketName = 'eventimages'; // unified bucket for both event and merch
+      const bucketName = 'eventimages';
 
       const { error } = await supabase.storage
         .from(bucketName)
@@ -61,7 +80,7 @@ const AddEventForm = () => {
     try {
       if (file.status === 'removed') return;
 
-      const url = await uploadFile(file); // now uses eventimages
+      const url = await uploadFile(file);
       if (url) {
         setMerchandiseData((prev) => ({
           ...prev,
@@ -114,27 +133,26 @@ const AddEventForm = () => {
         }
       }
 
-     const payload = {
-  eventName: values.eventName,
-  description: values.description,
-  startDate: values.startDate.format('YYYY-MM-DD'),
-  endDate: values.endDate.format('YYYY-MM-DD'),
-  eventTime: values.startTime.format('hh:mm A'),
-  endTime: values.endTime.format('hh:mm A'),
-  imageUrl: eventImageUrl,
-  isPublic: values.visibility === 'public',
-  isVirtual: eventType === 'virtual',
-  location: eventType === 'virtual' ? '' : values.location,
-  virtualLink: eventType === 'virtual' ? values.location : '',
-  hasMerchandise, 
-  merchandise: selectedMerchTypes.map((type) => ({
-    type,
-    description: merchandiseData[type]?.description || '',
-    images: merchandiseData[type]?.images?.map((img) => img.url) || [],
-    available: true,
-  })),
-};
-
+      const payload = {
+        eventName: values.eventName,
+        description: values.description,
+        startDate: values.startDate.format('YYYY-MM-DD'),
+        endDate: values.endDate.format('YYYY-MM-DD'),
+        eventTime: values.startTime.format('hh:mm A'),
+        endTime: values.endTime.format('hh:mm A'),
+        imageUrl: eventImageUrl,
+        isPublic: values.visibility === 'public',
+        isVirtual: eventType === 'virtual',
+        location: eventType === 'virtual' ? '' : values.location,
+        virtualLink: eventType === 'virtual' ? values.location : '',
+        hasMerchandise, 
+        merchandise: selectedMerchTypes.map((type) => ({
+          type,
+          description: merchandiseData[type]?.description || '',
+          images: merchandiseData[type]?.images?.map((img) => img.url) || [],
+          available: true,
+        })),
+      };
 
       const response = await axios.post('http://localhost:8080/api/events', payload);
       const eventId = response.data.eventId;
@@ -155,7 +173,8 @@ const AddEventForm = () => {
         await Promise.all(merchandisePromises);
       }
 
-      message.success(' Event published successfully!');
+      showSuccessNotification(values.eventName, values.visibility === 'public');
+      
       form.resetFields();
       setEventImageUrl('');
       setHasMerchandise(false);
@@ -173,10 +192,14 @@ const AddEventForm = () => {
 
   const handleMerchTypeChange = (values) => {
     setSelectedMerchTypes(values);
+    
+    // Create updated merchandise data with only selected types
     const updated = {};
     values.forEach(type => {
       updated[type] = merchandiseData[type] || { description: '', images: [] };
     });
+    
+    // Remove data for unselected types
     setMerchandiseData(updated);
   };
 
@@ -355,7 +378,7 @@ const AddEventForm = () => {
             type="primary" 
             htmlType="submit" 
             loading={isSubmitting} 
-            className="w-full bg-blue-600"
+            className="w-full bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
           >
             Create Event
           </Button>
