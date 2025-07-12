@@ -40,10 +40,17 @@ public class GalleryController {
         return ResponseEntity.ok(images);
     }
 
-    // Delete image by id
+    // Delete image by id(single delete)
     @DeleteMapping("/{galleryId}")
     public ResponseEntity<Void> deleteGalleryImage(@PathVariable Long galleryId) {
         galleryService.deleteGalleryImage(galleryId);
+        return ResponseEntity.noContent().build();
+    }
+
+    //Multiple delete
+    @DeleteMapping("/batch")
+    public ResponseEntity<Void> deleteMultipleGalleryImages(@RequestBody List<Long> galleryIds) {
+        galleryService.deleteGalleryImagesByIds(galleryIds);
         return ResponseEntity.noContent().build();
     }
 }
