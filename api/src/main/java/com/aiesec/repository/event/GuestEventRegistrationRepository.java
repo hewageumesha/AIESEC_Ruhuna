@@ -3,6 +3,8 @@ package com.aiesec.repository.event;
 import com.aiesec.dto.GuestRegistrationSummaryDTO;
 import com.aiesec.enums.InterestStatus;
 import com.aiesec.model.event.GuestEventRegistration;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -41,6 +43,9 @@ public interface GuestEventRegistrationRepository extends JpaRepository<GuestEve
                                               @Param("status") InterestStatus status);
 
 
+    Page<GuestEventRegistration> findByEvent_EventId(Long eventId, Pageable pageable);
+    @Query("SELECT g FROM GuestEventRegistration g WHERE g.event.eventId = :eventId AND (:status IS NULL OR g.interestStatus = :status)")
+    Page<GuestEventRegistration> findByEventIdAndStatus(@Param("eventId") Long eventId, @Param("status") InterestStatus status, Pageable pageable);
 
 
 

@@ -3,6 +3,8 @@ package com.aiesec.repository.event;
 import com.aiesec.dto.EventRegistrationSummaryDTO;
 import com.aiesec.enums.InterestStatus;
 import com.aiesec.model.event.AiesecMemberEventRegistration;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,7 +20,7 @@ public interface AiesecMemberEventRegistrationRepository extends JpaRepository<A
 
     List<AiesecMemberEventRegistration> findByUserIdAndEvent_EventId(Long userId, Long eventId);
 
-    List<AiesecMemberEventRegistration> findByEvent_EventId(Long eventId);
+    Page<AiesecMemberEventRegistration> findByEvent_EventId(Long eventId, Pageable pageable);
 
     // ✅ Aggregated Summary using JPQL
     @Query("SELECT new com.aiesec.dto.EventRegistrationSummaryDTO(" +
@@ -43,6 +45,8 @@ public interface AiesecMemberEventRegistrationRepository extends JpaRepository<A
             "(:eventId IS NULL OR r.event.eventId = :eventId) AND " +
             "(:status IS NULL OR r.interestStatus = :status)")
     List<AiesecMemberEventRegistration> findFiltered(@Param("eventId") Long eventId, @Param("status") InterestStatus status);
+
+
 
 
 

@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { Spin, Modal, Button } from 'antd';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useSelector } from 'react-redux';
+import { Spin, Modal, Button, message } from 'antd';
 import { DeleteOutlined, SelectOutlined, EyeOutlined, DownloadOutlined, CloseOutlined } from '@ant-design/icons';
+import { deleteImageFromStorage } from '../service/deleteImageFromStorage';
 
-const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
+const GalleryPage = () => {
+  // Get user data from Redux store
+  const { currentUser } = useSelector((state) => state.user);
+  
   const [images, setImages] = useState([]);
   const [filteredImages, setFilteredImages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +16,6 @@ const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [fullViewImage, setFullViewImage] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const categoryOptions = [
     { key: 'all', label: 'All Events' },
@@ -22,30 +26,54 @@ const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
     { key: 'OTHER', label: 'Other' },
   ];
 
+  // Check if user is logged in and has admin privileges
+  const isLoggedIn = !!currentUser;
+  const currentUserRole = currentUser?.role || '';
+  const userId = currentUser?.id || currentUser?._id || '';
+  const authToken = currentUser?.token || '';
+
   // Check if user can edit (LCP or LCVP roles only)
   const canEdit = (currentUserRole === 'LCP' || currentUserRole === 'LCVP') && isLoggedIn;
 
   useEffect(() => {
-    // Check if user is logged in based on userId
-    setIsLoggedIn(!!userId);
-  }, [userId]);
-
-  useEffect(() => {
     const fetchImages = async () => {
       try {
-        const res = await fetch('http://localhost:8080/api/gallery');
+        // Add authorization header if user is logged in
+        const headers = {};
+        if (authToken) {
+          headers['Authorization'] = `Bearer ${authToken}`;
+        }
+
+        const res = await fetch('http://localhost:8080/api/gallery', {
+          headers
+        });
+        
+        if (!res.ok) {
+          throw new Error('Failed to fetch images');
+        }
         const data = await res.json();
-        setImages(data);
-        setFilteredImages(data);
+        
+        // ✅ FIXED: Map backend fields to frontend fields
+        const imagesWithIds = data.map((img, index) => ({
+          ...img,
+          id: img.galleryId || img.id || `img_${index}_${Date.now()}`, // Use galleryId as id
+          imageUrl: img.imageUrl,
+          category: img.category,
+          storagePath: img.storagePath,
+          uploadedAt: img.uploadedAt
+        }));
+        
+        setImages(imagesWithIds);
+        setFilteredImages(imagesWithIds);
       } catch (error) {
         console.error('Failed to fetch gallery images:', error);
-        console.log('Failed to load gallery images');
+        message.error('Failed to load gallery images');
       } finally {
         setLoading(false);
       }
     };
     fetchImages();
-  }, []);
+  }, [authToken]);
 
   useEffect(() => {
     if (categoryFilter === 'all') {
@@ -57,60 +85,189 @@ const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
     setSelectedImages(new Set()); // Clear selections when filter changes
   }, [categoryFilter, images]);
 
-  const handleImageClick = (img) => {
+  // Fixed handleImageClick function
+  const handleImageClick = useCallback((img, event) => {
+    // Prevent event bubbling
+    if (event) {
+      event.stopPropagation();
+    }
+
     if (canEdit) {
       // Toggle selection in admin mode
-      const newSelected = new Set(selectedImages);
-      if (newSelected.has(img.id)) {
-        newSelected.delete(img.id);
-      } else {
-        newSelected.add(img.id);
-      }
-      setSelectedImages(newSelected);
+      setSelectedImages(prevSelected => {
+        const newSelected = new Set(prevSelected);
+        const imageId = img.id;
+        
+        if (newSelected.has(imageId)) {
+          newSelected.delete(imageId);
+          console.log(`Deselected image: ${imageId}`);
+        } else {
+          newSelected.add(imageId);
+          console.log(`Selected image: ${imageId}`);
+        }
+        
+        console.log('Current selection:', Array.from(newSelected));
+        return newSelected;
+      });
     } else {
       // Show full view for regular users
       setFullViewImage(img);
     }
-  };
+  }, [canEdit]);
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     if (!canEdit) return;
     
-    if (selectedImages.size === filteredImages.length) {
-      setSelectedImages(new Set());
-    } else {
-      const allIds = new Set(filteredImages.map(img => img.id));
-      setSelectedImages(allIds);
+    setSelectedImages(prevSelected => {
+      if (prevSelected.size === filteredImages.length) {
+        // Deselect all
+        return new Set();
+      } else {
+        // Select all
+        const allIds = new Set(filteredImages.map(img => img.id));
+        return allIds;
+      }
+    });
+  }, [canEdit, filteredImages]);
+
+  // Extract storage path from imageUrl for Supabase deletion
+  const extractStoragePath = (imageUrl) => {
+    try {
+      // Assuming your Supabase storage URLs follow the pattern:
+      // https://project.supabase.co/storage/v1/object/public/gallery/path/to/image.jpg
+      const url = new URL(imageUrl);
+      const pathSegments = url.pathname.split('/');
+      const galleryIndex = pathSegments.findIndex(segment => segment === 'gallery');
+      if (galleryIndex !== -1 && galleryIndex < pathSegments.length - 1) {
+        return pathSegments.slice(galleryIndex + 1).join('/');
+      }
+      return null;
+    } catch (error) {
+      console.error('Error extracting storage path:', error);
+      return null;
     }
   };
 
   const handleDeleteSelected = async () => {
-    if (selectedImages.size === 0) return;
+    if (selectedImages.size === 0) {
+      message.warning('No images selected for deletion');
+      return;
+    }
     
+    // Double-check authorization
+    if (!canEdit) {
+      message.error('You do not have permission to delete images');
+      return;
+    }
+
     setDeleting(true);
+    const selectedImageIds = Array.from(selectedImages);
+    
+    console.log('Deleting images with IDs:', selectedImageIds);
+    
     try {
-      // Delete images one by one using the correct API endpoint
-      const deletePromises = Array.from(selectedImages).map(async (imageId) => {
-        const res = await fetch(`http://localhost:8080/api/gallery/${imageId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-        if (!res.ok) throw new Error(`Failed to delete image ${imageId}`);
-        return imageId;
+      // Get full image objects for storage deletion
+      const imagesToDelete = images.filter(img => selectedImages.has(img.id));
+      
+      console.log('Images to delete:', imagesToDelete.map(img => ({ id: img.id, url: img.imageUrl })));
+      
+      // ✅ FIXED: Ensure IDs are numbers (galleryId is Long in backend)
+      const galleryIds = selectedImageIds.map(id => {
+        const numericId = Number(id);
+        if (isNaN(numericId)) {
+          throw new Error(`Invalid gallery ID: ${id}`);
+        }
+        return numericId;
       });
       
-      await Promise.all(deletePromises);
+      console.log('Gallery IDs to send to backend:', galleryIds);
+      
+      // Use batch delete endpoint with proper error handling
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      // Add authorization header
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+      
+      // ✅ FIXED: Send array of Long IDs to match backend expectation
+      const batchDeleteResponse = await fetch('http://localhost:8080/api/gallery/batch', {
+        method: 'DELETE',
+        headers,
+        body: JSON.stringify(galleryIds) // Send [1, 2, 3] format
+      });
+
+      // Log response for debugging
+      console.log('Backend response status:', batchDeleteResponse.status);
+
+      if (!batchDeleteResponse.ok) {
+        let errorMessage = `Backend deletion failed: ${batchDeleteResponse.status}`;
+        try {
+          const errorData = await batchDeleteResponse.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch (parseError) {
+          errorMessage = `HTTP ${batchDeleteResponse.status}: ${batchDeleteResponse.statusText}`;
+        }
+        throw new Error(errorMessage);
+      }
+
+      console.log('Backend deletion successful');
+
+      // ✅ FIXED: Delete images from Supabase storage using storagePath if available
+      const storageDeletePromises = imagesToDelete.map(async (img) => {
+        try {
+          // Use storagePath if available, otherwise extract from imageUrl
+          const storagePath = img.storagePath || extractStoragePath(img.imageUrl);
+          if (storagePath) {
+            await deleteImageFromStorage(storagePath);
+            console.log(`Deleted from storage: ${storagePath}`);
+          } else {
+            console.warn(`No storage path found for image: ${img.id}`);
+          }
+        } catch (storageError) {
+          console.error(`Failed to delete image from storage: ${img.id}`, storageError);
+          // Continue with other deletions even if one fails
+        }
+      });
+
+      // Wait for all storage deletions to complete
+      await Promise.allSettled(storageDeletePromises);
       
       // Remove deleted images from state
-      const updatedImages = images.filter(img => !selectedImages.has(img.id));
-      setImages(updatedImages);
+      setImages(prevImages => prevImages.filter(img => !selectedImages.has(img.id)));
       setSelectedImages(new Set());
-      console.log(`${selectedImages.size} images deleted successfully`);
+      
+      message.success(`${selectedImageIds.length} image(s) deleted successfully`);
+      
     } catch (error) {
       console.error('Failed to delete images:', error);
-      console.log('Failed to delete images');
+      message.error(`Failed to delete images: ${error.message}`);
+      
+      // ✅ FIXED: Refresh the gallery to sync with backend state
+      try {
+        const headers = {};
+        if (authToken) {
+          headers['Authorization'] = `Bearer ${authToken}`;
+        }
+        const res = await fetch('http://localhost:8080/api/gallery', { headers });
+        if (res.ok) {
+          const data = await res.json();
+          const imagesWithIds = data.map((img, index) => ({
+            ...img,
+            id: img.galleryId || img.id || `img_${index}_${Date.now()}`,
+            imageUrl: img.imageUrl,
+            category: img.category,
+            storagePath: img.storagePath,
+            uploadedAt: img.uploadedAt
+          }));
+          setImages(imagesWithIds);
+          setFilteredImages(imagesWithIds);
+        }
+      } catch (refreshError) {
+        console.error('Failed to refresh gallery:', refreshError);
+      }
     } finally {
       setDeleting(false);
       setDeleteModalVisible(false);
@@ -131,6 +288,7 @@ const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
       document.body.removeChild(link);
     } catch (error) {
       console.error('Failed to download image:', error);
+      message.error('Failed to download image');
     }
   };
 
@@ -192,7 +350,7 @@ const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
           </div>
         </div>
 
-        {/* Admin Controls */}
+        {/* Admin Controls - Only visible to LCP/LCVP users */}
         {canEdit && (
           <div className="mb-6 bg-white rounded-xl shadow-lg p-6 border border-blue-100">
             <div className="flex flex-wrap gap-4 items-center justify-between">
@@ -250,7 +408,7 @@ const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
                   <div key={columnIndex} className="flex-1 flex flex-col gap-2">
                     {column.map((img, index) => (
                       <div
-                        key={img.id || index}
+                        key={img.id}
                         className={`group relative overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-xl transform hover:scale-[1.02] ${
                           canEdit ? 'cursor-pointer' : 'cursor-zoom-in'
                         } ${
@@ -258,7 +416,7 @@ const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
                             ? 'ring-4 ring-blue-500 ring-opacity-50' 
                             : ''
                         }`}
-                        onClick={() => handleImageClick(img)}
+                        onClick={(e) => handleImageClick(img, e)}
                       >
                         {/* Image */}
                         <div className="relative bg-gray-100">
@@ -274,7 +432,7 @@ const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
                             {getCategoryLabel(img.category)}
                           </div>
                           
-                          {/* Download Button */}
+                          {/* Download Button - Only for non-admin users */}
                           {!canEdit && (
                             <button
                               onClick={(e) => {
@@ -288,7 +446,7 @@ const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
                           )}
                         </div>
 
-                        {/* Selection Indicator */}
+                        {/* Selection Indicator - Only for admin users */}
                         {canEdit && selectedImages.has(img.id) && (
                           <div className="absolute top-2 right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
                             <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -297,7 +455,7 @@ const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
                           </div>
                         )}
 
-                        {/* Admin Mode Indicator */}
+                        {/* Admin Mode Indicator - Only for admin users */}
                         {canEdit && !selectedImages.has(img.id) && (
                           <div className="absolute top-2 right-2 w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
                             <div className="w-4 h-4 border-2 border-blue-600 rounded-full"></div>
@@ -313,7 +471,7 @@ const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
         )}
       </div>
 
-      {/* Full View Modal */}
+      {/* Full View Modal - Only for non-admin users */}
       {fullViewImage && (
         <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4">
           <div className="relative max-w-5xl max-h-full">
@@ -341,7 +499,7 @@ const GalleryPage = ({ currentUserRole = '', userId = '' }) => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal - Only for admin users */}
       <Modal
         title={
           <div className="flex items-center gap-2">

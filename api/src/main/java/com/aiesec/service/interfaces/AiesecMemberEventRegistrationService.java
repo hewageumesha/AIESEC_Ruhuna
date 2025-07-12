@@ -4,6 +4,8 @@ import com.aiesec.dto.AiesecMemberEventRegistrationDTO;
 import com.aiesec.dto.EventRegistrationSummaryDTO;
 import com.aiesec.dto.RegistrationDTO;
 import com.aiesec.model.event.AiesecMemberEventRegistration;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,10 @@ public interface AiesecMemberEventRegistrationService {
     List<EventRegistrationSummaryDTO> getSummaryByEvent();
     Map<String, Integer> getStatusSummaryByEvent(Long eventId);
     AiesecMemberEventRegistration updateRegistration(Long id, RegistrationDTO dto);
+    Page<AiesecMemberEventRegistrationDTO> getPagedByEventId(Long eventId, int page, int size);
+
+
+
 
 
 }

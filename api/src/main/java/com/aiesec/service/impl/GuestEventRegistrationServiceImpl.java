@@ -7,6 +7,10 @@ import com.aiesec.model.event.GuestEventRegistration;
 import com.aiesec.repository.event.GuestEventRegistrationRepository;
 import com.aiesec.service.interfaces.GuestEventRegistrationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -68,6 +72,14 @@ public class GuestEventRegistrationServiceImpl implements GuestEventRegistration
         System.out.println("Guest summary map: " + summary); // optional debug log
 
         return summary;
+    }
+
+
+    @Override
+    public Page<GuestEventRegistrationDTO> getPagedByEventId(Long eventId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("registeredAt").descending());
+        Page<GuestEventRegistration> pageResult = registrationRepository.findByEvent_EventId(eventId, pageable);
+        return pageResult.map(GuestEventRegistrationMapper::toDTO);
     }
 
 
