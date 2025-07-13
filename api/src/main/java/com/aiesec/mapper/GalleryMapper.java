@@ -12,6 +12,7 @@ public class GalleryMapper {
                 .galleryId(gallery.getGalleryId())
                 .imageUrl(gallery.getImageUrl())
                 .category(gallery.getCategory())
+                .storagePath(gallery.getStoragePath())
                 .uploadedAt(gallery.getUploadedAt())
                 .build();
     }
@@ -22,6 +23,7 @@ public class GalleryMapper {
                 .imageUrl(dto.getImageUrl())
                 .category(dto.getCategory())
                 .uploadedAt(LocalDateTime.now())
+                .storagePath(dto.getStoragePath())
                 .build();
     }
 }

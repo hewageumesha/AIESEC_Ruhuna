@@ -15,8 +15,6 @@ import com.aiesec.repository.event.EventRepository;
 import com.aiesec.repository.event.GuestEventRegistrationRepository;
 import com.aiesec.service.interfaces.AnalyticsService;
 import com.aiesec.service.interfaces.EventService;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -214,7 +212,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
                 String name = user != null ? user.getFirstName() + " " + user.getLastName() : "N/A";
                 String email = user != null ? user.getEmail() : "N/A";
-                String phone = user != null ? user.getPhoneNumber() : "N/A";
+                String phone = user != null ? user.getPhone() : "N/A";
 
                 csvPrinter.printRecord(
                         reg.getEvent().getEventId(),

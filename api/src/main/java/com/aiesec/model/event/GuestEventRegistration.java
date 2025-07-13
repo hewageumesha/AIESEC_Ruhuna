@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 
 @Entity
- @Table(name = "guest_event_registration")
+@Table(name = "guest_event_registration")
 
 @Builder
 @NoArgsConstructor
@@ -94,6 +94,5 @@ public class GuestEventRegistration {
         this.registeredAt = registeredAt;
     }
 }
-
 
 

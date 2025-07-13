@@ -47,18 +47,15 @@ public class UserController {
 
     @PostMapping("/add")
     public User addUser(@RequestBody Map<String, Object> body) {
-
-        try {
-        
         String aiesecEmail = (String) body.get("aiesecEmail");
         String email = (String) body.get("email");
-        Date birthday = body.get("birthday") != null ? java.sql.Date.valueOf(body.get("birthday").toString()) : null;
-        Long function = body.get("function") != null ? Long.parseLong(body.get("function").toString()) : null;
+        Date birthday = (Date) body.get("birthday");
+        Long function = (Long) body.get("function");
         String firstName = (String) body.get("firstName");
         String lastName = (String) body.get("lastName");
-        Date joinedDate = body.get("joinedDate") != null ? java.sql.Date.valueOf(body.get("joinedDate").toString()) : null;
-        Gender gender = body.get("gender") != null ? Gender.valueOf(body.get("gender").toString()) : null;
-        UserRole role = body.get("role") != null ? UserRole.valueOf(body.get("role").toString()) : null;
+        Gender gender = (Gender) body.get("gender");
+        Date joinedDate = (Date) body.get("joinedDate");
+        UserRole role = (UserRole) body.get("role");
         String team_leader_aiesecEmail = (String) body.get("teamLeaderAiesecEmail");
 
         UserRequestDTO dto  = new UserRequestDTO();
@@ -75,7 +72,8 @@ public class UserController {
         dto.setTeamLeaderAiesecEmail(team_leader_aiesecEmail);
 
         String tempString = userService.generateTempPassword();
-        userService.sendTempPasswordEmail(email, tempString, aiesecEmail);
+        userService.sendTempPasswordEmail(email, tempString);
+
         return userService.addUser(dto);
 
        } catch (Exception e) {

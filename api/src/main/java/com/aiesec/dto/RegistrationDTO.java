@@ -4,6 +4,8 @@ package com.aiesec.dto;
 import com.aiesec.enums.InterestStatus;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -12,8 +14,9 @@ import lombok.*;
 public class RegistrationDTO {
     private Long eventId;
     private Long userId;
-    private String interestStatus;
+    private InterestStatus interestStatus;
     private String comment;
+    private LocalDateTime registeredAt;
 
     public Long getEventId() {
         return eventId;
@@ -21,6 +24,22 @@ public class RegistrationDTO {
 
     public void setEventId(Long eventId) {
         this.eventId = eventId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public InterestStatus getInterestStatus() {
+        return interestStatus;
+    }
+
+    public void setInterestStatus(InterestStatus interestStatus) {
+        this.interestStatus = interestStatus;
     }
 
     public String getComment() {
@@ -31,20 +50,11 @@ public class RegistrationDTO {
         this.comment = comment;
     }
 
-    public InterestStatus getInterestStatus() {
-        this.interestStatus=interestStatus.toString();
-        return null;
+    public LocalDateTime getRegisteredAt() {
+        return registeredAt;
     }
 
-    public void setInterestStatus(String interestStatus) {
-        this.interestStatus = interestStatus;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setRegisteredAt(LocalDateTime registeredAt) {
+        this.registeredAt = registeredAt;
     }
 }

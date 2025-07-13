@@ -26,4 +26,8 @@ public class EventGallery {
 
     @Column(name = "uploaded_at")
     private LocalDateTime uploadedAt;
+
+    @Column(name = "storage_path")
+    private String storagePath;
+
 }

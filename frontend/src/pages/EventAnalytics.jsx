@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Calendar, Users, Filter, Download } from 'lucide-react';
 import { aiesecColors } from '../components/event/constants';
 import SummaryCard from '../components/event/SummaryCard';
+import EventRegistrationViewer from '../components/event/EventRegistrationViewer';
 import CSVDownloadButton from '../components/event/CSVDownloadButton';
 import apiService from '../components/event/apiService';
 
@@ -90,7 +91,7 @@ const EventAnalytics = () => {
       <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">Event Analytics</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Event Analytics</h1>
           <p className="text-gray-600">Monitor and analyze event registrations across AIESEC Ruhuna</p>
         </div>
 

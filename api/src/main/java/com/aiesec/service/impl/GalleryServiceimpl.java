@@ -43,4 +43,12 @@ public class GalleryServiceimpl implements GalleryService {
     public void deleteGalleryImage(Long id) {
         galleryRepository.deleteById(id);
     }
-}
+
+    //multiple delete
+    @Override
+    public void deleteGalleryImagesByIds(List<Long> ids) {
+        galleryRepository.deleteAllByIdInBatch(ids);
+        }
+
+    }
+

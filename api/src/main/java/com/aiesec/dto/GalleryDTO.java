@@ -15,5 +15,7 @@ public class GalleryDTO {
     private Long galleryId;
     private String imageUrl;
     private String category;
+    private String storagePath;
     private LocalDateTime uploadedAt;
+
 }

@@ -28,7 +28,6 @@ public class EventExperience {
     private User user; // AIESEC member – nullable
 
 
-
     @Column(name = "Rating")
     private Integer rating; // 1 to 5 scale
 

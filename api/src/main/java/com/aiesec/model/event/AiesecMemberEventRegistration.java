@@ -1,7 +1,6 @@
 package com.aiesec.model.event;
 
 import com.aiesec.enums.InterestStatus;
-import com.aiesec.enums.RegistrationType;
 import com.aiesec.model.User;
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -88,10 +88,14 @@ public class GuestEventRegistrationServiceImpl implements GuestEventRegistration
         return summary;
     }
 
+
     @Override
     public Page<GuestEventRegistrationDTO> getPagedByEventId(Long eventId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("registeredAt").descending());
         Page<GuestEventRegistration> pageResult = registrationRepository.findByEvent_EventId(eventId, pageable);
         return pageResult.map(GuestEventRegistrationMapper::toDTO);
     }
+
+
+
 }

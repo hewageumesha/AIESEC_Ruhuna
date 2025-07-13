@@ -356,6 +356,11 @@ public class UserService {
         }
         return users.stream().map(this::userToDto).toList();
 
+=======
+    public void sendTempPasswordEmail(String toEmail, String tempPassword) {
+        String subject = "Your Temporary AIESEC Password";
+        String text = "Hello,\n\nYour temporary password is: " + tempPassword + "\n\nPlease log in and change it as soon as possible.";
+>>>>>>> 9a66ff04089ef00e33b999bfeb5fe8e3f94fc62d
 
     }
 
