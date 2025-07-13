@@ -2,8 +2,10 @@ package com.aiesec.service.interfaces;
 
 
 import com.aiesec.dto.EventDTO;
+import com.aiesec.model.event.Event;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+
+import java.awt.print.Pageable;
 import java.util.List;
 
 public interface EventService {
@@ -25,9 +27,14 @@ public interface EventService {
     // Method to update the T-shirt order availability (hasTshirtOrder)
     void updateTshirtOrder(Long eventId, Boolean hasTshirtOrder);
 
+    // Method to update visibility (Public or Private)
+    void updateEventVisibility(Long eventId, String visibility);
+
     List<EventDTO> getUpcomingEvents();
 
     List<EventDTO> getPublicUpcomingEvents();
+
+
 
     // Add these new methods
     List<EventDTO> getPrivateUpcomingEvents();
@@ -36,6 +43,12 @@ public interface EventService {
 
     List<EventDTO> getAllPrivateEvents();
 
-    //Search event
+
+    // Search event
     Page<EventDTO> filterEvents(String search, String status, String date, Pageable pageable);
+
+
 }
+
+}
+

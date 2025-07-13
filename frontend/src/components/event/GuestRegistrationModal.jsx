@@ -3,6 +3,9 @@ import { Modal } from "antd";
 import GuestRegistrationForm from "./GuestRegistrationForm";
 
 const GuestRegistrationModal = ({ visible, onClose, eventId, onRegister }) => {
+  return (
+    <Modal
+     visible={visible}
   if (!eventId) {
     console.warn("⚠️ GuestRegistrationModal: Missing eventId");
   }
@@ -15,6 +18,13 @@ const GuestRegistrationModal = ({ visible, onClose, eventId, onRegister }) => {
       footer={null}
       destroyOnClose
     >
+     <GuestRegistrationForm
+        eventId={eventId}
+        onSuccess={(data) => {
+          onRegister?.(data);
+          onClose();
+        }}
+      />
       {eventId ? (
         <GuestRegistrationForm
           eventId={eventId}
@@ -32,5 +42,6 @@ const GuestRegistrationModal = ({ visible, onClose, eventId, onRegister }) => {
     </Modal>
   );
 };
+
 
 export default GuestRegistrationModal;

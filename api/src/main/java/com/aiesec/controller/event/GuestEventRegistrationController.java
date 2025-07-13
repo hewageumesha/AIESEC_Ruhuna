@@ -1,7 +1,6 @@
 package com.aiesec.controller.event;
 
 import com.aiesec.dto.GuestEventRegistrationDTO;
-import com.aiesec.dto.GuestRegistrationSummaryDTO;
 import com.aiesec.service.interfaces.GuestEventRegistrationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,12 +48,6 @@ public class GuestEventRegistrationController {
         List<GuestEventRegistrationDTO> registrations = registrationService.getAllByEventId(eventId);
         return ResponseEntity.ok(registrations);
     }
-
-    @GetMapping("/analytics/summary")
-    public ResponseEntity<List<GuestRegistrationSummaryDTO>> getAnalyticsSummary() {
-        return ResponseEntity.ok(registrationService.getSummaryByEvent());
-    }
-
 
     // Inner class for structured error response
     public static class ApiError {

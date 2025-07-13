@@ -59,6 +59,7 @@ public class AuthController {
         json.put("phone", existingUser.getPhone());
         json.put("role", existingUser.getRole());
         json.put("token", token);
+        json.put("id",existingUser.get().getId());
 
         return ResponseEntity.ok(json.toString());
     }

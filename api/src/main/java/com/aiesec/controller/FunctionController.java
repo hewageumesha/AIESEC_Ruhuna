@@ -1,6 +1,6 @@
 package com.aiesec.controller;
 
-import com.aiesec.model.Function;
+import com.aiesec.dto.FunctionDTO;
 import com.aiesec.service.FunctionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +22,8 @@ public class FunctionController {
      * Response: The created Function object
      */
     @PostMapping("/add")
-    public Function addFunction(@RequestBody Function function) {
-        return functionService.addFunction(function);
+    public FunctionDTO addFunction(@RequestBody FunctionDTO dto) {
+        return functionService.addFunction(dto);
     }
 
      /**
@@ -32,7 +32,7 @@ public class FunctionController {
      * Response: List of all Function objects
      */
     @GetMapping("/")
-    public List<Function> getAllFunctions() {
+    public List<FunctionDTO> getAllFunctions() {
         return functionService.getAllFunctions();
     }
 
@@ -43,7 +43,7 @@ public class FunctionController {
      * Response: The Function object with the given ID
      */
     @GetMapping("/{id}")
-    public Function getFunctionById(@PathVariable Long id) {
+    public FunctionDTO getFunctionById(@PathVariable Long id) {
         return functionService.getFunctionById(id);
     }
 
@@ -56,7 +56,12 @@ public class FunctionController {
     @DeleteMapping("/delete/{id}")
     public String deleteFunction(@PathVariable Long id) {
         functionService.deleteFunction(id);
-        return "Function deleted successfully";
+        return "Function deleted successfully with id: " + id;
+    }
+
+    @PutMapping("/update/{id}")
+    public FunctionDTO updateFunction(@PathVariable Long id, @RequestBody FunctionDTO dto) {
+        return functionService.updateFunction(id, dto);
     }
 }
 

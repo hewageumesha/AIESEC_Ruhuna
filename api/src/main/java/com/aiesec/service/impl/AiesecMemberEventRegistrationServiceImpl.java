@@ -7,7 +7,6 @@ import com.aiesec.mapper.AiesecMemberEventRegistrationMapper;
 import com.aiesec.model.event.AiesecMemberEventRegistration;
 import com.aiesec.repository.event.AiesecMemberEventRegistrationRepository;
 import com.aiesec.service.interfaces.AiesecMemberEventRegistrationService;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 @Service
 @RequiredArgsConstructor
 public class AiesecMemberEventRegistrationServiceImpl implements AiesecMemberEventRegistrationService {
@@ -28,7 +28,7 @@ public class AiesecMemberEventRegistrationServiceImpl implements AiesecMemberEve
 
     @Override
     public AiesecMemberEventRegistrationDTO register(AiesecMemberEventRegistrationDTO dto) {
-        if (registrationRepository.existsByUserIdAndEvent_EventId(dto.getUserId(), dto.getEventId())) {
+        if (registrationRepository.existsByUserIdAndEventId(dto.getUserId(), dto.getEventId())) {
             throw new IllegalStateException("User with ID " + dto.getUserId() + " is already registered for event ID " + dto.getEventId());
         }
 

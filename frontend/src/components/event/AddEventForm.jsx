@@ -131,6 +131,7 @@ const AddEventForm = () => {
           setIsSubmitting(false);
           return;
         }
+        // Merchandise details are handled below when posting to /api/merchandise
       }
 
       const payload = {
@@ -143,7 +144,7 @@ const AddEventForm = () => {
         imageUrl: eventImageUrl,
         isPublic: values.visibility === 'public',
         isVirtual: eventType === 'virtual',
-        location: eventType === 'virtual' ? '' : values.location,
+        location: eventType === 'virtual' ? values.location : values.location,
         virtualLink: eventType === 'virtual' ? values.location : '',
         hasMerchandise, 
         merchandise: selectedMerchTypes.map((type) => ({

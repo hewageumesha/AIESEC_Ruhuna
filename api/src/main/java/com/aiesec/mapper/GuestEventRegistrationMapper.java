@@ -1,7 +1,6 @@
 package com.aiesec.mapper;
 
 import com.aiesec.dto.GuestEventRegistrationDTO;
-import com.aiesec.model.event.Event;
 import com.aiesec.model.event.GuestEventRegistration;
 
 public class GuestEventRegistrationMapper {

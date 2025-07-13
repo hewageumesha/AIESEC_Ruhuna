@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class EventDTO {
-
     private Long eventId;
     private String eventName;
     private String description;

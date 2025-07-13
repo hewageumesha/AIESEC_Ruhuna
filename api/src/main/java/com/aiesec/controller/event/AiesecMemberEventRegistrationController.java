@@ -21,6 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AiesecMemberEventRegistrationController {
 
+
     private final AiesecMemberEventRegistrationService registrationService;
 
     @PostMapping("/register")

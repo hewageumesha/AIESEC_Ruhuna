@@ -1,9 +1,12 @@
 package com.aiesec.model.event;
 
+
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -17,6 +20,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "event")
+
 public class Event {
 
     @Id
@@ -46,8 +50,9 @@ public class Event {
     @Column(name = "End_Time")
     private LocalTime endTime;
 
-    @Column(name = "Location", length = 255)
+    @Column(name = "Location", length = 255)  // Remove nullable=false
     private String location;
+
 
     @Column(name = "Image_URL", length = 255)
     private String imageUrl;
@@ -55,8 +60,10 @@ public class Event {
     @Column(name = "Is_Public")
     private Boolean isPublic = false;
 
+
     @Column(name = "Is_Virtual")
     private Boolean isVirtual = false;
+
 
     @Column(name = "Virtual_Link", length = 500)
     private String virtualLink;
@@ -164,6 +171,22 @@ public class Event {
         isVirtual = virtual;
     }
 
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
+    }
+
+    public Boolean getVirtual() {
+        return isVirtual;
+    }
+
+    public void setVirtual(Boolean virtual) {
+        isVirtual = virtual;
+    }
+
     public String getVirtualLink() {
         return virtualLink;
     }
@@ -176,7 +199,7 @@ public class Event {
         return hasMerchandise;
     }
 
-    public void setHasMerchandise(Boolean hasMerchandise) {
-        this.hasMerchandise = hasMerchandise;
+    public void setHasTshirtOrder(boolean hasTshirtOrder) {
+        this.hasTshirtOrder = hasTshirtOrder;
     }
 }
