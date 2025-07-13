@@ -11,7 +11,6 @@ import DashboardComp from '../components/DashboardComp';
 import DashComments from '../components/DashComments';
 import DashManageMember from '../components/DashManageMember';
 import UpdatePassword from '../components/UpdatePassword';
-import DashManageDepartment from '../components/DashManageDepartment';
 import DashManageFunction from '../components/DashManageFunction';
 import React from 'react';
 
@@ -38,7 +37,6 @@ export default function Dashboard() {
     manageCommittee: (
       <DashManageCommitee>
         {subtab === 'members' && <DashManageMember />}
-        {subtab === 'department' && <DashManageDepartment />}
         {subtab === 'function' && <DashManageFunction />}
       </DashManageCommitee>
     ),

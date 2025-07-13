@@ -24,6 +24,7 @@ public class EventMapper {
                 .isVirtual(event.getIsVirtual())
                 .virtualLink(event.getVirtualLink())
                 .hasMerchandise(event.getHasMerchandise())
+                .registrationCloseBeforeDays(event.getRegistrationCloseBeforeDays()) // ✅ new field
                 .merchandise(
                         event.getMerchandiseList() != null ?
                                 event.getMerchandiseList().stream()
@@ -49,12 +50,13 @@ public class EventMapper {
                 .isVirtual(dto.getIsVirtual())
                 .virtualLink(dto.getVirtualLink())
                 .hasMerchandise(false) // default
+                .registrationCloseBeforeDays(dto.getRegistrationCloseBeforeDays()) // ✅ new field
                 .build();
 
         // Attach merchandise if present
         if (dto.getMerchandise() != null && !dto.getMerchandise().isEmpty()) {
             List<Merchandise> merchandiseList = dto.getMerchandise().stream()
-                    .map(m -> MerchandiseMapper.toEntity(m, event))  // Link each to the parent event
+                    .map(m -> MerchandiseMapper.toEntity(m, event))
                     .collect(Collectors.toList());
 
             event.setMerchandiseList(merchandiseList);

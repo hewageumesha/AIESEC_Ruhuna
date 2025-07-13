@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DashManageMember from './DashManageMember';
-import DashManageDepartment from './DashManageDepartment';
 import DashManageFunction from './DashManageFunction';
 
 const OrgTable = () => {
@@ -91,9 +90,6 @@ const OrgTable = () => {
 
   if (subtab === 'member') {
     return <DashManageMember />;
-  }
-  if (subtab === 'department') {
-    return <DashManageDepartment />;
   }
   if (subtab === 'function') {
     return <DashManageFunction />;

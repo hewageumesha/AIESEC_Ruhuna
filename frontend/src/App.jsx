@@ -80,29 +80,29 @@ function App() {
         <Route path="/dashboard/finance/*" element={<DashFinance />} />
 
         <Route path="/functional-area" element={<Function />} />
-<Route path="/das" element={<EventDetails />} />
+        <Route path="/das" element={<EventDetails />} />
 
-{/* Task Routes */}
-<Route path="/user/:id/TaskList" element={<TaskList />} />
-<Route path="/assigned-tasks" element={<AssignedTasks />} />
-<Route path="/user/:id/progress" element={<UserProgressPage />} />
-<Route path="/user/:id/CreateTask" element={<CreateTask />} />
-<Route path="/users/:id/tasks/:taskId/edit" element={<TaskUpdate />} />
-<Route path="/user/:id/notifications" element={<NotificationsWrapper />} />
+        {/* Task Routes */}
+        <Route path="/user/:id/TaskList" element={<TaskList />} />
+        <Route path="/assigned-tasks" element={<AssignedTasks />} />
+        <Route path="/user/:id/progress" element={<UserProgressPage />} />
+        <Route path="/user/:id/CreateTask" element={<CreateTask />} />
+        <Route path="/users/:id/tasks/:taskId/edit" element={<TaskUpdate />} />
+        <Route path="/user/:id/notifications" element={<NotificationsWrapper />} />
 
-{/* LCP dashboard */}
-<Route path="/user/:id/TaskDashboard" element={<TaskDashboard />} />
-{/* LCVP dashboard */}
-<Route path="/user/:id/TaskDashboardLCVP" element={<TaskDashboardLCVP />} />
-{/* TL dashboard */}
-<Route path="/user/:id/TaskDashboardTL" element={<TaskDashboardTL />} />
-{/* Member dashboard */}
-<Route path="/user/:id/TaskDashboardMember" element={<TaskDashboardMember />} />
+        {/* LCP dashboard */}
+        <Route path="/user/:id/TaskDashboard" element={<TaskDashboard />} />
+        {/* LCVP dashboard */}
+        <Route path="/user/:id/TaskDashboardLCVP" element={<TaskDashboardLCVP />} />
+        {/* TL dashboard */}
+        <Route path="/user/:id/TaskDashboardTL" element={<TaskDashboardTL />} />
+        {/* Member dashboard */}
+        <Route path="/user/:id/TaskDashboardMember" element={<TaskDashboardMember />} />
 
-{/* Event Routes */}
-<Route path="/public-event" element={<PublicEventsPage />} />
-<Route path="/public-event/:id" element={<EventDetails />} />
-<Route path="/event-analytics" element={<EventAnalytics />} />
+        {/* Event Routes */}
+        <Route path="/public-event" element={<PublicEventsPage />} />
+        <Route path="/public-event/:id" element={<EventDetails />} />
+        <Route path="/event-analytics" element={<EventAnalytics />} />
 
 
       </Routes>

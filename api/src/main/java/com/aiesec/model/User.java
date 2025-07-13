@@ -3,6 +3,8 @@ package com.aiesec.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -15,7 +17,8 @@ import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User {
@@ -63,13 +66,16 @@ public class User {
     private String teamLeaderAiesecEmail;
 
     private String teamLeaderId;
-    private int noOfTask=0;
 
     private String s_department;
 
     private String faculty;
 
-    private String phone;
+    private int noOfTask=0;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department department;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
@@ -80,10 +86,6 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "function_id")
     private Function function;
-
-    @ManyToOne
-    @JoinColumn(name = "department_id")
-    private Department department;
 
 
     @OneToMany(mappedBy = "member")
@@ -189,14 +191,6 @@ public class User {
         this.function = function;
     }
 
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
     public Date getBirthday() {
         return birthday;
     }
@@ -285,32 +279,6 @@ public class User {
         this.teamLeaderId = teamLeaderId;
     }
 
-
-    public Date getBirthday() {
-    return birthday;
-}
-
-public void setBirthday(Date birthday) {
-    this.birthday = birthday;
-}
-
-public Date getJoinedDate() {
-    return joinedDate;
-}
-
-public void setJoinedDate(Date joinedDate) {
-    this.joinedDate = joinedDate;
-}
-
-public String getPhone(){
-
-    return phone;
-}
-public void setPhone(String phone){
-    this.phone=phone;
-}
-
-
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -334,6 +302,13 @@ public void setPhone(String phone){
     public void setFaculty(String faculty) {
         this.faculty = faculty;
     }
-    
+    public int getNoOfTask() {
+        return noOfTask;
+    }
+
+    public void setNoOfTask(int noOfTask) {
+        this.noOfTask = noOfTask;
+    }
+
 
 }

@@ -3,7 +3,6 @@ package com.aiesec.mapper;
 
 import com.aiesec.dto.EventExperienceDTO; 
 import com.aiesec.model.event.Event; 
-import com.aiesec.model.event.GuestUser; 
 import com.aiesec.model.User;
 import com.aiesec.model.event.EventExperience;
 
@@ -14,7 +13,7 @@ public class EventExperienceMapper {
                 .experienceId(experience.getExperienceId())
                 .eventId(experience.getEvent().getEventId())
                 .userId(Long.valueOf(experience.getUser() != null ? experience.getUser().getId() : null))
-                .guestUserId(experience.getGuestUser() != null ? experience.getGuestUser().getGuestUserId() : null)
+               
                 .rating(experience.getRating())
                 .testimonial(experience.getTestimonial())
                 // .dateCreated(experience.getDateCreated()) // Uncomment if needed
@@ -37,12 +36,6 @@ public class EventExperienceMapper {
             experience.setUser(user);
         }
 
-        // Set GuestUser
-        if (dto.getGuestUserId() != null) {
-            GuestUser guestUser = new GuestUser();
-            guestUser.setGuestUserId(dto.getGuestUserId());
-            experience.setGuestUser(guestUser);
-        }
 
         experience.setRating(dto.getRating());
         experience.setTestimonial(dto.getTestimonial());

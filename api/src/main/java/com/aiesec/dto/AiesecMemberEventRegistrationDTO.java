@@ -15,13 +15,22 @@ import java.time.LocalDateTime;
 
 public class AiesecMemberEventRegistrationDTO {
     private Long id;
-    @JsonProperty("userId")  // ✅ THIS IS THE FIX
+    @JsonProperty("userId")
     private Long userId;
     @JsonProperty("eventId")
     private Long eventId;
     private InterestStatus interestStatus;
     private String comment;
     private LocalDateTime registeredAt;
+    private UserDTO user;
+
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
+    }
 
     public Long getId() {
         return id;

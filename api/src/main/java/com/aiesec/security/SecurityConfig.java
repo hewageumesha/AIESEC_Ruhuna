@@ -21,7 +21,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/departments/**").permitAll()
                                 .requestMatchers("/api/functions/**").permitAll()
                                 .requestMatchers("/api/users/**").permitAll()
                                 .requestMatchers("/api/events/**").permitAll()

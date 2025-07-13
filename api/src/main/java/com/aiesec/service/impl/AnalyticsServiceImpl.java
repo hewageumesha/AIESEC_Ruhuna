@@ -212,7 +212,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             for (AiesecMemberEventRegistration reg : memberRegs) {
                 User user = reg.getUser();
 
-                String name = user != null ? user.getUserName() + " " + user.getLastName() : "N/A";
+                String name = user != null ? user.getFirstName() + " " + user.getLastName() : "N/A";
                 String email = user != null ? user.getEmail() : "N/A";
                 String phone = user != null ? user.getPhoneNumber() : "N/A";
 

@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class EventDTO {
+
     private Long eventId;
     private String eventName;
     private String description;
@@ -25,6 +26,8 @@ public class EventDTO {
     private LocalTime endTime;
 
     private LocalDate endDate;
+    private Integer registrationCloseBeforeDays;
+
     private String location;
     private String imageUrl;
     private Boolean isPublic;

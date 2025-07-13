@@ -5,7 +5,6 @@ import com.aiesec.enums.UserRole;
 public class UserUpdateDTO {
     private UserRole role;
     private Long functionId;
-    private Long departmentId;
 
     public UserRole getRole() {
         return role;
@@ -18,11 +17,5 @@ public class UserUpdateDTO {
     }
     public void setFunctionId(Long functionId) {
         this.functionId = functionId;
-    }
-    public Long getDepartmentId() {
-        return departmentId;
-    }
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
     }
 }

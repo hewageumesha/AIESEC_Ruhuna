@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TaskList from "./TaskList";
-import AssignedTasks from "./AssignedTasks";
-import {
-    BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer
-} from 'recharts';
+
 import UserProgressPage from "./UserProgressPage";
 
 const TaskDashboard = () => {
@@ -12,7 +9,7 @@ const TaskDashboard = () => {
     const { id} = useParams();
 
     // 🔹 States for user info
-    const [username, setUsername] = useState("Krish");
+    const [firstName, setFirstName] = useState("Krish");
     const [numberOfTasks, setNumberOfTasks] = useState(0);
     const navigate = useNavigate();
 
@@ -23,7 +20,7 @@ const TaskDashboard = () => {
                 const response = await fetch(`http://localhost:8080/api/users/id/${id}`);
                 if (response.ok) {
                     const userDetails = await response.json();
-                    setUsername(userDetails.userName);
+                    setFirstName(userDetails.firstName);
                     setNumberOfTasks(userDetails.noOfTask);
                 } else {
                     throw new Error("Failed to fetch user details");
@@ -36,10 +33,7 @@ const TaskDashboard = () => {
         fetchUserDetails();
     }, [id]);
 
-    // 🔹 Navigation Handlers
-    const handleShowAllTasks = () => {
-        navigate(`/assigned-tasks`);
-    };
+
 
     const handleCreateTask = () => {
         navigate(`/user/${id}/CreateTask`);
@@ -51,7 +45,7 @@ const TaskDashboard = () => {
 
             {/* 🔸 Sidebar Navigation */}
             <div className="w-64 bg-blue-800 text-white p-6 space-y-6 min-h-screen">
-                <h3 className="text-2xl font-bold mb-4">Welcome, {username}</h3>
+                <h3 className="text-2xl font-bold mb-4">Welcome, {firstName}</h3>
                 <ul className="space-y-4">
                     <li>
                         <button
@@ -61,14 +55,7 @@ const TaskDashboard = () => {
                             Dashboard
                         </button>
                     </li>
-                    <li>
-                        <button
-                            onClick={handleShowAllTasks}
-                            className="w-full text-left px-4 py-2 rounded hover:bg-blue-700"
-                        >
-                            My Tasks
-                        </button>
-                    </li>
+
                     <li>
                         <button
                             onClick={handleCreateTask}
@@ -85,14 +72,7 @@ const TaskDashboard = () => {
                             User Progress
                         </button>
                     </li>
-                    <li>
-                        <button
-                            onClick={() => navigate(`/user/${id}/notifications`)}
-                            className="w-full text-left px-4 py-2 rounded hover:bg-blue-700"
-                        >
-                            Notifications
-                        </button>
-                    </li>
+
                 </ul>
             </div>
 
