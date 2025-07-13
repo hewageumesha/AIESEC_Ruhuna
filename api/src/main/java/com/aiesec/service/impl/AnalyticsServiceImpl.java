@@ -15,8 +15,6 @@ import com.aiesec.repository.event.EventRepository;
 import com.aiesec.repository.event.GuestEventRegistrationRepository;
 import com.aiesec.service.interfaces.AnalyticsService;
 import com.aiesec.service.interfaces.EventService;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
