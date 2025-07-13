@@ -28,10 +28,10 @@ const AddBirthday = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#d9dfdf] to-[#fefeff] dark:from-gray-900 dark:to-gray-800 flex flex-col items-center justify-start py-10 px-4">
+   <div className="min-h-screen bg-white dark:from-gray-900 dark:to-gray-800 flex flex-col items-center justify-start py-10 px-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-[#1E40AF] dark:bg-gray-900 p-8 rounded-xl shadow-xl w-full max-w-md text-white"
+        className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-xl w-full max-w-md text-black dark:text-white"
       >
         <h2 className="text-center text-lg font-semibold mb-4">
           Add New Birthday
