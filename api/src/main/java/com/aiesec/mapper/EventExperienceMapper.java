@@ -2,8 +2,7 @@ package com.aiesec.mapper;
 
 
 import com.aiesec.dto.EventExperienceDTO; 
-import com.aiesec.model.event.Event; 
-import com.aiesec.model.event.GuestUser; 
+import com.aiesec.model.event.Event;
 import com.aiesec.model.User;
 import com.aiesec.model.event.EventExperience;
 

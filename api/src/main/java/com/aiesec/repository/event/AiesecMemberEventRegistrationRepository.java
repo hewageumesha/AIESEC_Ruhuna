@@ -1,10 +1,16 @@
 package com.aiesec.repository.event;
 
+import com.aiesec.dto.EventRegistrationSummaryDTO;
+import com.aiesec.enums.InterestStatus;
 import com.aiesec.model.event.AiesecMemberEventRegistration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AiesecMemberEventRegistrationRepository extends JpaRepository<AiesecMemberEventRegistration, Long> {

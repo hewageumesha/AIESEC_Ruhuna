@@ -2,10 +2,6 @@ package com.aiesec.service.impl;
 
 
 
-import com.aiesec.dto.GuestUserDTO;
-import com.aiesec.model.event.GuestUser;
-import com.aiesec.repository.event.GuestUserRepository;
-import com.aiesec.service.interfaces.GuestUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
