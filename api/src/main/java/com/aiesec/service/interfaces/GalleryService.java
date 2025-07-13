@@ -10,5 +10,6 @@ public interface GalleryService {
     List<GalleryDTO> getAllGalleryImages();
     List<GalleryDTO> getGalleryImagesByCategory(String category);
     void deleteGalleryImage(Long id);
+    void deleteGalleryImagesByIds(List<Long> ids);
 
 }

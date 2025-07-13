@@ -5,6 +5,7 @@ import com.aiesec.service.interfaces.GuestEventRegistrationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -16,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/guest-registrations")
+@RequestMapping("/guest-registrations")
 @RequiredArgsConstructor
 public class GuestEventRegistrationController {
 
@@ -77,6 +78,15 @@ public class GuestEventRegistrationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Internal server error", "message", e.getMessage()));
         }
+    }
+
+    @GetMapping("/event/{eventId}/paged")
+    public ResponseEntity<Page<GuestEventRegistrationDTO>> getPagedRegistrations(
+            @PathVariable Long eventId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<GuestEventRegistrationDTO> pagedResult = registrationService.getPagedByEventId(eventId, page, size);
+        return ResponseEntity.ok(pagedResult);
     }
 
 

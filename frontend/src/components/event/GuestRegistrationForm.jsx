@@ -20,7 +20,7 @@ const GuestRegistrationForm = ({ eventId, onSuccess }) => {
       console.log("Submitting guest registration:", payload);
 
       const { data } = await axios.post(
-        "http://localhost:8080/api/guest-registrations",
+        "http://localhost:8080/guest-registrations",
         payload
       );
 

@@ -7,7 +7,7 @@ import com.aiesec.dto.RegistrationDTO;
 import com.aiesec.model.event.AiesecMemberEventRegistration;
 import com.aiesec.service.interfaces.AiesecMemberEventRegistrationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/member-event-registrations")
+@RequestMapping("/member-event-registrations")
 @RequiredArgsConstructor
 public class AiesecMemberEventRegistrationController {
 
@@ -26,7 +26,7 @@ public class AiesecMemberEventRegistrationController {
 
     @PostMapping("/register")
     public ResponseEntity<AiesecMemberEventRegistrationDTO> register(@RequestBody AiesecMemberEventRegistrationDTO dto) {
-        System.out.println("🚀 Incoming DTO: " + dto);
+        System.out.println(" Incoming DTO: " + dto);
         try {
             AiesecMemberEventRegistrationDTO registered = registrationService.register(dto);
             return ResponseEntity.ok(registered);
@@ -78,7 +78,7 @@ public class AiesecMemberEventRegistrationController {
             RegistrationDTO responseDto = new RegistrationDTO();
             responseDto.setEventId(updated.getEventId());
             responseDto.setUserId(updated.getUserId());
-            responseDto.setInterestStatus(String.valueOf(updated.getInterestStatus()));
+            responseDto.setInterestStatus(updated.getInterestStatus()); // enum, no String conversion
             responseDto.setComment(updated.getComment());
 
             return ResponseEntity.ok(responseDto);
@@ -86,5 +86,15 @@ public class AiesecMemberEventRegistrationController {
             return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
         }
     }
+
+
+    @GetMapping("/event/{eventId}/paged")
+    public ResponseEntity<Page<AiesecMemberEventRegistrationDTO>> getPagedRegistrations(
+            @PathVariable Long eventId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(registrationService.getPagedByEventId(eventId, page, size));
+    }
+
 
 }
