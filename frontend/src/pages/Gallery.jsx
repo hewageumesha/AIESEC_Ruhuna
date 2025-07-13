@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { Spin, Modal, Button, message } from 'antd';
-import { DeleteOutlined, SelectOutlined, EyeOutlined, DownloadOutlined, CloseOutlined } from '@ant-design/icons';
+import { Spin, Modal, Button, message, notification } from 'antd';
+import { DeleteOutlined, SelectOutlined, EyeOutlined, DownloadOutlined, CloseOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { deleteImageFromStorage } from '../service/deleteImageFromStorage';
 
 const GalleryPage = () => {
@@ -239,7 +239,18 @@ const GalleryPage = () => {
       setImages(prevImages => prevImages.filter(img => !selectedImages.has(img.id)));
       setSelectedImages(new Set());
       
-      message.success(`${selectedImageIds.length} image(s) deleted successfully`);
+      // Beautiful success notification
+      notification.success({
+        message: 'Images Deleted Successfully',
+        description: `${selectedImageIds.length} image${selectedImageIds.length > 1 ? 's' : ''} ${selectedImageIds.length > 1 ? 'have' : 'has'} been removed from the gallery.`,
+        icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+        placement: 'topRight',
+        duration: 4,
+        style: {
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        },
+      });
       
     } catch (error) {
       console.error('Failed to delete images:', error);
@@ -331,9 +342,9 @@ const GalleryPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Category Filter Tabs */}
+        {/* Category Filter Tabs and Management Controls */}
         <div className="mb-8">
-          <div className="flex flex-wrap gap-3 justify-center">
+          <div className="flex flex-wrap gap-3 justify-center mb-6">
             {categoryOptions.map(category => (
               <button
                 key={category.key}
@@ -348,27 +359,19 @@ const GalleryPage = () => {
               </button>
             ))}
           </div>
-        </div>
 
-        {/* Admin Controls - Only visible to LCP/LCVP users */}
-        {canEdit && (
-          <div className="mb-6 bg-white rounded-xl shadow-lg p-6 border border-blue-100">
-            <div className="flex flex-wrap gap-4 items-center justify-between">
+          {/* Management Controls - Only visible to LCP/LCVP users */}
+          {canEdit && (
+            <div className="flex flex-wrap gap-4 items-center justify-center">
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                  <span className="font-medium">Admin Mode: {currentUserRole}</span>
+                <div className="text-sm text-gray-600 bg-blue-50 px-4 py-2 rounded-full font-medium">
+                  {selectedImages.size} of {filteredImages.length} images selected
                 </div>
-                <div className="text-sm text-gray-600 bg-blue-50 px-3 py-1 rounded-full">
-                  {selectedImages.size} of {filteredImages.length} selected
-                </div>
-              </div>
-              <div className="flex gap-3">
                 <Button
                   type="default"
                   icon={<SelectOutlined />}
                   onClick={handleSelectAll}
-                  className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400"
+                  className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 font-medium"
                 >
                   {selectedImages.size === filteredImages.length ? 'Deselect All' : 'Select All'}
                 </Button>
@@ -378,14 +381,14 @@ const GalleryPage = () => {
                   icon={<DeleteOutlined />}
                   onClick={() => setDeleteModalVisible(true)}
                   disabled={selectedImages.size === 0}
-                  className="bg-red-500 hover:bg-red-600 border-red-500"
+                  className="bg-red-500 hover:bg-red-600 border-red-500 font-medium"
                 >
                   Delete Selected ({selectedImages.size})
                 </Button>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Loading State */}
         {loading ? (
@@ -413,7 +416,7 @@ const GalleryPage = () => {
                           canEdit ? 'cursor-pointer' : 'cursor-zoom-in'
                         } ${
                           selectedImages.has(img.id) 
-                            ? 'ring-4 ring-blue-500 ring-opacity-50' 
+                            ? 'ring-4 ring-blue-500 ring-opacity-50 shadow-2xl' 
                             : ''
                         }`}
                         onClick={(e) => handleImageClick(img, e)}
@@ -446,7 +449,7 @@ const GalleryPage = () => {
                           )}
                         </div>
 
-                        {/* Selection Indicator - Only for admin users */}
+                        {/* Selection Indicator - Only for LCP/LCVP users */}
                         {canEdit && selectedImages.has(img.id) && (
                           <div className="absolute top-2 right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
                             <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -455,7 +458,7 @@ const GalleryPage = () => {
                           </div>
                         )}
 
-                        {/* Admin Mode Indicator - Only for admin users */}
+                        {/* Selection Indicator - Only for LCP/LCVP users */}
                         {canEdit && !selectedImages.has(img.id) && (
                           <div className="absolute top-2 right-2 w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
                             <div className="w-4 h-4 border-2 border-blue-600 rounded-full"></div>
@@ -499,7 +502,7 @@ const GalleryPage = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal - Only for admin users */}
+      {/* Delete Confirmation Modal - Only for LCP/LCVP users */}
       <Modal
         title={
           <div className="flex items-center gap-2">
@@ -517,7 +520,7 @@ const GalleryPage = () => {
         className="delete-modal"
       >
         <p className="text-gray-700">Are you sure you want to delete {selectedImages.size} selected image(s)?</p>
-        <p className="text-red-500 text-sm mt-2 font-medium">⚠️ This action cannot be undone.</p>
+        <p className="text-gray-500 text-sm mt-2">This action cannot be undone.</p>
       </Modal>
     </div>
   );

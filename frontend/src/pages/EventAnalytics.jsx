@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Calendar, Users, Filter, Eye, UserCheck, UserX, Clock, Mail, Phone, User } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -42,40 +43,67 @@ const apiService = {
   },
 
   // Get registration analytics by event
-  getRegistrationsByEvent: async (type = 'all', eventId = null) => {
-    const params = new URLSearchParams({ type });
-    if (eventId) params.append('eventID', eventId);
+  getRegistrationsByEvent: async (eventId = null, status = null) => {
+    const params = new URLSearchParams();
+    if (eventId) params.append('eventId', eventId);
+    if (status) params.append('status', status);
     
     const response = await fetch(`/analytics/registrations/by-event?${params}`);
     if (!response.ok) throw new Error('Failed to fetch registrations');
     return response.json();
   },
 
-  // Get member registrations (paginated)
+  // Updated to fetch member registrations with user details
   getMemberRegistrations: async (eventId, page = 0, size = 10) => {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      size: size.toString()
-    });
-    
-    const response = await fetch(`/api/member-event-registrations/event/${eventId}/paged?${params}`);
+    const response = await fetch(`/api/member-event-registrations/event/${eventId}/paged?page=${page}&size=${size}`);
     if (!response.ok) throw new Error('Failed to fetch member registrations');
-    return response.json();
-  },
-
-  // Get guest registrations (paginated)
-  getGuestRegistrations: async (eventId, page = 0, size = 10) => {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      size: size.toString()
-    });
+    const data = await response.json();
     
-    const response = await fetch(`/api/guest-registrations/event/${eventId}/paged?${params}`);
-    if (!response.ok) throw new Error('Failed to fetch guest registrations');
-    return response.json();
+    // Transform the data to include proper user information
+    if (data.content) {
+      data.content = data.content.map(registration => ({
+        ...registration,
+        // Construct full name from user data
+        name: registration.user ? 
+          `${registration.user.firstName || ''} ${registration.user.lastName || ''}`.trim() : 
+          'Unknown Member',
+        // Use user email
+        email: registration.user?.email || registration.user?.aiesecEmail || 'No email',
+        // Use user phone
+        contact: registration.user?.phone || 'No contact',
+        // Map status correctly
+        status: registration.interestStatus || 'PENDING'
+      }));
+    }
+    
+    return data;
   },
 
-  // Get status distribution for an event
+  // Updated to fetch guest registrations with proper contact info
+  getGuestRegistrations: async (eventId, page = 0, size = 10) => {
+    const response = await fetch(`/api/guest-registrations/event/${eventId}/paged?page=${page}&size=${size}`);
+    if (!response.ok) throw new Error('Failed to fetch guest registrations');
+    const data = await response.json();
+    
+    // Transform the data to ensure proper mapping
+    if (data.content) {
+      data.content = data.content.map(registration => ({
+        ...registration,
+        // Guest name should be directly from registration
+        name: registration.name || 'Unknown Guest',
+        // Guest email from registration
+        email: registration.email || 'No email',
+        // Guest phone from registration
+        contact: registration.phone || 'No contact',
+        // Map status correctly
+        status: registration.interestStatus || 'PENDING'
+      }));
+    }
+    
+    return data;
+  },
+
+  // Get status distribution for an event (include all statuses)
   getStatusDistribution: async (eventId, type = 'all') => {
     const params = new URLSearchParams({
       eventId: eventId.toString(),
@@ -87,26 +115,32 @@ const apiService = {
     return response.json();
   },
 
-  // Get member status summary
+  // Get member status summary (all statuses)
   getMemberStatusSummary: async (eventId) => {
-    const params = new URLSearchParams({
-      eventId: eventId.toString()
-    });
-    
-    const response = await fetch(`/api/member-event-registrations/summary/status?${params}`);
+    const response = await fetch(`/api/member-event-registrations/event/${eventId}/status-summary`);
     if (!response.ok) throw new Error('Failed to fetch member status summary');
-    return response.json();
+    const data = await response.json();
+    
+    // Ensure all statuses are included
+    return {
+      GOING: data.GOING || 0,
+      PENDING: data.PENDING || 0,
+      NOT_GOING: data.NOT_GOING || 0
+    };
   },
 
-  // Get guest status summary
+  // Get guest status summary (all statuses)
   getGuestStatusSummary: async (eventId) => {
-    const params = new URLSearchParams({
-      eventId: eventId.toString()
-    });
-    
-    const response = await fetch(`/api/guest-registrations/analytics/summary/status?${params}`);
+    const response = await fetch(`/api/guest-registrations/event/${eventId}/status-summary`);
     if (!response.ok) throw new Error('Failed to fetch guest status summary');
-    return response.json();
+    const data = await response.json();
+    
+    // Ensure all statuses are included
+    return {
+      GOING: data.GOING || 0,
+      PENDING: data.PENDING || 0,
+      NOT_GOING: data.NOT_GOING || 0
+    };
   }
 };
 
@@ -177,8 +211,10 @@ const DataTable = ({ data, loading, pagination, onPageChange, type }) => {
             {record.name?.charAt(0)?.toUpperCase() || '?'}
           </div>
           <div>
-            <div className="font-medium text-gray-900">{record.name}</div>
-            <div className="text-sm text-gray-500">{type === 'member' ? 'AIESEC Member' : 'Guest'}</div>
+            <div className="font-medium text-gray-900">{record.name || 'Unknown'}</div>
+            <div className="text-sm text-gray-500">
+              {type === 'member' ? 'AIESEC Member' : 'Guest'}
+            </div>
           </div>
         </div>
       )
@@ -189,7 +225,7 @@ const DataTable = ({ data, loading, pagination, onPageChange, type }) => {
       render: (record) => (
         <div className="flex items-center space-x-2">
           <Mail className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-900">{record.email}</span>
+          <span className="text-gray-900">{record.email || 'No email'}</span>
         </div>
       )
     },
@@ -199,14 +235,14 @@ const DataTable = ({ data, loading, pagination, onPageChange, type }) => {
       render: (record) => (
         <div className="flex items-center space-x-2">
           <Phone className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-900">{record.contact || record.contactNumber || 'N/A'}</span>
+          <span className="text-gray-900">{record.contact || 'No contact'}</span>
         </div>
       )
     },
     {
       key: 'status',
       title: 'Status',
-      render: (record) => <StatusBadge status={record.interestStatus || record.status} />
+      render: (record) => <StatusBadge status={record.status} />
     }
   ];
 
@@ -307,6 +343,9 @@ const EventRegistrationViewer = ({ events, loading: eventsLoading }) => {
   const [statusDistribution, setStatusDistribution] = useState(null);
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [error, setError] = useState(null);
+
+    
+
 
   const selectedEventData = events.find(e => e.id === parseInt(selectedEvent));
 
@@ -688,7 +727,7 @@ const EventAnalytics = () => {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">Registration Summary</h2>
-                <p className="text-gray-600">Overview of event registrations</p>
+                <p className="text-gray-600">Overview of event registrations-Going Count</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">

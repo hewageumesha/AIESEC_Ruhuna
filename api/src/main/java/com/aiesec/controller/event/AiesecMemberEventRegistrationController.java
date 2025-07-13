@@ -77,7 +77,7 @@ public class AiesecMemberEventRegistrationController {
             RegistrationDTO responseDto = new RegistrationDTO();
             responseDto.setEventId(updated.getEventId());
             responseDto.setUserId(updated.getUserId());
-            responseDto.setInterestStatus(String.valueOf(updated.getInterestStatus()));
+            responseDto.setInterestStatus(updated.getInterestStatus()); // enum, no String conversion
             responseDto.setComment(updated.getComment());
 
             return ResponseEntity.ok(responseDto);
@@ -85,6 +85,7 @@ public class AiesecMemberEventRegistrationController {
             return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
         }
     }
+
 
     @GetMapping("/event/{eventId}/paged")
     public ResponseEntity<Page<AiesecMemberEventRegistrationDTO>> getPagedRegistrations(

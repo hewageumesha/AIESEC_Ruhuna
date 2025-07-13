@@ -19,7 +19,7 @@ const MemberRegistrationForm = ({ eventId, onSuccess }) => {
 
       try {
         const res = await axios.get(
-          `http://localhost:8080/api/member-event-registrations/user/${userId}/event/${eventId}`
+          `http://localhost:8080/member-event-registrations/user/${userId}/event/${eventId}`
         );
         if (res.data && res.data.length > 0) {
           setExistingRegistration(res.data[0]);
@@ -57,14 +57,14 @@ const MemberRegistrationForm = ({ eventId, onSuccess }) => {
       if (existingRegistration) {
         // Update existing registration (PUT)
         res = await axios.put(
-          `http://localhost:8080/api/member-event-registrations/${existingRegistration.id}`,
+          `http://localhost:8080/member-event-registrations/${existingRegistration.id}`,
           payload
         );
         message.success("Your registration has been updated.");
       } else {
         // Create new registration (POST)
         res = await axios.post(
-          "http://localhost:8080/api/member-event-registrations/register",
+          "http://localhost:8080/member-event-registrations/register",
           payload
         );
         message.success("Your response has been submitted.");
