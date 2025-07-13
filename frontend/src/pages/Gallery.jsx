@@ -326,18 +326,14 @@ const GalleryPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50">
       {/* AIESEC Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white py-12 px-4 shadow-xl">
+      <div className="bg-gradient-to-r from-blue-150 via-blue-200 to-blue-250 text-white py-12 px-4 shadow-xl">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center mb-4">
-            <div className="bg-white rounded-full p-3 mr-4">
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">A</span>
-              </div>
-            </div>
-            <h1 className="text-5xl font-bold">AIESEC in Ruhuna</h1>
+            
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">AIESEC in Ruhuna</h1>
           </div>
-          <p className="text-center text-blue-100 text-xl">Event Gallery</p>
-          <p className="text-center text-blue-200 text-lg mt-2">Showcasing our memorable moments and achievements</p>
+          <p className="text-center text-blue-100 text-xl bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">Event Gallery</p>
+          <p className="text-center text-blue-200 text-lg mt-2 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">Showcasing our memorable moments and achievements</p>
         </div>
       </div>
 
