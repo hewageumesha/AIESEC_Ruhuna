@@ -9,8 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-@Getter
 @Setter
+@Getter
 @Entity
 public class AiesecMemberEventRegistration {
 
@@ -39,10 +39,6 @@ public class AiesecMemberEventRegistration {
     @Enumerated(EnumType.STRING)
     @Column(name = "interest_status")
     private InterestStatus interestStatus;
-
-    @Enumerated(EnumType.STRING)
-    private RegistrationType type;
-
     private String comment;
 
     @CreationTimestamp

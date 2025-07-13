@@ -6,14 +6,12 @@ import com.aiesec.dto.UserHierarchyDTO;
 import com.aiesec.dto.UserRequestDTO;
 import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.UserRole;
-import com.aiesec.model.Function;
 import com.aiesec.model.Department;
+import com.aiesec.model.Function;
 import com.aiesec.model.User;
 import com.aiesec.repository.UserRepository;
 import com.aiesec.repository.FunctionRepo;
 
-
-import java.util.Collections;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -355,13 +353,6 @@ public class UserService {
             return Collections.emptyList(); // or return a new ArrayList<UserDto>()
         }
         return users.stream().map(this::userToDto).toList();
-
-=======
-    public void sendTempPasswordEmail(String toEmail, String tempPassword) {
-        String subject = "Your Temporary AIESEC Password";
-        String text = "Hello,\n\nYour temporary password is: " + tempPassword + "\n\nPlease log in and change it as soon as possible.";
->>>>>>> 9a66ff04089ef00e33b999bfeb5fe8e3f94fc62d
-
     }
 
     public UserDTO userToDto(User user){
@@ -390,5 +381,4 @@ public class UserService {
 
         return userDto;
     }
-
 }

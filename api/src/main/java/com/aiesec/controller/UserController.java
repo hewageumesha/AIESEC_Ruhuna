@@ -1,16 +1,24 @@
 package com.aiesec.controller;
 
+import com.aiesec.dto.CommentDTO;
 import com.aiesec.dto.PasswordUpdateRequest;
+import com.aiesec.dto.UserDTO;
+import com.aiesec.dto.UserHierarchyDTO;
 import com.aiesec.dto.UserRequestDTO;
 import com.aiesec.dto.UserUpdateDTO;
-import com.aiesec.enums.UserRole;
 import com.aiesec.enums.Gender;
+import com.aiesec.enums.UserRole;
 import com.aiesec.model.User;
 
 import com.aiesec.repository.UserRepository;
+import com.aiesec.security.UserDetailsImpl;
+import com.aiesec.service.CommentService;
 import com.aiesec.service.UserService;
 
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,27 +45,42 @@ public class UserController {
     @Autowired 
     private UserRepository userRepo;
 
-    @Autowired
-    private JavaMailSender mailSender;
-
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         return ResponseEntity.ok(userRepo.getUserById(id));
     }
 
+@Autowired
+private JavaMailSender mailSender;
+
+@GetMapping("/sendmail")
+public String senMail() {
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setTo("n.u.m.hewage@gmail.com");
+    message.setSubject("Test Mail");
+    message.setText("This is a test email from Spring Boot!");
+
+    mailSender.send(message);
+
+    return "Mail sent successfully!";
+}
+
 
     @PostMapping("/add")
     public User addUser(@RequestBody Map<String, Object> body) {
+
+        try {
+        
         String aiesecEmail = (String) body.get("aiesecEmail");
         String email = (String) body.get("email");
-        Date birthday = (Date) body.get("birthday");
-        Long function = (Long) body.get("function");
+        Date birthday = body.get("birthday") != null ? java.sql.Date.valueOf(body.get("birthday").toString()) : null;
+        Long function = body.get("function") != null ? Long.parseLong(body.get("function").toString()) : null;
         String firstName = (String) body.get("firstName");
         String lastName = (String) body.get("lastName");
-        Gender gender = (Gender) body.get("gender");
-        Date joinedDate = (Date) body.get("joinedDate");
-        UserRole role = (UserRole) body.get("role");
+        Date joinedDate = body.get("joinedDate") != null ? java.sql.Date.valueOf(body.get("joinedDate").toString()) : null;
+        Gender gender = body.get("gender") != null ? Gender.valueOf(body.get("gender").toString()) : null;
+        UserRole role = body.get("role") != null ? UserRole.valueOf(body.get("role").toString()) : null;
         String team_leader_aiesecEmail = (String) body.get("teamLeaderAiesecEmail");
 
         UserRequestDTO dto  = new UserRequestDTO();
@@ -72,8 +97,7 @@ public class UserController {
         dto.setTeamLeaderAiesecEmail(team_leader_aiesecEmail);
 
         String tempString = userService.generateTempPassword();
-        userService.sendTempPasswordEmail(email, tempString);
-
+        userService.sendTempPasswordEmail(email, tempString, aiesecEmail);
         return userService.addUser(dto);
 
        } catch (Exception e) {

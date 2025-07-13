@@ -212,7 +212,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
                 String name = user != null ? user.getFirstName() + " " + user.getLastName() : "N/A";
                 String email = user != null ? user.getEmail() : "N/A";
-                String phone = user != null ? user.getPhone() : "N/A";
+                String phone = user != null ? user.getPhoneNumber() : "N/A";
 
                 csvPrinter.printRecord(
                         reg.getEvent().getEventId(),
