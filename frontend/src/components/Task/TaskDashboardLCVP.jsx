@@ -2,17 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TaskList from "./TaskList";
 import AssignedTasks from "./AssignedTasks";
-import {
-    BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer
-} from 'recharts';
 import UserProgressPage from "./UserProgressPage";
 
-const TaskDashboardLCP = () => {
+const TaskDashboardLCVP = () => {
     // 🔹 Extract userId from URL
     const { id} = useParams();
 
     // 🔹 States for user info
-    const [username, setUsername] = useState("Krish");
+    const [firstName, setFisrstName] = useState("Krish");
     const [numberOfTasks, setNumberOfTasks] = useState(0);
     const navigate = useNavigate();
 
@@ -23,7 +20,7 @@ const TaskDashboardLCP = () => {
                 const response = await fetch(`http://localhost:8080/api/users/id/${id}`);
                 if (response.ok) {
                     const userDetails = await response.json();
-                    setUsername(userDetails.userName);
+                    setFisrstName(userDetails.firstName);
                     setNumberOfTasks(userDetails.noOfTask);
                 } else {
                     throw new Error("Failed to fetch user details");
@@ -51,7 +48,7 @@ const TaskDashboardLCP = () => {
 
             {/* 🔸 Sidebar Navigation */}
             <div className="w-64 bg-blue-800 text-white p-6 space-y-6 min-h-screen">
-                <h3 className="text-2xl font-bold mb-4">Welcome, {username}</h3>
+                <h3 className="text-2xl font-bold mb-4">Welcome, {firstName}</h3>
                 <ul className="space-y-4">
                     <li>
                         <button
@@ -123,4 +120,4 @@ const TaskDashboardLCP = () => {
     );
 };
 
-export default TaskDashboardLCP;
+export default TaskDashboardLCVP;

@@ -20,7 +20,12 @@ export default function DashboardComp() {
   const [lastMonthUsers, setLastMonthUsers] = useState(0);
   const [lastMonthTasks, setLastMonthTasks] = useState(0);
   const [lastMonthEvents, setLastMonthEvents] = useState(0);
-  const { currentUser } = useSelector((state) => state.user);
+    const { currentUser } = useSelector((state) => state.user);
+
+    console.log("==== DEBUG currentUser ====");
+    console.log(currentUser);
+    console.log("No of Tasks:", currentUser?.noOfTask);
+    console.log("==========================");
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -94,7 +99,7 @@ export default function DashboardComp() {
                         <h3 className='text-gray-500 text-md uppercase'>
                             Total Tasks
                         </h3>
-                        <p className='text-2xl'>{totalTasks}</p>
+                        <p className='text-2xl'>{currentUser?.noOfTask}</p>
                     </div>
                     <HiNewspaper className='bg-blue-600  text-white rounded-full text-5xl p-3 shadow-lg' />
                 </div>
@@ -128,7 +133,13 @@ export default function DashboardComp() {
                 <div className='flex justify-between  p-3 text-sm font-semibold'>
                     <h1 className='text-center p-2'>Task</h1>
                     <Button outline gradientDuoTone='purpleToBlue'>
-                    <Link to={'/dashboard?task'}>See all</Link>
+                        <Link to={
+                            currentUser?.role === 'LCP'
+                                ? `/user/${currentUser.id}/TaskList`
+                                : '/assigned-tasks'
+                        }>
+                            See all
+                        </Link>
                     </Button>
                 </div>
                 <Table hoverable>

@@ -8,7 +8,7 @@ public interface GalleryService {
 
     GalleryDTO uploadGalleryImage(GalleryDTO dto);
     List<GalleryDTO> getAllGalleryImages();
-    List<GalleryDTO> getGalleryImagesByCategory(String category);
+    List<GalleryDTO> getGalleryImagesByEventId(Long eventId);
     void deleteGalleryImage(Long id);
-
 }
+

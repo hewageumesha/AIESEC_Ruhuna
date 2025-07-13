@@ -2,6 +2,7 @@ package com.aiesec.model;
 
 import com.aiesec.dto.TaskDto;
 import com.aiesec.enums.Priority;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,25 +43,21 @@ public class Task {
 
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "assigned_to")
-    private User assignedTo;
+    @Column(name = "assigned_to")
+    private Long assignedToId; // just store user ID
 
-    @ManyToOne
-    @JoinColumn(name = "assigned_by")
-    private User assignedBy;
+    @Column(name = "assigned_by")
+    private Long assignedById; // just store user ID
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private java.util.List<TaskProof> proofs = new java.util.ArrayList<>();
 
     // Optional: Provide setter that maps from DTO (can be removed if unused)
 
 
-    public void setAssignedBy(User assigner) {
-        this.assignedBy = assigner;
-    }
+
 
 }

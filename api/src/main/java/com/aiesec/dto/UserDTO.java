@@ -7,6 +7,7 @@ import java.util.List;
 import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
+import com.aiesec.model.Department;
 import com.aiesec.model.Function;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,7 @@ import lombok.Setter;
 @Setter
 public class UserDTO {
     private Long id;
-    private String userName;
+    private String firstName;
     private String lastName;
     private String aiesecEmail;  // Add this field
     private String email;
@@ -24,7 +25,7 @@ public class UserDTO {
     private String streetAddress;
     private String city;
     private String stateORProvince;
-    private String ZIPORPostalCode; 
+    private String ZIPORPostalCode;
     private String s_department;
     private String faculty;
     private Date birthday;
@@ -34,17 +35,15 @@ public class UserDTO {
     private UserRole role;
     private UserStatus status;
     private Function functionId;
-    private String functionName; 
-    private Long departmentId;
-    private String departmentName;  
+    private String functionName;
+    private Department departmentId;
+    private String departmentName;
     private String teamLeaderAiesecEmail;
     private String teamLeaderName;
     private List<UserDTO> teamMembers;
-    private List<String> commentsForUser; 
+    private List<String> commentsForUser;
     private List<String> commentsCreated;
-    private String password;
     private int noOfTask;
-
 
     public Long getId() {
         return id;
@@ -54,12 +53,12 @@ public class UserDTO {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getLastName() {
@@ -189,11 +188,11 @@ public class UserDTO {
         this.functionName = functionName;
     }
 
-    public Long getDepartmentId() {
+    public Department getDepartmentId() {
         return departmentId;
     }
 
-    public void setDepartmentId(Long departmentId) {
+    public void setDepartmentId(Department departmentId) {
         this.departmentId = departmentId;
     }
 
@@ -244,7 +243,7 @@ public class UserDTO {
     public void setCommentsCreated(List<String> commentsCreated) {
         this.commentsCreated = commentsCreated;
     }
-        public String getAbout() {
+    public String getAbout() {
         return about;
     }
 
@@ -267,6 +266,6 @@ public class UserDTO {
     public void setFaculty(String faculty) {
         this.faculty = faculty;
     }
-    
+
 }
 

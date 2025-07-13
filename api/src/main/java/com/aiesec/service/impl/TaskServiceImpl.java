@@ -36,7 +36,7 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private TaskProofRepo taskProofRepo;
 
-
+    @Transactional
     @Override
     public TaskDto createTask(TaskDto taskDto, Integer id) {
         User assigner = userRepo.findById(Long.valueOf(id))
@@ -52,14 +52,14 @@ public class TaskServiceImpl implements TaskService {
 
             switch (assigner.getRole()) {
                 case LCP:
-                    allowed = List.of(UserRole.LCVP, UserRole.Team_Leader, UserRole.Member).contains(assignee.getRole());
+                    allowed = List.of(UserRole.LCVP, UserRole.Team_Leader, UserRole.Member)
+                            .contains(assignee.getRole());
                     break;
                 case LCVP:
                     allowed = List.of(UserRole.Team_Leader, UserRole.Member).contains(assignee.getRole())
                             && assigner.getDepartment() != null
                             && assignee.getDepartment() != null
                             && assigner.getDepartment().getId().equals(assignee.getDepartment().getId());
-
                     break;
                 case Team_Leader:
                     allowed = assignee.getRole() == UserRole.Member
@@ -73,18 +73,24 @@ public class TaskServiceImpl implements TaskService {
                 throw new RuntimeException("Not allowed to assign task: hierarchy or department violation.");
             }
 
-            task.setAssignedTo(assignee);
+            task.setAssignedToId(assignee.getId()); // ✅ set ID
         }
 
-        task.setAssignedBy(assigner);
-        task.setUser(assigner);
+        task.setAssignedById(assigner.getId()); // ✅ set ID
+        task.setUser(assigner); // still keep owner if needed
 
         Task savedTask = taskRepo.save(task);
-        assigner.setNoOfTask(assigner.getNoOfTask() + 1);
+
+        Integer currentCount = assigner.getNoOfTask();
+        if (currentCount == null) {
+            currentCount = 0;
+        }
+        assigner.setNoOfTask(currentCount + 1);
         userRepo.save(assigner);
 
         return taskToDto(savedTask);
     }
+
 
 
 
@@ -135,9 +141,13 @@ public class TaskServiceImpl implements TaskService {
         Task task = this.taskRepo.findById(taskId)
                 .orElseThrow(() -> new ResourcesNotFoundException("Task", "task Id", taskId));
 
-        user.getTasks().remove(task);
+        if (!task.getAssignedById().equals(user.getId())) {
+            throw new RuntimeException("You are not allowed to delete this task.");
+        }
+
         this.taskRepo.delete(task);
     }
+
 
     @Override
     public List<TaskDto> getAllTasksByUser(Integer id) {
@@ -150,9 +160,13 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskDto> getTasksAssignedToUser(Integer id) {
-        List<Task> tasks = taskRepo.findByAssignedTo_Id(id);
+        // Convert Integer to Long if needed
+        Long assignedToId = id.longValue();
+
+        List<Task> tasks = taskRepo.findByAssignedToId(assignedToId);
         return tasks.stream().map(this::taskToDto).collect(Collectors.toList());
     }
+
 
     @Override
     public TaskDto getTaskByIdAndUserId(Integer taskId, Integer userId) {
@@ -187,45 +201,51 @@ public class TaskServiceImpl implements TaskService {
         dto.setDescription(task.getDescription());
         dto.setPriority(task.getPriority());
         dto.setWorkOfStatus(task.getWorkOfStatus());
+        dto.setCompletedAt(task.getCompletedAt());
 
-        // Safe null check before accessing task.getUser()
+        // Set creator ID (task owner)
         if (task.getUser() != null) {
-            dto.setId(task.getUser().getId());
+            dto.setId(Math.toIntExact(task.getUser().getId()));
         } else {
-            dto.setId(null);  // or some default value if needed
+            dto.setId(null);
         }
 
-        // Set assignedTo with null check
-        if (task.getAssignedTo() != null) {
-            TaskDto.AssignedUserDTO assignedTo = new TaskDto.AssignedUserDTO(
-                    task.getAssignedTo().getId(),
-                    task.getAssignedTo().getUserName(),
-                    task.getAssignedTo().getNoOfTask()
-
-            );
-            dto.setAssignedTo(assignedTo);
+        if (task.getAssignedToId() != null) {
+            User assignedUser = userRepo.findById(task.getAssignedToId()).orElse(null);
+            if (assignedUser != null) {
+                dto.setAssignedTo(new TaskDto.AssignedUserDTO(
+                        assignedUser.getId().intValue(),
+                        assignedUser.getFirstName(),
+                        assignedUser.getNoOfTask() // or 0 if no such field
+                ));
+            } else {
+                dto.setAssignedTo(null);
+            }
         } else {
             dto.setAssignedTo(null);
         }
 
-        // Set assignedBy with null check
-        if (task.getAssignedBy() != null) {
-            TaskDto.AssignedUserDTO assignedBy = new TaskDto.AssignedUserDTO(
-                    task.getAssignedBy().getId(),
-                    task.getAssignedBy().getUserName(),
-                    task.getAssignedBy().getNoOfTask()
-
-            );
-            dto.setAssignedBy(assignedBy);
+        // Same for assignedBy
+        if (task.getAssignedById() != null) {
+            User assigner = userRepo.findById(task.getAssignedById()).orElse(null);
+            if (assigner != null) {
+                dto.setAssignedBy(new TaskDto.AssignedUserDTO(
+                        assigner.getId().intValue(),
+                        assigner.getFirstName(),
+                        assigner.getNoOfTask()
+                ));
+            } else {
+                dto.setAssignedBy(null);
+            }
         } else {
             dto.setAssignedBy(null);
         }
+
         if (task.getProofs() != null && !task.getProofs().isEmpty()) {
-            TaskProof proof = task.getProofs().get(0);  // get first proof
+            TaskProof proof = task.getProofs().get(0);
             dto.setNote(proof.getNote());
             dto.setFilePath(proof.getFilePath());
         }
-
 
         return dto;
     }
@@ -297,7 +317,7 @@ public class TaskServiceImpl implements TaskService {
                         .toList();
             }
 
-                case Member -> {
+            case Member -> {
                 filteredUsers = allUsers.stream()
                         .filter(u -> !u.getId().equals(loggedInUser.getId())
                                 && u.getRole() == UserRole.Member
@@ -311,7 +331,7 @@ public class TaskServiceImpl implements TaskService {
 
         List<UserProgressDto> result = new ArrayList<>();
         for (User user : filteredUsers) {
-            List<Task> tasks = taskRepo.findByAssignedToId(user.getId());
+            List<Task> tasks = taskRepo.findByAssignedToId(Math.toIntExact(user.getId()));
             long total = tasks.size();
             long completed = tasks.stream()
                     .filter(t -> "completed".equalsIgnoreCase(t.getWorkOfStatus()))
@@ -319,8 +339,8 @@ public class TaskServiceImpl implements TaskService {
             double progress = total == 0 ? 0.0 : ((double) completed / total) * 100;
 
             UserProgressDto dto = new UserProgressDto();
-            dto.setId(user.getId());
-            dto.setName(user.getUserName());
+            dto.setId(Math.toIntExact(user.getId()));
+            dto.setName(user.getFirstName());
             dto.setEmail(user.getEmail());
             dto.setTotalTasks(total);
             dto.setCompletedTasks(completed);
@@ -373,7 +393,7 @@ public class TaskServiceImpl implements TaskService {
 
             // Save only relative path WITHOUT "uploads/" to DB
             // because your Spring Boot serves files from /static/ directly
-            filePath = "task_" + taskId + "/" + file.getOriginalFilename();
+            filePath = "uploads/task_" + taskId + "/" + file.getOriginalFilename();
         }
 
         // Save TaskProof entity
@@ -388,26 +408,6 @@ public class TaskServiceImpl implements TaskService {
 
 
 
-    @Service
-    public class TaskCleanupService {
-
-        @Autowired
-        private TaskRepo taskRepo;
-
-        @Transactional
-        @Scheduled(cron = "0 0 2 * * ?")  // every day at 2 AM
-        public void deleteCompletedTasksOlderThan2Days() {
-            LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);
-            List<Task> tasksToDelete = taskRepo.findByWorkOfStatusAndCompletedAtBefore("completed", twoDaysAgo);
-
-            for (Task task : tasksToDelete) {
-                taskRepo.delete(task);
-            }
-
-            System.out.println("Deleted " + tasksToDelete.size() + " completed tasks older than 2 days.");
-        }
-    }
-
 
     public Task convertToEntity(TaskDto taskDto) {
         Task task = new Task();
@@ -418,27 +418,17 @@ public class TaskServiceImpl implements TaskService {
         task.setPriority(taskDto.getPriority());
         task.setWorkOfStatus(taskDto.getWorkOfStatus());
 
-
-
-
-
         if (taskDto.getAssignedBy() != null) {
-            User assignedByUser = new User();
-            assignedByUser.setId(taskDto.getAssignedBy().getId());
-            assignedByUser.setUserName(taskDto.getAssignedBy().getUsername());
-            task.setAssignedBy(assignedByUser);
+            task.setAssignedById(Long.valueOf(taskDto.getAssignedBy().getId()));
         }
 
         if (taskDto.getAssignedTo() != null) {
-            User assignedToUser = new User();
-            assignedToUser.setId(taskDto.getAssignedTo().getId());
-            assignedToUser.setUserName(taskDto.getAssignedTo().getUsername());
-            task.setAssignedTo(assignedToUser);
-
+            task.setAssignedToId(Long.valueOf(taskDto.getAssignedTo().getId()));
         }
 
         return task;
     }
+
 
 
 

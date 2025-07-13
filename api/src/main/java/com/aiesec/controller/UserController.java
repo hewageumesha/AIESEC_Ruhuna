@@ -5,7 +5,9 @@ import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
 import com.aiesec.dto.UserRequestDTO;
 import com.aiesec.dto.UserUpdateDTO;
+import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
+import com.aiesec.exception.ResourcesNotFoundException;
 import com.aiesec.model.User;
 
 import com.aiesec.repository.UserRepository;
@@ -13,10 +15,7 @@ import com.aiesec.security.UserDetailsImpl;
 import com.aiesec.service.CommentService;
 import com.aiesec.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +57,13 @@ public String senMail() {
 
     return "Mail sent successfully!";
 }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<UserDTO> getUser(@PathVariable Integer id) {
+        UserDTO user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
+
 
 
     @PostMapping("/add")
@@ -158,4 +164,29 @@ public String senMail() {
     ) {
         return userService.updatePassword(aiesecEmail, request);
     }
+
+    @GetMapping("/profile/id/{id}")
+    public ResponseEntity<Map<String, Object>> getProfileById(@PathVariable Integer id) {
+        User user = userRepo.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ResourcesNotFoundException("User", "id", id));
+
+        Map<String, Object> simpleUser = new HashMap<>();
+        simpleUser.put("id", user.getId());
+        simpleUser.put("firstName", user.getFirstName());
+        simpleUser.put("role", user.getRole().toString());
+        simpleUser.put("departmentId", user.getDepartment() != null ? user.getDepartment().getId() : null);
+
+        // ✅ Add functionId as an object {id, name}
+        if (user.getFunction() != null) {
+            Map<String, Object> functionMap = new HashMap<>();
+            functionMap.put("id", user.getFunction().getId());
+            functionMap.put("name", user.getFunction().getName());
+            simpleUser.put("functionId", functionMap);
+        } else {
+            simpleUser.put("functionId", null);
+        }
+
+        return ResponseEntity.ok(simpleUser);
+    }
+
 }

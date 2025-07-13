@@ -3,6 +3,8 @@ import axios from "axios";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useNavigate } from "react-router-dom";
+
 
 const UserProgressPage = () => {
     const [progressData, setProgressData] = useState([]);
@@ -10,6 +12,7 @@ const UserProgressPage = () => {
     const [expandedCard, setExpandedCard] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     // Filters state
     const [selectedDepartment, setSelectedDepartment] = useState("");
@@ -73,7 +76,7 @@ const UserProgressPage = () => {
                 "Completed Tasks",
                 "Progress (%)",
             ],
-            ...progressData.map((user) => [
+            ...filteredData.map((user) => [
                 user.name,
                 user.email || "",
                 user.department?.name || "",
@@ -111,7 +114,7 @@ const UserProgressPage = () => {
                 "Completed Tasks",
                 "Progress (%)",
             ]],
-            body: progressData.map((user) => [
+            body: filteredData.map((user) => [
                 user.name,
                 user.email || "",
                 user.department?.name || "",
@@ -194,6 +197,22 @@ const UserProgressPage = () => {
                 color: "#222222",
             }}
         >
+            <button
+                onClick={() => navigate(-1)}
+                style={{
+                    marginBottom: "1rem",
+                    padding: "0.5rem 1rem",
+                    borderRadius: 6,
+                    backgroundColor: "#0052cc",
+                    color: "#fff",
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                }}
+                aria-label="Go back to previous page"
+            >
+                ← Back
+            </button>
             <header
                 style={{
                     marginBottom: "2rem",
@@ -206,6 +225,7 @@ const UserProgressPage = () => {
                 }}
             >
                 <div>
+
                     <h1
                         style={{
                             fontSize: "2rem",

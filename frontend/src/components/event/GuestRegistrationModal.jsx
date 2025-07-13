@@ -6,13 +6,6 @@ const GuestRegistrationModal = ({ visible, onClose, eventId, onRegister }) => {
   return (
     <Modal
      visible={visible}
-  if (!eventId) {
-    console.warn("⚠️ GuestRegistrationModal: Missing eventId");
-  }
-
-  return (
-    <Modal
-      open={visible}                // ✅ Correct Ant Design prop
       title="Guest Event Registration"
       onCancel={onClose}
       footer={null}
@@ -25,20 +18,6 @@ const GuestRegistrationModal = ({ visible, onClose, eventId, onRegister }) => {
           onClose();
         }}
       />
-      {eventId ? (
-        <GuestRegistrationForm
-          eventId={eventId}
-          onSuccess={(data) => {
-            console.log("✅ Guest registration succeeded:", data);
-            onRegister?.(data);     // optional chaining
-            onClose();
-          }}
-        />
-      ) : (
-        <div style={{ padding: "1rem", color: "red", fontWeight: 500 }}>
-          ⚠️ Cannot load form: Event ID is missing.
-        </div>
-      )}
     </Modal>
   );
 };

@@ -1,5 +1,6 @@
 package com.aiesec.model.event;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,12 +19,17 @@ public class EventGallery {
     @Column(name = "gallery_id")
     private Long galleryId;
 
-    @Column(name = "image_url", nullable = false, length = 255)
+    @ManyToOne
+    @JoinColumn(name = "Event_ID", nullable = false)
+    private Event event;
+
+    @Column(name = "Image_URL", nullable = false, length = 255)
     private String imageUrl;
 
-    @Column(name = "category", length = 255)
-    private String category;
+    @Column(name = "Caption", length = 255)
+    private String caption;
 
-    @Column(name = "uploaded_at")
-    private LocalDateTime uploadedAt;
+       @Column(name = "uploaded_at")
+       private LocalDateTime uploadedAt;
 }
+

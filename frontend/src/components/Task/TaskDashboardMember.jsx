@@ -8,7 +8,7 @@ const TaskDashboardMember = () => {
     const { id} = useParams();
 
     // 🔹 States for user info
-    const [username, setUsername] = useState("Krish");
+    const [fisrtName, setFirstName] = useState("Krish");
     const [numberOfTasks, setNumberOfTasks] = useState(0);
     const navigate = useNavigate();
 
@@ -19,7 +19,7 @@ const TaskDashboardMember = () => {
                 const response = await fetch(`http://localhost:8080/api/users/id/${id}`);
                 if (response.ok) {
                     const userDetails = await response.json();
-                    setUsername(userDetails.userName);
+                    setFirstName(userDetails.fisrtName);
                     setNumberOfTasks(userDetails.noOfTask);
                 } else {
                     throw new Error("Failed to fetch user details");
@@ -45,7 +45,7 @@ const TaskDashboardMember = () => {
 
             {/* 🔸 Sidebar Navigation */}
             <div className="w-64 bg-blue-800 text-white p-6 space-y-6 min-h-screen">
-                <h3 className="text-2xl font-bold mb-4">Welcome, {username}</h3>
+                <h3 className="text-2xl font-bold mb-4">Welcome, {fisrtName}</h3>
                 <ul className="space-y-4">
                     <li>
                         <button

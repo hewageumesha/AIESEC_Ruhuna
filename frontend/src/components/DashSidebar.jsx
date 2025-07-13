@@ -18,7 +18,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { signoutSuccess } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import TaskDashboardLCP from "./Task/TaskDashboardLCVP.jsx";
 
 export default function DashSidebar({ tab, subtab }) {
   const location = useLocation();
@@ -263,8 +262,7 @@ export default function DashSidebar({ tab, subtab }) {
                 </Sidebar.Item>
               </>
           )}
-
-          <Link to='/dashboard?tab=event'>
+              <Link to='/dashboard?tab=event'>
                 <Sidebar.Item
                   active={tab === 'event'}
                   icon={HiRectangleStack}
@@ -278,7 +276,7 @@ export default function DashSidebar({ tab, subtab }) {
                   <span className="font-medium">Events</span>
                 </Sidebar.Item>
               </Link>
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' ) && (
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
             <>
               <Link to='/dashboard?tab=birthday'>
                 <Sidebar.Item

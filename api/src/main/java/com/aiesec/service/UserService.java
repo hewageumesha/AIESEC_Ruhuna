@@ -6,6 +6,7 @@ import com.aiesec.dto.UserHierarchyDTO;
 import com.aiesec.dto.UserRequestDTO;
 import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.UserRole;
+import com.aiesec.exception.ResourcesNotFoundException;
 import com.aiesec.model.Department;
 import com.aiesec.model.Function;
 import com.aiesec.model.User;
@@ -13,7 +14,6 @@ import com.aiesec.repository.DepartmentRepo;
 import com.aiesec.repository.UserRepository;
 import com.aiesec.repository.FunctionRepo;
 
-import io.jsonwebtoken.lang.Collections;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,7 +204,7 @@ public class UserService {
         }
 
         return userRepository.save(user);
-   }
+    }
 
     public User getUserProfile(String aiesecEmail) {
         return userRepository.findByAiesecEmail(aiesecEmail)
@@ -340,4 +340,47 @@ public class UserService {
         message.setText(text);
         mailSender.send(message);
     }
+
+    public List<UserDTO> getAllUsers() {
+        List<User> users = this.userRepository.findAll();
+        if (users == null || users.isEmpty()) {
+            return Collections.emptyList(); // or return a new ArrayList<UserDto>()
+        }
+        return users.stream().map(this::userToDto).toList();
+    }
+
+    public UserDTO userToDto(User user){
+        UserDTO userDto = new UserDTO();
+        userDto.setId(Long.valueOf(user.getId()));
+        userDto.setFirstName(user.getFirstName());
+        userDto.setNoOfTask(user.getNoOfTask());
+        userDto.setRole(user.getRole());
+
+        // Department
+        if (user.getDepartment() != null) {
+            Department Dep = new Department();
+            Dep.setId(user.getDepartment().getId());
+            Dep.setName(user.getDepartment().getName());
+            userDto.setDepartmentName(user.getDepartment().getName());
+        }
+
+        // ✅ Function
+        if (user.getFunction() != null) {
+            Function func = new Function();
+            func.setId(user.getFunction().getId());
+            func.setName(user.getFunction().getName());
+            userDto.setFunctionId(func);
+            userDto.setFunctionName(user.getFunction().getName());
+        }
+
+        return userDto;
+    }
+
+    public UserDTO getUserById(Integer id) {
+
+        User user=this.userRepository.findById(Long.valueOf(id)).orElseThrow(()-> new ResourcesNotFoundException("User","User Id",(long)id));
+        return this.userToDto(user);
+    }
+
+
 }

@@ -4,12 +4,10 @@ package com.aiesec.controller.event;
 import com.aiesec.dto.EventDTO;
 import com.aiesec.service.interfaces.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -68,58 +66,4 @@ public class EventController {
         eventService.deleteEvent(eventId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-// Search filter
-@GetMapping("/filter")
-public ResponseEntity<Page<EventDTO>> filterEvents(
-        @RequestParam(required = false) String search,
-        @RequestParam(required = false) String status,
-        @RequestParam(required = false) String date,
-        Pageable pageable) {
-    Page<EventDTO> results = eventService.filterEvents(search, status, date, pageable);
-    return ResponseEntity.ok(results);
-}
-
-// Get Public Events (for public event page)
-@GetMapping("/public")
-public ResponseEntity<List<EventDTO>> getPublicUpcomingEvents() {
-    List<EventDTO> publicEvents = eventService.getPublicUpcomingEvents();
-    return new ResponseEntity<>(publicEvents, HttpStatus.OK);
-}
-
-// Get Private Events (for members dashboard)
-@GetMapping("/private")
-public ResponseEntity<List<EventDTO>> getPrivateUpcomingEvents() {
-    List<EventDTO> privateEvents = eventService.getPrivateUpcomingEvents();
-    return new ResponseEntity<>(privateEvents, HttpStatus.OK);
-}
-
-// Get All Public Events
-@GetMapping("/public/all")
-public ResponseEntity<List<EventDTO>> getAllPublicEvents() {
-    List<EventDTO> publicEvents = eventService.getAllPublicEvents();
-    return new ResponseEntity<>(publicEvents, HttpStatus.OK);
-}
-
-// Get All Private Events
-@GetMapping("/private/all")
-public ResponseEntity<List<EventDTO>> getAllPrivateEvents() {
-    List<EventDTO> privateEvents = eventService.getAllPrivateEvents();
-    return new ResponseEntity<>(privateEvents, HttpStatus.OK);
-}
-
-
-    //Search filter
-    @GetMapping("/filter")
-    public ResponseEntity<Page<EventDTO>> filterEvents(
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String date,
-            Pageable pageable) {
-
-        Page<EventDTO> results = eventService.filterEvents(search, status, date, pageable);
-        return ResponseEntity.ok(results);
-    }
-
-
-
 }

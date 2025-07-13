@@ -87,14 +87,25 @@ const TaskUpdate = () => {
         setTask((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleAssigneeChange = (e) => {
-        const selectedUserId = parseInt(e.target.value);
-        const selectedUser = users.find((u) => u.id === selectedUserId) || null;
-        setTask((prev) => ({ ...prev, assignedTo: selectedUser }));
-    };
+
 
     return (
         <div className="create-task-wrapper">
+            <button
+                className="btn-back"
+                onClick={() => navigate(-1)}
+                style={{
+                    backgroundColor: "#3498db",
+                    color: "white",
+                    padding: "8px 16px",
+                    borderRadius: "6px",
+                    border: "none",
+                    cursor: "pointer",
+                    marginBottom: "16px"
+                }}
+            >
+                ← Back
+            </button>
             <h2 className="create-task-title">Edit Task #{taskId}</h2>
 
             <div className="task-step">
@@ -147,49 +158,7 @@ const TaskUpdate = () => {
                     </select>
                 </div>
 
-                <div className="form-group">
-                    <label>Assign To</label>
-                    <select
-                        value={task.assignedTo?.id?.toString() || ""}
-                        onChange={handleAssigneeChange}
-                        className="form-input"
-                    >
-                        <option value="">Unassigned</option>
-                        {users
-                            .filter((user) => {
-                                if (!user || !task.assignedBy) return false;
 
-                                const sameDepartment =
-                                    user.departmentId === task.assignedBy.departmentId;
-                                const sameFunction = task.assignedBy.functionId?.id
-                                    ? user.functionId?.id === task.assignedBy.functionId?.id
-                                    : true;
-
-                                if (task.assignedBy.role === "LCP") {
-                                    return ["LCVP", "Team_Leader", "Member"].includes(user.role);
-                                }
-
-                                if (task.assignedBy.role === "LCVP") {
-                                    return (
-                                        ["Team_Leader", "Member"].includes(user.role) &&
-                                        sameDepartment &&
-                                        sameFunction
-                                    );
-                                }
-
-                                if (task.assignedBy.role === "Team_Leader") {
-                                    return user.role === "Member" && sameDepartment && sameFunction;
-                                }
-
-                                return false;
-                            })
-                            .map((user) => (
-                                <option key={user.id} value={user.id.toString()}>
-                                    {user.userName} ({user.role})
-                                </option>
-                            ))}
-                    </select>
-                </div>
             </div>
 
             <div className="flex gap-4 mt-6">

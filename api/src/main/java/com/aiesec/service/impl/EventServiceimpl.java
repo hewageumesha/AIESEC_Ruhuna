@@ -1,18 +1,13 @@
 package com.aiesec.service.impl;
 
 import com.aiesec.dto.EventDTO;
-import com.aiesec.mapper.EventMapper;
-import com.aiesec.mapper.MerchandiseMapper;
 import com.aiesec.model.event.Event;
-import com.aiesec.model.event.Merchandise;
+import com.aiesec.mapper.EventMapper;
 import com.aiesec.repository.event.EventRepository;
-import com.aiesec.repository.event.MerchandiseRepository;
 import com.aiesec.service.interfaces.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -22,39 +17,30 @@ import java.util.stream.Collectors;
 public class EventServiceimpl implements EventService {
 
     private final EventRepository eventRepository;
-    
-    private final MerchandiseRepository merchandiseRepository;
 
     @Autowired
     public EventServiceimpl(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
-        merchandiseRepository = null;
     }
     @Override
     public EventDTO createEvent(EventDTO eventDTO) {
-        // Convert DTO to Entity
         Event event = EventMapper.toEntity(eventDTO);
 
-        // Set isPublic with fallback to false
-        event.setIsPublic(Boolean.TRUE.equals(eventDTO.getIsPublic()));
-
-        // Check and attach merchandise
-        if (eventDTO.getMerchandise() != null && !eventDTO.getMerchandise().isEmpty()) {
-            List<Merchandise> merchList = eventDTO.getMerchandise().stream()
-                    .map(dto -> MerchandiseMapper.toEntity(dto, event)) // link unsaved event
-                    .collect(Collectors.toList());
-
-            event.setMerchandiseList(merchList);
-            event.setHasMerchandise(true);
+        // Handle null value for hasTshirtOrder (if EventDTO uses Boolean)
+        if (eventDTO.getHasTshirtOrder() == null) {
+            event.setHasTshirtOrder(false); // default to false
         } else {
-            event.setHasMerchandise(false);
+            event.setHasTshirtOrder(eventDTO.getHasTshirtOrder());
         }
 
-        // Save event — merchandise list is saved via CascadeType.ALL
-        Event savedEvent = eventRepository.save(event);
+        // Handle null or empty visibility
+        if (eventDTO.getVisibility() == null || eventDTO.getVisibility().isEmpty()) {
+            event.setVisibility("Private"); // default visibility
+        } else {
+            event.setVisibility(eventDTO.getVisibility());
+        }
 
-        // Return mapped DTO
-        return EventMapper.toDTO(savedEvent);
+        return EventMapper.toDTO(eventRepository.save(event));
     }
 
 
@@ -91,35 +77,14 @@ public class EventServiceimpl implements EventService {
     @Override
     public EventDTO getEventById(Long id) {
         return eventRepository.findById(id)
-                .map(event -> {
-                    EventDTO dto = EventMapper.toDTO(event);
-
-                    if (Boolean.TRUE.equals(dto.getHasMerchandise())) {
-                        List<Merchandise> merchList = merchandiseRepository.findByEventEventId(id);
-                        dto.setMerchandise(
-                                merchList.stream()
-                                        .map(MerchandiseMapper::toDTO)
-                                        .collect(Collectors.toList())
-                        );
-                    }
-
-                    return dto;
-                })
+                .map(EventMapper::toDTO)
                 .orElse(null);
     }
 
-
-
     @Override
     public void deleteEvent(Long eventId) {
-        Optional<Event> optionalEvent = eventRepository.findById(eventId);
-        if (optionalEvent.isPresent()) {
-            eventRepository.delete(optionalEvent.get());
-        } else {
-            throw new RuntimeException("Event not found with ID: " + eventId);
-        }
+        eventRepository.deleteById(eventId);
     }
-
 
     @Override
     public List<EventDTO> getUpcomingEvents() {
@@ -138,7 +103,6 @@ public class EventServiceimpl implements EventService {
                 .map(EventMapper::toDTO)
                 .collect(Collectors.toList());
     }
-
     @Override
     public void updateTshirtOrder(Long eventId, Boolean hasTshirtOrder) {
         Optional<Event> optionalEvent = eventRepository.findById(eventId);
@@ -152,16 +116,7 @@ public class EventServiceimpl implements EventService {
     }
 
     @Override
-
     public void updateEventVisibility(Long eventId, String visibility) {
-
-    public Page<EventDTO> filterEvents(String search, String status, String date, Pageable pageable) {
-        return null;
-    }
-
-    @Override
-    public void updateTshirtOrder(Long eventId, Boolean hasTshirtOrder) {
-
         Optional<Event> optionalEvent = eventRepository.findById(eventId);
         if (optionalEvent.isPresent()) {
             Event event = optionalEvent.get();
@@ -173,21 +128,10 @@ public class EventServiceimpl implements EventService {
     }
 
 
-    @Override
-    public Page<EventDTO> filterEvents(String search, String status, String dateStr, Pageable pageable) {
-        LocalDate date = (dateStr != null && !dateStr.isEmpty()) ? LocalDate.parse(dateStr) : null;
-        Page<Event> events = eventRepository.filterEvents(search, status, date, pageable);
-        return events.map(EventMapper::toDTO);
-    }
-
-
-
-
 
     //@Override
     //public List<EventDTO> getEventsByGroup(String groupName) {
         //return List.of(); // Dummy return for now
     //}
-
 }
 

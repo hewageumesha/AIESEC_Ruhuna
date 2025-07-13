@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 public class GalleryDTO {
     private Long galleryId;
+    private Long eventId;
     private String imageUrl;
-    private String category;
+    private String caption;
     private LocalDateTime uploadedAt;
 }

@@ -3,9 +3,6 @@ package com.aiesec.service.interfaces;
 
 import com.aiesec.dto.EventDTO;
 import com.aiesec.model.event.Event;
-import org.springframework.data.domain.Page;
-
-import java.awt.print.Pageable;
 import java.util.List;
 
 public interface EventService {
@@ -33,22 +30,4 @@ public interface EventService {
     List<EventDTO> getUpcomingEvents();
 
     List<EventDTO> getPublicUpcomingEvents();
-
-
-
-    // Add these new methods
-    List<EventDTO> getPrivateUpcomingEvents();
-
-    List<EventDTO> getAllPublicEvents();
-
-    List<EventDTO> getAllPrivateEvents();
-
-
-    // Search event
-    Page<EventDTO> filterEvents(String search, String status, String date, Pageable pageable);
-
-
 }
-
-}
-

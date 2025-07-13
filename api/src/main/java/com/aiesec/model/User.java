@@ -8,6 +8,8 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -15,7 +17,8 @@ import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User {
@@ -65,17 +68,18 @@ public class User {
     private String teamLeaderId;
     private int noOfTask=0;
 
+
     private String s_department;
 
     private String faculty;
-
-    private String phone;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+
+
 
     @ManyToOne
     @JoinColumn(name = "function_id")
@@ -111,7 +115,7 @@ public class User {
     public Long getId() {
         return id;
     }
-   
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -155,7 +159,7 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-    
+
 
     public String getProfilePicture() {
         return profilePicture;
@@ -285,32 +289,6 @@ public class User {
         this.teamLeaderId = teamLeaderId;
     }
 
-
-    public Date getBirthday() {
-    return birthday;
-}
-
-public void setBirthday(Date birthday) {
-    this.birthday = birthday;
-}
-
-public Date getJoinedDate() {
-    return joinedDate;
-}
-
-public void setJoinedDate(Date joinedDate) {
-    this.joinedDate = joinedDate;
-}
-
-public String getPhone(){
-
-    return phone;
-}
-public void setPhone(String phone){
-    this.phone=phone;
-}
-
-
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -334,6 +312,5 @@ public void setPhone(String phone){
     public void setFaculty(String faculty) {
         this.faculty = faculty;
     }
-    
 
 }

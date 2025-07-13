@@ -4,7 +4,7 @@ package com.aiesec.model.event;
 import com.aiesec.enums.InterestStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import com.aiesec.model.User;
+import com.aiesec.model.User; 
 import java.time.LocalDateTime;
 
 @Entity
