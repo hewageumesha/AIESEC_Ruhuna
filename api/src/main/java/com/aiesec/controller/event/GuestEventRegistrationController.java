@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/guest-registrations")
+@RequestMapping("/guest-registrations")
 @RequiredArgsConstructor
 public class GuestEventRegistrationController {
 
