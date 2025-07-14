@@ -46,6 +46,10 @@ public class Event {
     @Column(name = "End_Time")
     private LocalTime endTime;
 
+    @Column(name = "registration_close_before_days")
+    private Integer registrationCloseBeforeDays;
+
+
     @Column(name = "Location", length = 255)
     private String location;
 
@@ -174,6 +178,14 @@ public class Event {
 
     public Boolean getHasMerchandise() {
         return hasMerchandise;
+    }
+
+    public Integer getRegistrationCloseBeforeDays() {
+        return registrationCloseBeforeDays;
+    }
+
+    public void setRegistrationCloseBeforeDays(Integer registrationCloseBeforeDays) {
+        this.registrationCloseBeforeDays = registrationCloseBeforeDays;
     }
 
     public void setHasMerchandise(Boolean hasMerchandise) {

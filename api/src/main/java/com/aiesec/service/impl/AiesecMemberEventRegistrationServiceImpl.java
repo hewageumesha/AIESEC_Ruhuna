@@ -62,11 +62,9 @@ public class AiesecMemberEventRegistrationServiceImpl implements AiesecMemberEve
                 .collect(Collectors.toList());
     }
 
-    // Updated method to handle pageable properly and fix missing pageable param
     @Override
     public List<AiesecMemberEventRegistrationDTO> getByEventId(Long eventId) {
-        // Use default Pageable if you want, or change method signature to accept pageable
-        Pageable pageable = PageRequest.of(0, 1000, Sort.by("registeredAt").descending()); // default paging if you want
+        Pageable pageable = PageRequest.of(0, 1000, Sort.by("registeredAt").descending());
         return registrationRepository.findByEvent_EventId(eventId, pageable)
                 .stream()
                 .map(AiesecMemberEventRegistrationMapper::toDTO)

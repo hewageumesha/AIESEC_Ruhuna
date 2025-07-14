@@ -1,26 +1,16 @@
 import React, { useState } from 'react';
 import {
-  Form, Input, DatePicker, TimePicker, Button, Upload, Radio, message, Select, notification,
-  Card, Divider, Space, Typography, InputNumber, Tooltip, Progress, Alert
+  Form, Input, DatePicker, TimePicker, Button, Upload, Radio, message, Select, notification
 } from 'antd';
-import { 
-  InboxOutlined, 
-  CheckCircleOutlined, 
-  CalendarOutlined, 
-  ClockCircleOutlined,
-  EnvironmentOutlined,
-  ShopOutlined,
-  EyeOutlined,
-  QuestionCircleOutlined,
-  PlusOutlined,
-  FileImageOutlined
-} from '@ant-design/icons';
+import { InboxOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import axios from 'axios';
 import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../../service/supabaseClient';
 
 const { TextArea } = Input;
 const { Dragger } = Upload;
 const { Option } = Select;
-const { Title, Text } = Typography;
 
 const AddEventForm = () => {
   const [form] = Form.useForm();
@@ -30,26 +20,12 @@ const AddEventForm = () => {
   const [hasMerchandise, setHasMerchandise] = useState(false);
   const [selectedMerchTypes, setSelectedMerchTypes] = useState([]);
   const [merchandiseData, setMerchandiseData] = useState({});
-  const [formProgress, setFormProgress] = useState(0);
 
-  // Calculate form completion progress
-  const calculateProgress = () => {
-    const values = form.getFieldsValue();
-    const requiredFields = ['eventName', 'description', 'startDate', 'endDate', 'startTime', 'endTime', 'location', 'visibility'];
-    const completedFields = requiredFields.filter(field => values[field]).length;
-    const imageCompleted = eventImageUrl ? 1 : 0;
-    const totalFields = requiredFields.length + 1; // +1 for image
-    const progress = Math.round(((completedFields + imageCompleted) / totalFields) * 100);
-    setFormProgress(progress);
-  };
-
-  React.useEffect(() => {
-    calculateProgress();
-  }, [eventImageUrl]);
+  const navigate = useNavigate();
 
   const showSuccessNotification = (eventName, isPublic) => {
     notification.success({
-      message: 'Event Created Successfully! ',
+      message: 'Event Created Successfully! 🎉',
       description: (
         <div>
           <p><strong>{eventName}</strong> has been created and is now {isPublic ? 'publicly available' : 'private to AIESEC members'}.</p>
@@ -60,21 +36,35 @@ const AddEventForm = () => {
       duration: 4,
       icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
       style: {
-        borderRadius: '12px',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
       },
     });
   };
 
   const uploadFile = async (file) => {
     try {
-      // Simulate file upload - replace with your actual Supabase upload logic
       const fileName = `${Date.now()}_${file.name}`;
-      // Your existing Supabase upload logic here
-      const mockUrl = `https://via.placeholder.com/400x200?text=${encodeURIComponent(file.name)}`;
-      return mockUrl;
+      const bucketName = 'eventimages';
+
+      const { error } = await supabase.storage
+        .from(bucketName)
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type,
+        });
+
+      if (error) {
+        console.error('Upload error details:', error);
+        message.error(`Upload failed: ${error.message}`);
+        return '';
+      }
+
+      const { data } = supabase.storage.from(bucketName).getPublicUrl(fileName);
+      return data.publicUrl;
     } catch (err) {
-      message.error('Upload failed');
+      message.error('Unexpected upload error');
       console.error('Upload exception:', err);
       return '';
     }
@@ -82,10 +72,7 @@ const AddEventForm = () => {
 
   const handleEventImageUpload = async (file) => {
     const url = await uploadFile(file);
-    if (url) {
-      setEventImageUrl(url);
-      calculateProgress();
-    }
+    if (url) setEventImageUrl(url);
     return false;
   };
 
@@ -118,7 +105,6 @@ const AddEventForm = () => {
     try {
       setIsSubmitting(true);
 
-      // Validation logic
       if (moment(values.endDate).isBefore(values.startDate, 'day')) {
         message.error('End date must be same or after start date.');
         setIsSubmitting(false);
@@ -130,13 +116,6 @@ const AddEventForm = () => {
         moment(values.endTime).isBefore(values.startTime)
       ) {
         message.error('End time must be after start time.');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Validate registration close days
-      if (values.registrationCloseBeforeDays && values.registrationCloseBeforeDays < 0) {
-        message.error('Registration close days must be 0 or positive.');
         setIsSubmitting(false);
         return;
       }
@@ -166,7 +145,6 @@ const AddEventForm = () => {
         isVirtual: eventType === 'virtual',
         location: eventType === 'virtual' ? '' : values.location,
         virtualLink: eventType === 'virtual' ? values.location : '',
-        registrationCloseBeforeDays: values.registrationCloseBeforeDays || 0,
         hasMerchandise, 
         merchandise: selectedMerchTypes.map((type) => ({
           type,
@@ -176,19 +154,34 @@ const AddEventForm = () => {
         })),
       };
 
-      // Simulate API call
-      console.log('Event payload:', payload);
-      
+      const response = await axios.post('http://localhost:8080/api/events', payload);
+      const eventId = response.data.eventId;
+
+      if (hasMerchandise && selectedMerchTypes.length > 0) {
+        const merchandisePromises = selectedMerchTypes.map(async (type) => {
+          const merch = merchandiseData[type];
+          const merchPayload = {
+            eventId,
+            type,
+            description: merch.description.trim(),
+            images: merch.images.map((img) => img.url),
+            available: true,
+          };
+          return axios.post('http://localhost:8080/api/merchandise', merchPayload);
+        });
+
+        await Promise.all(merchandisePromises);
+      }
+
       showSuccessNotification(values.eventName, values.visibility === 'public');
       
-      // Reset form
       form.resetFields();
       setEventImageUrl('');
       setHasMerchandise(false);
       setSelectedMerchTypes([]);
       setMerchandiseData({});
-      setFormProgress(0);
 
+      navigate(values.visibility === 'public' ? `/public-event` : `/event/${eventId}`);
     } catch (error) {
       console.error('Error creating event:', error);
       message.error('❌ Failed to publish event.');
@@ -200,11 +193,13 @@ const AddEventForm = () => {
   const handleMerchTypeChange = (values) => {
     setSelectedMerchTypes(values);
     
+    // Create updated merchandise data with only selected types
     const updated = {};
     values.forEach(type => {
       updated[type] = merchandiseData[type] || { description: '', images: [] };
     });
     
+    // Remove data for unselected types
     setMerchandiseData(updated);
   };
 
@@ -230,411 +225,165 @@ const AddEventForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-              <CalendarOutlined className="text-white text-xl" />
-            </div>
-            <Title level={2} className="!mb-0 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Create New Event
-            </Title>
-          </div>
-          <Text className="text-gray-600 text-lg">
-            Build engaging experiences for the AIESEC community
-          </Text>
+    <div className="bg-white rounded-2xl shadow-lg w-full max-w-xl px-6 py-8 mx-auto mt-6 sm:mt-10">
+      <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">Create New Event</h2>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        initialValues={{ visibility: 'private', eventType: 'in_person' }}
+      >
+        <Form.Item name="eventName" label="Event Title" rules={[{ required: true }]}>
+          <Input placeholder="Enter event title" />
+        </Form.Item>
+
+        <Form.Item name="description" label="Description" rules={[{ required: true }]}>
+          <TextArea rows={4} placeholder="Describe the event" />
+        </Form.Item>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Form.Item name="startDate" label="Start Date" rules={[{ required: true }]}>
+            <DatePicker className="w-full" disabledDate={disabledDate} />
+          </Form.Item>
+          <Form.Item name="endDate" label="End Date" rules={[{ required: true }]}>
+            <DatePicker className="w-full" disabledDate={disabledDate} />
+          </Form.Item>
         </div>
 
-        {/* Progress Bar */}
-        <Card className="mb-6 border-0 shadow-sm">
-          <div className="flex items-center gap-4">
-            <Text strong className="text-gray-700">Form Progress:</Text>
-            <Progress 
-              percent={formProgress} 
-              size="small" 
-              strokeColor={{
-                '0%': '#3B82F6',
-                '100%': '#6366F1',
-              }}
-              className="flex-1"
-            />
-            <Text className="text-sm text-gray-500">{formProgress}% Complete</Text>
-          </div>
-        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Form.Item name="startTime" label="Start Time" rules={[{ required: true }]}>
+            <TimePicker use12Hours format="h:mm A" className="w-full" />
+          </Form.Item>
+          <Form.Item name="endTime" label="End Time" rules={[{ required: true }]}>
+            <TimePicker use12Hours format="h:mm A" className="w-full" />
+          </Form.Item>
+        </div>
 
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-          onValuesChange={calculateProgress}
-          initialValues={{ 
-            visibility: 'private', 
-            eventType: 'in_person',
-            registrationCloseBeforeDays: 1
-          }}
-          className="space-y-6"
+        <Form.Item label="Event Type">
+          <Radio.Group 
+            value={eventType} 
+            onChange={(e) => setEventType(e.target.value)} 
+            className="flex gap-6"
+          >
+            <Radio value="in_person">In Person</Radio>
+            <Radio value="virtual">Virtual</Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        <Form.Item 
+          name="location" 
+          label={eventType === 'virtual' ? 'Meeting Link' : 'Location'} 
+          rules={[{ required: true }]}
         >
-          {/* Basic Information */}
-          <Card 
-            title={
-              <Space>
-                <FileImageOutlined className="text-blue-600" />
-                <span>Basic Information</span>
-              </Space>
-            }
-            className="border-0 shadow-sm hover:shadow-md transition-shadow duration-200"
+          <Input placeholder={eventType === 'virtual' ? 'Enter meeting link' : 'Enter event location'} />
+        </Form.Item>
+
+        <Form.Item label="Event Image" required>
+          <Dragger
+            multiple={false}
+            maxCount={1}
+            beforeUpload={handleEventImageUpload}
+            showUploadList={false}
+            accept="image/*"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="lg:col-span-2">
-                <Form.Item 
-                  name="eventName" 
-                  label={<span className="font-semibold">Event Title</span>}
-                  rules={[{ required: true, message: 'Please enter event title' }]}
-                >
-                  <Input 
-                    placeholder="Enter a compelling event title" 
-                    size="large"
-                    className="rounded-lg"
-                  />
-                </Form.Item>
-              </div>
+            <p className="ant-upload-drag-icon">
+              <InboxOutlined />
+            </p>
+            <p className="ant-upload-text">Click or drag image to upload</p>
+          </Dragger>
+          {eventImageUrl && (
+            <img src={eventImageUrl} alt="Uploaded preview" className="mt-4 w-48 rounded shadow" />
+          )}
+        </Form.Item>
 
-              <div className="lg:col-span-2">
-                <Form.Item 
-                  name="description" 
-                  label={<span className="font-semibold">Description</span>}
-                  rules={[{ required: true, message: 'Please enter event description' }]}
-                >
-                  <TextArea 
-                    rows={4} 
-                    placeholder="Describe your event in detail - what makes it special?"
-                    className="rounded-lg"
-                  />
-                </Form.Item>
-              </div>
-
-              <div className="lg:col-span-2">
-                <Form.Item 
-                  label={<span className="font-semibold">Event Image</span>}
-                  required
-                >
-                  <Dragger
-                    multiple={false}
-                    maxCount={1}
-                    beforeUpload={handleEventImageUpload}
-                    showUploadList={false}
-                    accept="image/*"
-                    className="hover:border-blue-400 transition-colors duration-200"
-                  >
-                    <p className="ant-upload-drag-icon">
-                      <InboxOutlined style={{ color: '#3B82F6' }} />
-                    </p>
-                    <p className="ant-upload-text">Click or drag image to upload</p>
-                    <p className="ant-upload-hint">Support for JPG, PNG, WebP formats</p>
-                  </Dragger>
-                  {eventImageUrl && (
-                    <div className="mt-4 text-center">
-                      <img 
-                        src={eventImageUrl} 
-                        alt="Event preview" 
-                        className="max-w-full h-48 object-cover rounded-lg shadow-md mx-auto" 
-                      />
-                      <Text className="text-green-600 mt-2 block">
-                        <CheckCircleOutlined /> Image uploaded successfully
-                      </Text>
-                    </div>
-                  )}
-                </Form.Item>
-              </div>
-            </div>
-          </Card>
-
-          {/* Date and Time */}
-          <Card 
-            title={
-              <Space>
-                <ClockCircleOutlined className="text-blue-600" />
-                <span>Date & Time</span>
-              </Space>
-            }
-            className="border-0 shadow-sm hover:shadow-md transition-shadow duration-200"
+        <Form.Item label="Merchandise Available?">
+          <Radio.Group
+            onChange={(e) => {
+              const value = e.target.value === 'yes';
+              setHasMerchandise(value);
+              if (!value) {
+                setSelectedMerchTypes([]);
+                setMerchandiseData({});
+              }
+            }}
+            value={hasMerchandise ? 'yes' : 'no'}
+            className="flex gap-8"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Form.Item 
-                name="startDate" 
-                label={<span className="font-semibold">Start Date</span>}
-                rules={[{ required: true, message: 'Please select start date' }]}
+            <Radio value="yes">Yes</Radio>
+            <Radio value="no">No</Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        {hasMerchandise && (
+          <>
+            <Form.Item label="Select Merchandise Items">
+              <Select
+                mode="multiple"
+                allowClear
+                style={{ width: '100%' }}
+                placeholder="Select items (e.g., T-Shirt, Cap)"
+                onChange={handleMerchTypeChange}
+                value={selectedMerchTypes}
               >
-                <DatePicker 
-                  className="w-full rounded-lg" 
-                  size="large"
-                  disabledDate={disabledDate}
-                  placeholder="Select start date"
-                />
-              </Form.Item>
-
-              <Form.Item 
-                name="endDate" 
-                label={<span className="font-semibold">End Date</span>}
-                rules={[{ required: true, message: 'Please select end date' }]}
-              >
-                <DatePicker 
-                  className="w-full rounded-lg" 
-                  size="large"
-                  disabledDate={disabledDate}
-                  placeholder="Select end date"
-                />
-              </Form.Item>
-
-              <Form.Item 
-                name="startTime" 
-                label={<span className="font-semibold">Start Time</span>}
-                rules={[{ required: true, message: 'Please select start time' }]}
-              >
-                <TimePicker 
-                  use12Hours 
-                  format="h:mm A" 
-                  className="w-full rounded-lg" 
-                  size="large"
-                  placeholder="Select start time"
-                />
-              </Form.Item>
-
-              <Form.Item 
-                name="endTime" 
-                label={<span className="font-semibold">End Time</span>}
-                rules={[{ required: true, message: 'Please select end time' }]}
-              >
-                <TimePicker 
-                  use12Hours 
-                  format="h:mm A" 
-                  className="w-full rounded-lg" 
-                  size="large"
-                  placeholder="Select end time"
-                />
-              </Form.Item>
-            </div>
-          </Card>
-
-          {/* Location and Registration */}
-          <Card 
-            title={
-              <Space>
-                <EnvironmentOutlined className="text-blue-600" />
-                <span>Location & Registration</span>
-              </Space>
-            }
-            className="border-0 shadow-sm hover:shadow-md transition-shadow duration-200"
-          >
-            <div className="space-y-6">
-              <Form.Item label={<span className="font-semibold">Event Type</span>}>
-                <Radio.Group 
-                  value={eventType} 
-                  onChange={(e) => setEventType(e.target.value)} 
-                  className="flex gap-6"
-                  size="large"
-                >
-                  <Radio value="in_person" className="text-base">
-                    <Space>
-                      <EnvironmentOutlined />
-                      In Person
-                    </Space>
-                  </Radio>
-                  <Radio value="virtual" className="text-base">
-                    <Space>
-                      <span>💻</span>
-                      Virtual
-                    </Space>
-                  </Radio>
-                </Radio.Group>
-              </Form.Item>
-
-              <Form.Item 
-                name="location" 
-                label={<span className="font-semibold">{eventType === 'virtual' ? 'Meeting Link' : 'Location'}</span>}
-                rules={[{ required: true, message: `Please enter ${eventType === 'virtual' ? 'meeting link' : 'location'}` }]}
-              >
-                <Input 
-                  placeholder={eventType === 'virtual' ? 'https://zoom.us/j/...' : 'Enter event location'} 
-                  size="large"
-                  className="rounded-lg"
-                />
-              </Form.Item>
-
-              <Form.Item 
-                name="registrationCloseBeforeDays"
-                label={
-                  <Space>
-                    <span className="font-semibold">Close Registration Before (Days)</span>
-                    <Tooltip title="Number of days before the event starts when registration should automatically close. Set to 0 to keep registration open until the event starts.">
-                      <QuestionCircleOutlined className="text-gray-400" />
-                    </Tooltip>
-                  </Space>
-                }
-                rules={[{ 
-                  type: 'number', 
-                  min: 0, 
-                  max: 30, 
-                  message: 'Please enter a number between 0 and 30' 
-                }]}
-              >
-                <InputNumber
-                  placeholder="1"
-                  size="large"
-                  className="w-full rounded-lg"
-                  min={0}
-                  max={30}
-                  addonAfter="days"
-                />
-              </Form.Item>
-
-              <Alert
-                message="Registration Management"
-                description="Setting this to 1 day means registration will automatically close 1 day before the event starts. This gives you time to prepare attendee lists and materials."
-                type="info"
-                showIcon
-                className="rounded-lg"
-              />
-            </div>
-          </Card>
-
-          {/* Merchandise */}
-          <Card 
-            title={
-              <Space>
-                <ShopOutlined className="text-blue-600" />
-                <span>Merchandise</span>
-              </Space>
-            }
-            className="border-0 shadow-sm hover:shadow-md transition-shadow duration-200"
-          >
-            <Form.Item label={<span className="font-semibold">Merchandise Available?</span>}>
-              <Radio.Group
-                onChange={(e) => {
-                  const value = e.target.value === 'yes';
-                  setHasMerchandise(value);
-                  if (!value) {
-                    setSelectedMerchTypes([]);
-                    setMerchandiseData({});
-                  }
-                }}
-                value={hasMerchandise ? 'yes' : 'no'}
-                className="flex gap-8"
-                size="large"
-              >
-                <Radio value="yes">Yes</Radio>
-                <Radio value="no">No</Radio>
-              </Radio.Group>
-            </Form.Item>
-
-            {hasMerchandise && (
-              <div className="space-y-6">
-                <Form.Item label={<span className="font-semibold">Select Merchandise Items</span>}>
-                  <Select
-                    mode="multiple"
-                    allowClear
-                    style={{ width: '100%' }}
-                    placeholder="Select items (e.g., T-Shirt, Cap)"
-                    onChange={handleMerchTypeChange}
-                    value={selectedMerchTypes}
-                    size="large"
-                    className="rounded-lg"
-                  >
-                    {['T-Shirt', 'Cap', 'Wristband', 'Hoodie', 'Mug', 'Sticker', 'Bag', 'Other'].map((item) => (
-                      <Option key={item} value={item}>{item}</Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-
-                {selectedMerchTypes.map((type) => (
-                  <Card 
-                    key={type} 
-                    size="small" 
-                    title={`${type} Details`}
-                    className="bg-gray-50 border border-gray-200"
-                  >
-                    <div className="space-y-4">
-                      <Form.Item label={`${type} Description`}>
-                        <TextArea
-                          rows={3}
-                          placeholder={`Enter description for ${type} (e.g., sizes, colors, materials)`}
-                          value={merchandiseData[type]?.description || ''}
-                          onChange={(e) => handleDescriptionChange(type, e.target.value)}
-                          className="rounded-lg"
-                        />
-                      </Form.Item>
-
-                      <Form.Item label={`Upload ${type} Images`}>
-                        <Upload
-                          listType="picture-card"
-                          multiple
-                          accept="image/*"
-                          onRemove={(file) => handleImageRemove(type, file)}
-                          customRequest={({ file, onSuccess, onError }) =>
-                            handleMerchImagesUpload(type, { file, onSuccess, onError })
-                          }
-                        >
-                          <div className="text-center">
-                            <PlusOutlined />
-                            <div className="mt-2">Upload</div>
-                          </div>
-                        </Upload>
-                      </Form.Item>
-                    </div>
-                  </Card>
+                {['T-Shirt', 'Cap', 'Wristband', 'Hoodie', 'Mug', 'Sticker', 'Bag', 'Other'].map((item) => (
+                  <Option key={item} value={item}>{item}</Option>
                 ))}
-              </div>
-            )}
-          </Card>
-
-          {/* Visibility */}
-          <Card 
-            title={
-              <Space>
-                <EyeOutlined className="text-blue-600" />
-                <span>Event Visibility</span>
-              </Space>
-            }
-            className="border-0 shadow-sm hover:shadow-md transition-shadow duration-200"
-          >
-            <Form.Item 
-              name="visibility" 
-              label={<span className="font-semibold">Who can register for this event?</span>}
-              rules={[{ required: true, message: 'Please select event visibility' }]}
-            >
-              <Radio.Group className="flex flex-col gap-4" size="large">
-                <Radio value="private" className="text-base">
-                  <div>
-                    <div className="font-medium">Private (AIESEC members only)</div>
-                    <div className="text-gray-500 text-sm ml-6">Only AIESEC members can see and register for this event</div>
-                  </div>
-                </Radio>
-                <Radio value="public" className="text-base">
-                  <div>
-                    <div className="font-medium">Public (Open to everyone)</div>
-                    <div className="text-gray-500 text-sm ml-6">Anyone can see and register for this event</div>
-                  </div>
-                </Radio>
-              </Radio.Group>
+              </Select>
             </Form.Item>
-          </Card>
 
-          {/* Submit Button */}
-          <div className="text-center pt-6">
-            <Button 
-              type="primary" 
-              htmlType="submit" 
-              loading={isSubmitting} 
-              size="large"
-              className="px-12 py-3 h-auto text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-0 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              {isSubmitting ? 'Creating Event...' : 'Create Event'}
-            </Button>
-          </div>
-        </Form>
-      </div>
+            {selectedMerchTypes.map((type) => (
+              <div key={type} className="mb-6 border rounded-lg p-4 bg-gray-50">
+                <h3 className="text-lg font-semibold mb-2">{type}</h3>
+
+                <Form.Item label={`${type} Description`}>
+                  <TextArea
+                    rows={3}
+                    placeholder={`Enter description for ${type}`}
+                    value={merchandiseData[type]?.description || ''}
+                    onChange={(e) => handleDescriptionChange(type, e.target.value)}
+                  />
+                </Form.Item>
+
+                <Form.Item label={`Upload ${type} Images`}>
+                  <Upload
+                    listType="picture"
+                    multiple
+                    accept="image/*"
+                    onRemove={(file) => handleImageRemove(type, file)}
+                    customRequest={({ file, onSuccess, onError }) =>
+                      handleMerchImagesUpload(type, { file, onSuccess, onError })
+                    }
+                  >
+                    <Button icon={<InboxOutlined />}>Upload Images</Button>
+                  </Upload>
+                </Form.Item>
+              </div>
+            ))}
+          </>
+        )}
+
+        <Form.Item 
+          name="visibility" 
+          label="Event Visibility" 
+          rules={[{ required: true }]}
+        >
+          <Radio.Group className="flex gap-6">
+            <Radio value="private">Private (AIESEC members only)</Radio>
+            <Radio value="public">Public (Guests can register)</Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        <Form.Item>
+          <Button 
+            type="primary" 
+            htmlType="submit" 
+            loading={isSubmitting} 
+            className="w-full bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
+          >
+            Create Event
+          </Button>
+        </Form.Item>
+      </Form>
     </div>
   );
 };

@@ -38,7 +38,7 @@ import TaskDashboardLCVP from "./components/Task/TaskDashboardLCVP.jsx";
 import TaskDashboardTL from "./components/Task/TaskDashboardTL.jsx";
 import TaskDashboardMember from "./components/Task/TaskDashboardMember.jsx";
 
-import PublicEventsPage from "./pages/PublicEvents";
+import PublicEventsPage from "./pages/PublicEvents.jsx";
 import EventAnalytics from "./pages/EventAnalytics";
 
 const NotificationsWrapper = () => {
