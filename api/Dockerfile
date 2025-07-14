@@ -1,11 +1,15 @@
-# Use official OpenJDK image
-FROM openjdk:17-jdk-slim
+# Use a Node base image
+FROM node:18
 
-# Set working directory
 WORKDIR /app
 
-# Copy the built jar to the container
-COPY target/*.jar app.jar
+COPY ./frontend ./frontend
+COPY ./api ./api
 
-# Run the jar file
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Install frontend
+RUN cd frontend && npm install && npm run build
+
+# Install backend
+RUN cd ../api && npm install
+
+CMD ["node", "api/index.js"]
