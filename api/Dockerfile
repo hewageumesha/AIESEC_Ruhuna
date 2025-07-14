@@ -1,11 +1,11 @@
 # Use official OpenJDK image
 FROM openjdk:17-jdk-slim
 
-# Set working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy the JAR file built by Maven or Gradle
+# Copy the built jar to the container
 COPY target/*.jar app.jar
 
-# Run the JAR file
+# Run the jar file
 ENTRYPOINT ["java", "-jar", "app.jar"]
