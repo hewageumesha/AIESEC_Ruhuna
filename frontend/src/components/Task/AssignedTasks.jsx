@@ -5,6 +5,7 @@ import { FaFlag } from "react-icons/fa";
 import { MdOutlineSort, MdSort } from "react-icons/md";
 import notfoundGif from "../asset/notfound.gif";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const AssignedTasks = () => {
     const [tasks, setTasks] = useState([]);
@@ -19,12 +20,8 @@ const AssignedTasks = () => {
 
 
     // Safely parse user from localStorage
-    let user = {};
-    try {
-        user = JSON.parse(localStorage.getItem("user") || "{}");
-    } catch {
-        user = {};
-    }
+
+    const user = useSelector((state) => state.user.currentUser);
     const id = user?.id;
 
     useEffect(() => {

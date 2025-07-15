@@ -6,6 +6,7 @@ import com.aiesec.dto.UserHierarchyDTO;
 import com.aiesec.dto.UserRequestDTO;
 import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.UserRole;
+import com.aiesec.exception.ResourcesNotFoundException;
 import com.aiesec.model.Department;
 import com.aiesec.model.Function;
 import com.aiesec.model.User;
@@ -380,5 +381,11 @@ public class UserService {
         }
 
         return userDto;
+    }
+
+    public UserDTO getUserById(Integer id) {
+
+        User user=this.userRepository.findById(Long.valueOf(id)).orElseThrow(()-> new ResourcesNotFoundException("User","User Id",(long)id));
+        return this.userToDto(user);
     }
 }

@@ -4,6 +4,7 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 
 const UserProgressPage = () => {
@@ -23,7 +24,9 @@ const UserProgressPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
 
-    const user = JSON.parse(localStorage.getItem("user"));
+
+
+    const user = useSelector((state) => state.user.currentUser);
     const userId = user?.id;
 
     useEffect(() => {
