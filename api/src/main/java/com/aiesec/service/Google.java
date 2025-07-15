@@ -17,6 +17,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.io.ByteArrayInputStream;
+import java.util.Base64;
 
 @Service
 public class Google {
@@ -33,10 +35,7 @@ public class Google {
     }
 
     public List<BirthdayPerson> fetchAndSaveBirthdays() throws Exception {
-        // ✅ Load credentials from GOOGLE_APPLICATION_CREDENTIALS environment variable
-        GoogleCredentials credentials = GoogleCredentials
-                .getApplicationDefault()
-                .createScoped(Collections.singleton("https://www.googleapis.com/auth/spreadsheets.readonly"));
+        GoogleCredentials credentials = loadCredentialsFromEnv();
 
         Sheets service = new Sheets.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),
@@ -57,14 +56,13 @@ public class Google {
             for (List<Object> row : values) {
                 try {
                     String name = row.get(0).toString(); // Column A
-                    String birthdayStr = row.get(2).toString(); // Column C (birth date)
+                    String birthdayStr = row.get(2).toString(); // Column C
                     String photoUrl = row.size() > 4 ? row.get(4).toString() : null; // Column E
 
                     LocalDate birthdayDate = LocalDate.parse(birthdayStr, formatter);
 
                     Birthday birthdayEntity = new Birthday(name, birthdayDate, photoUrl);
 
-                    // Check if already exists
                     boolean exists = birthdayRepository
                             .findByDate(birthdayDate)
                             .stream()
@@ -77,9 +75,7 @@ public class Google {
                         System.out.println("⚠️ Skipped (already exists): " + name);
                     }
 
-                    // Convert to BirthdayPerson
                     birthdayPeople.add(new BirthdayPerson(name, birthdayDate, photoUrl));
-
                 } catch (Exception e) {
                     System.err.println("❌ Error parsing row: " + row);
                     e.printStackTrace();
@@ -88,5 +84,16 @@ public class Google {
         }
 
         return birthdayPeople;
+    }
+
+   
+    private GoogleCredentials loadCredentialsFromEnv() throws Exception {
+        String base64 = System.getenv("GCP_CREDENTIALS_BASE64");
+        if (base64 == null || base64.isEmpty()) {
+            throw new RuntimeException("Missing GCP_CREDENTIALS_BASE64 environment variable");
+        }
+        byte[] decoded = Base64.getDecoder().decode(base64);
+        return GoogleCredentials.fromStream(new ByteArrayInputStream(decoded))
+                .createScoped(Collections.singleton("https://www.googleapis.com/auth/spreadsheets.readonly"));
     }
 }
