@@ -18,7 +18,7 @@ const TaskDashboardTL = () => {
     useEffect(() => {
         const fetchUserDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/users/id/${id}`);
+                const response = await fetch(`https://aiesecinruhuna-production.up.railway.app/api/users/id/${id}`);
                 if (response.ok) {
                     const userDetails = await response.json();
                     setFistName(userDetails.fisrtName);

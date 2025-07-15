@@ -41,7 +41,7 @@ const UserProgressPage = () => {
     const fetchProgressData = async () => {
         try {
             const response = await axios.get(
-                `http://localhost:8080/api/user/progress?userId=${userId}`
+                `https://aiesecinruhuna-production.up.railway.app/api/user/progress?userId=${userId}`
             );
             const data = Array.isArray(response.data)
                 ? response.data

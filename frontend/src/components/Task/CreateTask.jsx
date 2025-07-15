@@ -27,7 +27,7 @@ const CreateTask = () => {
     const [loggedInUser, setLoggedInUser] = useState(null);
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/user/users')
+        fetch('https://aiesecinruhuna-production.up.railway.app/api/user/users')
             .then((res) => res.json())
             .then((data) => {
                 console.log("Users fetched: ", data);
@@ -37,7 +37,7 @@ const CreateTask = () => {
     }, []);
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/users/profile/id/${id}`)
+        fetch(`https://aiesecinruhuna-production.up.railway.app/api/users/profile/id/${id}`)
             .then(res => res.json())
             .then(data => {
                 console.log("Logged in user: ", data);

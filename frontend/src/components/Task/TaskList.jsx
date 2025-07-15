@@ -24,12 +24,12 @@ const TaskList = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const userRes = await fetch(`http://localhost:8080/api/users/id/${id}`);
+                const userRes = await fetch(`https://aiesecinruhuna-production.up.railway.app/api/users/id/${id}`);
                 if (!userRes.ok) throw new Error("Failed to fetch user");
                 const userData = await userRes.json();
                 setUserDetails(userData);
 
-                const tasksRes = await fetch(`http://localhost:8080/api/user/${id}/tasks/`);
+                const tasksRes = await fetch(`https://aiesecinruhuna-production.up.railway.app/api/user/${id}/tasks/`);
                 if (!tasksRes.ok) throw new Error("Failed to fetch tasks");
                 const userTasks = await tasksRes.json();
                 setTasks(userTasks);
@@ -85,7 +85,7 @@ const TaskList = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const res = await fetch(`http://localhost:8080/api/user/${id}/${taskId}/`, {
+                    const res = await fetch(`https://aiesecinruhuna-production.up.railway.app/api/user/${id}/${taskId}/`, {
                         method: "DELETE",
                     });
                     if (!res.ok) throw new Error("Failed to delete task");
@@ -113,7 +113,7 @@ const TaskList = () => {
         try {
             // ensure it always starts with /
             const path = filePath.startsWith('/') ? filePath : `/${filePath}`;
-            const response = await fetch(`http://localhost:8080${path}`);
+            const response = await fetch(`https://aiesecinruhuna-production.up.railway.app${path}`);
             if (!response.ok) throw new Error("Failed to download file");
 
             const blob = await response.blob();
