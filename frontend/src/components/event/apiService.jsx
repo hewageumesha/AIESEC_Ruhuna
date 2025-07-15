@@ -2,7 +2,7 @@ import axios from 'axios';
 const apiService = {
   // Get all events for analytics
   getEvents: async () => {
-    const response = await axios.get('/analytics/registrations/events');
+    const response = await axios.get('https://aiesecinruhuna-production.up.railway.app/analytics/registrations/events');
     if (response.status !== 200) throw new Error('Failed to fetch events');
     return response.data;
   },
@@ -13,14 +13,14 @@ const apiService = {
     if (eventId) params.append('eventId', eventId);
     if (status) params.append('status', status);
     
-    const response = await fetch(`/analytics/registrations/by-event?${params}`);
+    const response = await fetch(`https://aiesecinruhuna-production.up.railway.app/analytics/registrations/by-event?${params}`);
     if (!response.ok) throw new Error('Failed to fetch registrations');
     return response.json();
   },
 
   // Updated to fetch member registrations with user details
   getMemberRegistrations: async (eventId, page = 0, size = 10) => {
-    const response = await fetch(`/api/member-event-registrations/event/${eventId}/paged?page=${page}&size=${size}`);
+    const response = await fetch(`https://aiesecinruhuna-production.up.railway.app/api/member-event-registrations/event/${eventId}/paged?page=${page}&size=${size}`);
     if (!response.ok) throw new Error('Failed to fetch member registrations');
     const data = await response.json();
     
@@ -46,7 +46,7 @@ const apiService = {
 
   // Updated to fetch guest registrations with proper contact info
   getGuestRegistrations: async (eventId, page = 0, size = 10) => {
-    const response = await fetch(`/api/guest-registrations/event/${eventId}/paged?page=${page}&size=${size}`);
+    const response = await fetch(`https://aiesecinruhuna-production.up.railway.app/api/guest-registrations/event/${eventId}/paged?page=${page}&size=${size}`);
     if (!response.ok) throw new Error('Failed to fetch guest registrations');
     const data = await response.json();
     
@@ -75,14 +75,14 @@ const apiService = {
       type
     });
     
-    const response = await fetch(`/analytics/registrations/status-distribution?${params}`);
+    const response = await fetch(`https://aiesecinruhuna-production.up.railway.app/analytics/registrations/status-distribution?${params}`);
     if (!response.ok) throw new Error('Failed to fetch status distribution');
     return response.json();
   },
 
   // Get member status summary (all statuses)
   getMemberStatusSummary: async (eventId) => {
-    const response = await fetch(`/api/member-event-registrations/event/${eventId}/status-summary`);
+    const response = await fetch(`https://aiesecinruhuna-production.up.railway.app/api/member-event-registrations/event/${eventId}/status-summary`);
     if (!response.ok) throw new Error('Failed to fetch member status summary');
     const data = await response.json();
     
@@ -96,7 +96,7 @@ const apiService = {
 
   // Get guest status summary (all statuses)
   getGuestStatusSummary: async (eventId) => {
-    const response = await fetch(`/api/guest-registrations/event/${eventId}/status-summary`);
+    const response = await fetch(`https://aiesecinruhuna-production.up.railway.app/api/guest-registrations/event/${eventId}/status-summary`);
     if (!response.ok) throw new Error('Failed to fetch guest status summary');
     const data = await response.json();
     
