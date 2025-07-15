@@ -10,7 +10,7 @@ const CSVDownloadButton = ({ type = "all", eventId = null, status = null }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get("/analytics/registrations/export", {
+      const response = await axios.get("https://aiesecinruhuna-production.up.railway.app/analytics/registrations/export", {
         params: { type, eventId, status },
         responseType: "blob", // important for file download
       });
