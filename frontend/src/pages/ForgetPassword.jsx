@@ -17,7 +17,7 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost/8080/api/auth/forgot-password', {
+      const res = await fetch('https://aiesecinruhuna-production.up.railway.app/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -39,7 +39,7 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost/8080/api/auth/verify-code', {
+      const res = await fetch('https://aiesecinruhuna-production.up.railway.app/api/auth/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code }),
@@ -65,7 +65,7 @@ export default function ForgotPassword() {
         return setMessage('Passwords do not match');
       }
 
-      const res = await fetch('http://localhost:8080/api/auth/reset-password', {
+      const res = await fetch('https://aiesecinruhuna-production.up.railway.app/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password: newPassword, confirmPassword }),

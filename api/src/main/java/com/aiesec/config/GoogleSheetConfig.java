@@ -15,11 +15,11 @@ public class GoogleSheetConfig {
     public CommandLineRunner testGoogleSheetAccess(Google google) {
         return args -> {
             try {
-                List<BirthdayPerson> people = google.fetchAndSaveBirthdays();
-                System.out.println("🎉 Fetched birthday data:");
-                for (BirthdayPerson person : people) {
-                    System.out.println("Name: " + person.getName() + ", Birthday: " + person.getBirthday());
-                }
+                // List<BirthdayPerson> people = google.fetchAndSaveBirthdays();
+                // System.out.println("🎉 Fetched birthday data:");
+                // for (BirthdayPerson person : people) {
+                //     System.out.println("Name: " + person.getName() + ", Birthday: " + person.getBirthday());
+                // }
             } catch (Exception e) {
                 System.err.println("❌ Failed to fetch birthday data: " + e.getMessage());
                 e.printStackTrace();

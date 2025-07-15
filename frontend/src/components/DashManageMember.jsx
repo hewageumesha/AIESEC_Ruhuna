@@ -44,7 +44,7 @@ export default function DashManageMember() {
 
   const fetchRoles = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/roles/all");
+      const res = await axios.get("https://aiesecinruhuna-production.up.railway.app/api/roles/all");
       setRoleOptions(res.data);
     } catch (err) {
       setErrorMsg("Failed to fetch roles!");
@@ -53,7 +53,7 @@ export default function DashManageMember() {
 
   const fetchFunctions = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/functions/");
+      const res = await axios.get("https://aiesecinruhuna-production.up.railway.app/api/functions/");
       setFunctionOptions(res.data);
     } catch (err) {
       setErrorMsg("Failed to fetch functions!");
@@ -62,7 +62,7 @@ export default function DashManageMember() {
 
   const fetchMembers = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/users/getall");
+      const res = await axios.get("https://aiesecinruhuna-production.up.railway.app/api/users/getall");
       setMembers(res.data);
     } catch (err) {
       setErrorMsg("Failed to fetch members!");
@@ -85,10 +85,10 @@ export default function DashManageMember() {
     }
     try {
       if (editing) {
-        await axios.post(`http://localhost:8080/api/users/update/${formData.aiesecEmail}`, formData);
+        await axios.post(`https://aiesecinruhuna-production.up.railway.app/api/users/update/${formData.aiesecEmail}`, formData);
         setSuccessMsg("Member updated successfully!");
       } else {
-        await axios.post("http://localhost:8080/api/users/add", formData);
+        await axios.post("https://aiesecinruhuna-production.up.railway.app/api/users/add", formData);
         setSuccessMsg("Member added successfully!");
       }
       setFormData({
@@ -124,7 +124,7 @@ export default function DashManageMember() {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/users/delete/${deleteId}`);
+      await axios.delete(`https://aiesecinruhuna-production.up.railway.app/api/users/delete/${deleteId}`);
       setSuccessMsg("Member deleted successfully!");
       setShowModal(false);
       fetchMembers();

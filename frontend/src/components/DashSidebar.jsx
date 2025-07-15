@@ -87,24 +87,6 @@ export default function DashSidebar({ tab, subtab }) {
     <Sidebar className='w-full md:w-64 bg-gray-50 dark:bg-gray-800'>
       <Sidebar.Items>
         <Sidebar.ItemGroup className='flex flex-col gap-1'>
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
-            <>
-              <Link to='/dashboard?tab=dash'>
-                <Sidebar.Item
-                  active={tab === 'dash' || !tab}
-                  icon={HiChartPie}
-                  as='div'
-                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  onClick={() => {
-                    setIsCommitteeExpanded(false);
-                    setIsProfileExpanded(false);
-                  }}
-                >
-                  <span className="font-medium">Dashboard</span>
-                </Sidebar.Item>
-              </Link>
-            </>
-          )}
 
           {/* Manage Committee with dropdown */}
           <div className="relative">
@@ -225,24 +207,7 @@ export default function DashSidebar({ tab, subtab }) {
                   <span className="font-medium">Events</span>
                 </Sidebar.Item>
               </Link>
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
-            <>
-              <Link to='/dashboard?tab=birthday'>
-                <Sidebar.Item
-                  active={tab === 'birthday'}
-                  icon={HiCake}
-                  as='div'
-                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  onClick={() => {
-                    setIsCommitteeExpanded(false);
-                    setIsProfileExpanded(false);
-                  }}
-                >
-                  <span className="font-medium">Birthday</span>
-                </Sidebar.Item>
-              </Link>
-            </>
-          )}
+
           
           {/* Profile with dropdown */}
           <div className="relative">

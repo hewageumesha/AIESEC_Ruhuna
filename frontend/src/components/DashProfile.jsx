@@ -29,7 +29,7 @@ export default function DashProfile() {
 
   const fetchProfileData = async () => {
     try {
-      const profile = await axios.get(`http://localhost:8080/api/users/profile/${currentUser.aiesecEmail}`, {
+      const profile = await axios.get(`https://aiesecinruhuna-production.up.railway.app/api/users/profile/${currentUser.aiesecEmail}`, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
       setProfileData(profile.data);
@@ -99,7 +99,7 @@ export default function DashProfile() {
     try {
       dispatch(updateStart());
       const updatedData = { ...profileData, ...formData };
-      const res = await fetch(`http://localhost:8080/api/users/update/${currentUser.aiesecEmail}`, {
+      const res = await fetch(`https://aiesecinruhuna-production.up.railway.app/api/users/update/${currentUser.aiesecEmail}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${currentUser.token}`,

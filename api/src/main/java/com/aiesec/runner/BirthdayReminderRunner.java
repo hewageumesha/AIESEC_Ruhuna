@@ -18,6 +18,6 @@ public class BirthdayReminderRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         logger.info("Application started, checking for birthdays...");
-        birthdayReminderService.checkAndSendReminders();
+        //birthdayReminderService.checkAndSendReminders();
     }
 }

@@ -23,11 +23,11 @@ public class BirthdayScheduler {
 
     @Scheduled(cron = "0 0 8 * * ?")  // This will run every day at 8 AM
     public void checkAndNotify() throws Exception {
-        List<BirthdayPerson> allPeople = google.fetchAndSaveBirthdays();
-        List<BirthdayPerson> birthdaysTomorrow = new BirthdayReminderService().getTomorrowBirthdays(allPeople);
+        // List<BirthdayPerson> allPeople = google.fetchAndSaveBirthdays();
+        // List<BirthdayPerson> birthdaysTomorrow = new BirthdayReminderService().getTomorrowBirthdays(allPeople);
 
-        for (BirthdayPerson person : birthdaysTomorrow) {
-            emailService.sendFlyerEmail(person);
-        }
+        // for (BirthdayPerson person : birthdaysTomorrow) {
+        //     emailService.sendFlyerEmail(person);
+        // }
     }
 }
