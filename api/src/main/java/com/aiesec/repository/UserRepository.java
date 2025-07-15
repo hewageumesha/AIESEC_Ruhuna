@@ -14,12 +14,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends JpaRepository<User, Long>{
+
     Optional<User> findByAiesecEmail(String aiesecEmail);
     Optional<User> findByAiesecEmailAndPassword(String aiesecEmail, String password);
     void deleteByAiesecEmail(String aieseEmail);
     List<User> findByRole(UserRole role);
     List<User> findByTeamLeaderAiesecEmail(String teamLeaderAiesecEmail);
     List<User> findByFunctionId(Long functionId);
+
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.joinedDate BETWEEN :start AND :end")
     Long countUsersJoinedLastMonth(Date start, Date end);

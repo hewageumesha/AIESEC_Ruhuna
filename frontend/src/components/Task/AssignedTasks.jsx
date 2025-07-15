@@ -5,6 +5,7 @@ import { FaFlag } from "react-icons/fa";
 import { MdOutlineSort, MdSort } from "react-icons/md";
 import notfoundGif from "../asset/notfound.gif";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const AssignedTasks = () => {
     const [tasks, setTasks] = useState([]);
@@ -19,12 +20,8 @@ const AssignedTasks = () => {
 
 
     // Safely parse user from localStorage
-    let user = {};
-    try {
-        user = JSON.parse(localStorage.getItem("user") || "{}");
-    } catch {
-        user = {};
-    }
+
+    const user = useSelector((state) => state.user.currentUser);
     const id = user?.id;
 
     useEffect(() => {
@@ -34,7 +31,7 @@ const AssignedTasks = () => {
     const fetchTasks = () => {
         console.log("Fetching tasks for userId:", id);
         axios
-            .get(`http://localhost:8080/api/user/${id}/assigned/`)
+            .get(`https://aiesecinruhuna-production.up.railway.app/api/user/${id}/assigned/`)
             .then((res) => {
                 console.log("✅ Raw tasks from backend:", res.data);
                 setTasks(res.data);
@@ -83,7 +80,7 @@ const AssignedTasks = () => {
     const handleStatusChange = async (taskId, newStatus) => {
         try {
             await axios.put(
-                `http://localhost:8080/api/user/task/${taskId}/updateStatus`,
+                `https://aiesecinruhuna-production.up.railway.app/api/user/task/${taskId}/updateStatus`,
                 null,
                 { params: { status: newStatus } }
             );
@@ -108,7 +105,7 @@ const AssignedTasks = () => {
         formData.append("id", id);
 
         try {
-            await axios.post(`http://localhost:8080/api/user/task/${taskId}/upload-proof`, formData, {
+            await axios.post(`https://aiesecinruhuna-production.up.railway.app/api/user/task/${taskId}/upload-proof`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             Swal.fire("Success", "Proof uploaded successfully!", "success");

@@ -20,7 +20,7 @@ const Notifications = ({ id }) => {
 
         const fetchTasks = async () => {
             try {
-                const res = await fetch(`http://localhost:8080/api/user/${id}/notification`);
+                const res = await fetch(`https://aiesecinruhuna-production.up.railway.app/api/user/${id}/notification`);
                 const data = await res.json();
 
                 const today = new Date();

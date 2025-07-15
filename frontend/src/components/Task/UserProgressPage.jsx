@@ -4,6 +4,7 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 
 const UserProgressPage = () => {
@@ -23,7 +24,9 @@ const UserProgressPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
 
-    const user = JSON.parse(localStorage.getItem("user"));
+
+
+    const user = useSelector((state) => state.user.currentUser);
     const userId = user?.id;
 
     useEffect(() => {
@@ -38,7 +41,7 @@ const UserProgressPage = () => {
     const fetchProgressData = async () => {
         try {
             const response = await axios.get(
-                `http://localhost:8080/api/user/progress?userId=${userId}`
+                `https://aiesecinruhuna-production.up.railway.app/api/user/progress?userId=${userId}`
             );
             const data = Array.isArray(response.data)
                 ? response.data
