@@ -67,7 +67,7 @@ const GalleryPage = () => {
         setFilteredImages(imagesWithIds);
       } catch (error) {
         console.error('Failed to fetch gallery images:', error);
-        message.error('Failed to load gallery images');
+        
       } finally {
         setLoading(false);
       }
@@ -324,16 +324,21 @@ const GalleryPage = () => {
   const masonryColumns = createMasonryLayout(filteredImages);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* AIESEC Header */}
-      <div className="bg-gradient-to-r from-blue-150 via-blue-200 to-blue-250 text-white py-12 px-4 shadow-xl">
+      <div className="bg-gradient-to-r from-blue-150 via-blue-200 to-blue-250 dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 text-white py-12 px-4 shadow-xl">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center mb-4">
-            
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">AIESEC in Ruhuna</h1>
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent dark:from-purple-400 dark:via-blue-400 dark:to-cyan-400">
+              AIESEC in Ruhuna
+            </h1>
           </div>
-          <p className="text-center text-blue-100 text-xl bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">Event Gallery</p>
-          <p className="text-center text-blue-200 text-lg mt-2 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">Showcasing our memorable moments and achievements</p>
+          <p className="text-center text-blue-100 text-xl bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent dark:from-purple-400 dark:via-blue-400 dark:to-cyan-400">
+            Event Gallery
+          </p>
+          <p className="text-center text-blue-200 text-lg mt-2 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent dark:from-purple-400 dark:via-blue-400 dark:to-cyan-400">
+            Showcasing our memorable moments and achievements
+          </p>
         </div>
       </div>
 
@@ -347,8 +352,8 @@ const GalleryPage = () => {
                 onClick={() => setCategoryFilter(category.key)}
                 className={`px-8 py-4 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
                   categoryFilter === category.key
-                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md border border-gray-200 hover:border-blue-300'
+                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg dark:from-blue-500 dark:to-blue-600'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md border border-gray-200 hover:border-blue-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 dark:border-gray-600 dark:hover:border-blue-500'
                 }`}
               >
                 {category.label}
@@ -360,14 +365,14 @@ const GalleryPage = () => {
           {canEdit && (
             <div className="flex flex-wrap gap-4 items-center justify-center">
               <div className="flex items-center gap-4">
-                <div className="text-sm text-gray-600 bg-blue-50 px-4 py-2 rounded-full font-medium">
+                <div className="text-sm text-gray-600 bg-blue-50 px-4 py-2 rounded-full font-medium dark:bg-blue-900 dark:text-blue-200">
                   {selectedImages.size} of {filteredImages.length} images selected
                 </div>
                 <Button
                   type="default"
                   icon={<SelectOutlined />}
                   onClick={handleSelectAll}
-                  className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 font-medium"
+                  className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 font-medium dark:bg-blue-800 dark:text-blue-200 dark:border-blue-600 dark:hover:bg-blue-700 dark:hover:border-blue-500"
                 >
                   {selectedImages.size === filteredImages.length ? 'Deselect All' : 'Select All'}
                 </Button>
@@ -377,7 +382,7 @@ const GalleryPage = () => {
                   icon={<DeleteOutlined />}
                   onClick={() => setDeleteModalVisible(true)}
                   disabled={selectedImages.size === 0}
-                  className="bg-red-500 hover:bg-red-600 border-red-500 font-medium"
+                  className="bg-red-600 hover:bg-red-700 text-white font-medium dark:bg-red-700 dark:hover:bg-red-600" 
                 >
                   Delete Selected ({selectedImages.size})
                 </Button>
@@ -390,16 +395,16 @@ const GalleryPage = () => {
         {loading ? (
           <div className="flex flex-col justify-center items-center h-60">
             <Spin size="large" />
-            <p className="mt-4 text-gray-600">Loading gallery images...</p>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading gallery images...</p>
           </div>
         ) : (
           <>
             {/* Images Grid - Masonry Layout */}
             {filteredImages.length === 0 ? (
-              <div className="text-center py-16 bg-white rounded-xl shadow-sm">
-                <EyeOutlined className="text-6xl text-gray-400 mb-4" />
-                <h3 className="text-2xl text-gray-600 mb-2">No images found</h3>
-                <p className="text-gray-500">No images available for the selected category.</p>
+              <div className="text-center py-16 bg-white rounded-xl shadow-sm dark:bg-gray-800">
+                <EyeOutlined className="text-6xl text-gray-400 mb-4 dark:text-gray-500" />
+                <h3 className="text-2xl text-gray-600 mb-2 dark:text-gray-300">No images found</h3>
+                <p className="text-gray-500 dark:text-gray-400">No images available for the selected category.</p>
               </div>
             ) : (
               <div className="flex gap-2">
@@ -408,17 +413,17 @@ const GalleryPage = () => {
                     {column.map((img, index) => (
                       <div
                         key={img.id}
-                        className={`group relative overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-xl transform hover:scale-[1.02] ${
+                        className={`group relative overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-xl transform hover:scale-[1.02] dark:shadow-gray-700 dark:hover:shadow-gray-600 ${
                           canEdit ? 'cursor-pointer' : 'cursor-zoom-in'
                         } ${
                           selectedImages.has(img.id) 
-                            ? 'ring-4 ring-blue-500 ring-opacity-50 shadow-2xl' 
+                            ? 'ring-4 ring-blue-500 ring-opacity-50 shadow-2xl dark:ring-blue-400' 
                             : ''
                         }`}
                         onClick={(e) => handleImageClick(img, e)}
                       >
                         {/* Image */}
-                        <div className="relative bg-gray-100">
+                        <div className="relative bg-gray-100 dark:bg-gray-700">
                           <img
                             src={img.imageUrl}
                             alt={`Gallery image ${index + 1}`}
@@ -427,7 +432,7 @@ const GalleryPage = () => {
                           />
                           
                           {/* Category Badge */}
-                          <div className="absolute top-2 left-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-1 rounded-full text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="absolute top-2 left-2 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                             {getCategoryLabel(img.category)}
                           </div>
                           
@@ -438,7 +443,7 @@ const GalleryPage = () => {
                                 e.stopPropagation();
                                 handleDownload(img.imageUrl, `image_${img.id}.jpg`);
                               }}
-                              className="absolute top-2 right-2 w-10 h-10 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-opacity-70"
+                              className="absolute top-2 right-2 w-10 h-10 bg-black bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-opacity-70 dark:hover:bg-opacity-80"
                             >
                               <DownloadOutlined className="text-white text-lg" />
                             </button>
@@ -447,7 +452,7 @@ const GalleryPage = () => {
 
                         {/* Selection Indicator - Only for LCP/LCVP users */}
                         {canEdit && selectedImages.has(img.id) && (
-                          <div className="absolute top-2 right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                          <div className="absolute top-2 right-2 w-8 h-8 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
                             <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
@@ -456,8 +461,8 @@ const GalleryPage = () => {
 
                         {/* Selection Indicator - Only for LCP/LCVP users */}
                         {canEdit && !selectedImages.has(img.id) && (
-                          <div className="absolute top-2 right-2 w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
-                            <div className="w-4 h-4 border-2 border-blue-600 rounded-full"></div>
+                          <div className="absolute top-2 right-2 w-8 h-8 bg-white bg-opacity-90 dark:bg-gray-800 dark:bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
+                            <div className="w-4 h-4 border-2 border-blue-600 dark:border-blue-400 rounded-full"></div>
                           </div>
                         )}
                       </div>
@@ -472,21 +477,21 @@ const GalleryPage = () => {
 
       {/* Full View Modal - Only for non-admin users */}
       {fullViewImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-95 dark:bg-black dark:bg-opacity-98 flex items-center justify-center z-50 p-4">
           <div className="relative max-w-5xl max-h-full">
             <button
               onClick={() => setFullViewImage(null)}
-              className="absolute top-4 right-4 w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors z-10"
+              className="absolute top-4 right-4 w-12 h-12 bg-white bg-opacity-20 dark:bg-gray-800 dark:bg-opacity-60 rounded-full flex items-center justify-center hover:bg-opacity-30 dark:hover:bg-opacity-80 transition-colors z-10"
             >
               <CloseOutlined className="text-white text-xl" />
             </button>
             <button
               onClick={() => handleDownload(fullViewImage.imageUrl, `image_${fullViewImage.id}.jpg`)}
-              className="absolute top-4 left-4 w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors z-10"
+              className="absolute top-4 left-4 w-12 h-12 bg-white bg-opacity-20 dark:bg-gray-800 dark:bg-opacity-60 rounded-full flex items-center justify-center hover:bg-opacity-30 dark:hover:bg-opacity-80 transition-colors z-10"
             >
               <DownloadOutlined className="text-white text-xl" />
             </button>
-            <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white px-4 py-2 rounded-lg">
+            <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-70 text-white px-4 py-2 rounded-lg">
               <span className="text-sm font-medium">{getCategoryLabel(fullViewImage.category)}</span>
             </div>
             <img
@@ -502,8 +507,8 @@ const GalleryPage = () => {
       <Modal
         title={
           <div className="flex items-center gap-2">
-            <DeleteOutlined className="text-red-500" />
-            <span>Confirm Deletion</span>
+            <DeleteOutlined className="text-red-500 dark:text-red-400" />
+            <span className="dark:text-gray-200">Confirm Deletion</span>
           </div>
         }
         open={deleteModalVisible}
@@ -515,8 +520,8 @@ const GalleryPage = () => {
         okButtonProps={{ danger: true }}
         className="delete-modal"
       >
-        <p className="text-gray-700">Are you sure you want to delete {selectedImages.size} selected image(s)?</p>
-        <p className="text-gray-500 text-sm mt-2">This action cannot be undone.</p>
+        <p className="text-gray-700 dark:text-gray-300">Are you sure you want to delete {selectedImages.size} selected image(s)?</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">This action cannot be undone.</p>
       </Modal>
     </div>
   );
