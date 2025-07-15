@@ -13,7 +13,7 @@ public interface TaskRepo extends JpaRepository<Task, Integer> {
 
 
     List<Task> findByAssignedToId(Integer id);
-    List<Task> findByAssignedTo_Id(Integer id);
+    List<Task> findByAssignedToId(Long assignedToId);
 
     @Query("SELECT t.workOfStatus, COUNT(t) FROM Task t GROUP BY t.workOfStatus")
     List<Object[]> countTasksByWorkStatus();

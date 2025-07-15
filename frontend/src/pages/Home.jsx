@@ -17,32 +17,6 @@ export default function Home() {
     { id: 4, url: '/image4.jpg', alt: 'Aiesec in Ruhuna' },
   ];
 
-  /*
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await fetch('/api/event/getEvents');
-        if (!res.ok) {
-          throw new Error('Failed to fetch events');
-        }
-        const data = await res.json();
-        const currentDate = new Date();
-        
-        const filteredEvents = data.events.filter(event => new Date(event.date) <= currentDate);
-        const filteredUpcomingEvents = data.events.filter(event => new Date(event.date) > currentDate);
-        
-        setEvents(filteredEvents);
-        setUpcomingEvents(filteredUpcomingEvents);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEvents();
-  }, []);
-  */
-
   const programs = [
     {
       title: "Explore teaching",

@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { FaFlag } from "react-icons/fa";
 import { MdOutlineSort, MdSort } from "react-icons/md";
 import notfoundGif from "../asset/notfound.gif";
+import { useNavigate } from "react-router-dom";
 
 const AssignedTasks = () => {
     const [tasks, setTasks] = useState([]);
@@ -14,6 +15,7 @@ const AssignedTasks = () => {
     const [proofNotes, setProofNotes] = useState({});
     const [assignedByFilter, setAssignedByFilter] = useState("All");
     const [deadlineSort, setDeadlineSort] = useState("asc");
+    const navigate = useNavigate();
 
 
     // Safely parse user from localStorage
@@ -126,7 +128,7 @@ const AssignedTasks = () => {
         const matchesPriority = priorityFilter === "All" || task.priority === priorityFilter;
         const matchesStatus = statusFilter === "All" || task.workOfStatus === statusFilter;
 
-        const assignedByName = task.assignedBy?.username || "Unknown";
+        const assignedByName = task.assignedBy?.firstName || "Unknown";
         const matchesAssignedBy = assignedByFilter === "All" || assignedByName === assignedByFilter;
 
         return matchesSearch && matchesPriority && matchesStatus && matchesAssignedBy;
@@ -139,10 +141,19 @@ const AssignedTasks = () => {
     );
 
     return (
+
         <div
             className="p-8 rounded-lg shadow-xl"
             style={{ backgroundColor: "rgba(195,217,215,0.31)", color: "#070707" }}
         >
+
+            <button
+                onClick={() => navigate(-1)}
+                className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+                ← Back
+            </button>
+
             <h2 className="text-3xl font-bold mb-6 text-center">Assigned Tasks</h2>
 
             <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
@@ -260,7 +271,7 @@ const AssignedTasks = () => {
                                         value={assignedByFilter}
                                     >
                                         <option value="All">All</option>
-                                        {Array.from(new Set(tasks.map((t) => t.assignedBy?.username || "Unknown")))
+                                        {Array.from(new Set(tasks.map((t) => t.assignedBy?.firstName || "Unknown")))
                                             .filter(name => name !== "Unknown")
                                             .map((name, idx) => (
                                                 <option key={idx} value={name}>{name}</option>
@@ -306,11 +317,11 @@ const AssignedTasks = () => {
                                 <td className="px-6 py-3">{new Date(task.deadLine).toLocaleDateString()}</td>
                                 <td className="px-6 py-3 text-sm text-gray-700">{getDaysRemaining(task.deadLine)}</td>
                                 <td className="px-6 py-3">
-                                    {task.assignedBy?.username ? (
+                                    {task.assignedBy?.firstName ? (
                                         <span
                                             title={`Role: ${task.assignedBy?.role || task.assignedBy?.userRole || "Unknown"}`}
                                         >
-  {task.assignedBy?.username || task.assignedBy?.userName || task.assignedBy || "Unknown"}
+  {task.assignedBy?.firstName || task.assignedBy?.firstName || task.assignedBy || "Unknown"}
 </span>
                                     ) : (
                                         <i className="text-red-500">Unknown</i>

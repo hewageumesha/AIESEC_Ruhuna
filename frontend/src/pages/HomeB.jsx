@@ -38,10 +38,10 @@ const HomeB = ({ setTodayCount }) => {
     return aDate - bDate;
   });
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-[#eaefef] to-[#f8f9fc] flex flex-col items-center justify-start py-10 px-4">
-      <div className="bg-[#1E40AF] rounded-2xl shadow-2xl w-full max-w-7xl p-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-center text-[#d9dfdf] mb-8">
+   return (
+    <div className="min-h-screen bg-gradient-to-br from-[#feffff] to-[#f8f9fc] dark:from-gray-900 dark:to-gray-800 flex flex-col items-center justify-start py-10 px-4">
+      <div className="bg-[#feffff] dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-7xl p-8">
+        <h1 className="text-4xl md:text-5xl font-bold text-center text-[#060e0e] dark:text-white mb-8">
           Upcoming Birthdays 🎂
         </h1>
 

@@ -1,9 +1,9 @@
 package com.aiesec.dto;
 
 public class PasswordUpdateRequest {
+    private String userAiesecEmail;
     private String currentPassword;
     private String newPassword;
-    private String confirmPassword;
 
     public String getCurrentPassword() {
         return currentPassword;
@@ -17,10 +17,10 @@ public class PasswordUpdateRequest {
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
     }
-    public String getConfirmPassword() {
-        return confirmPassword;
+    public String getUserAiesecEmail() {
+        return userAiesecEmail;
     }
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
+    public void setUserAiesecEmail(String userAiesecEmail) {
+        this.userAiesecEmail = userAiesecEmail;
     }
 }

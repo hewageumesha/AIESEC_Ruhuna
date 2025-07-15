@@ -1,8 +1,8 @@
 package com.aiesec.service;
-
 import com.aiesec.dto.FunctionDTO;
 import com.aiesec.model.Function;
 import com.aiesec.repository.FunctionRepo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -16,6 +16,9 @@ public class FunctionService {
     private FunctionRepo functionRepository;
 
     public FunctionDTO addFunction(FunctionDTO dto) {
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be null or empty");
+        }
         Function function = new Function();
         function.setName(dto.getName());
         Function saved = functionRepository.save(function);
@@ -25,7 +28,7 @@ public class FunctionService {
     public List<FunctionDTO> getAllFunctions() {
         return functionRepository.findAll()
                 .stream()
-                .map(f -> new FunctionDTO(f.getId(), f.getName()))
+                .map(d -> new FunctionDTO(d.getId(), d.getName()))
                 .collect(Collectors.toList());
     }
 
@@ -35,14 +38,6 @@ public class FunctionService {
         return new FunctionDTO(function.getId(), function.getName());
     }
 
-    public void deleteFunction(Long id) {
-        if (functionRepository.existsById(id)) {
-            functionRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Function not found with id: " + id);
-        }
-    }
-    
     public FunctionDTO updateFunction(Long id, FunctionDTO dto) {
         Optional<Function> optional = functionRepository.findById(id);
         if (optional.isPresent()) {
@@ -53,5 +48,17 @@ public class FunctionService {
         } else {
             throw new RuntimeException("Function not found with id: " + id);
         }
+    }
+
+    public void deleteFunction(Long id) {
+        if(functionRepository.existsById(id)) {
+            functionRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Function not found with id: " + id);
+        }
+    }
+
+    public List<Function> getFunctions() {
+        return functionRepository.findAll();
     }
 }

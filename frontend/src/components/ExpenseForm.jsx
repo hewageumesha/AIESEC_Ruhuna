@@ -1,10 +1,8 @@
-import React from "react";
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { createExpense, updateExpense, deleteExpense } from "../service/api";
-import { FaEdit, FaTrash, FaTimes } from "react-icons/fa"; 
+import { FaEdit, FaTrash, FaTimes } from "react-icons/fa";
 import ConfirmModal from "../components/ConfirmModal";
-import CustomAlert from "../components/CustomAlert"; 
+import CustomAlert from "../components/CustomAlert";
 
 const ExpenseForm = ({ refreshExpenses, editingExpense, setEditingExpense }) => {
   const [expense, setExpense] = useState({
@@ -18,8 +16,8 @@ const ExpenseForm = ({ refreshExpenses, editingExpense, setEditingExpense }) => 
   });
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");  
-  const [alertType, setAlertType] = useState("");        
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
 
   useEffect(() => {
     if (editingExpense) {
@@ -43,8 +41,7 @@ const ExpenseForm = ({ refreshExpenses, editingExpense, setEditingExpense }) => 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const today = new Date().toISOString().split("T")[0]; // Get today's date
+    const today = new Date().toISOString().split("T")[0];
 
     if (isNaN(expense.amount) || Number(expense.amount) <= 0) {
       setAlertMessage("Please enter a valid amount greater than 0.");
@@ -62,7 +59,6 @@ const ExpenseForm = ({ refreshExpenses, editingExpense, setEditingExpense }) => 
       return;
     }
 
-    // Ensure Role ID starts with 'LCP' or 'LCVP' and followed by numbers (e.g., LCP123)
     const roleIdPattern = /^(LCP|LCVP)\d+$/i;
     if (!roleIdPattern.test(expense.userId)) {
       setAlertMessage("Invalid Role ID! It should start with 'LCP' or 'LCVP' followed by numbers (e.g., LCP123).");
@@ -70,7 +66,6 @@ const ExpenseForm = ({ refreshExpenses, editingExpense, setEditingExpense }) => 
       return;
     }
 
-    // Convert to uppercase before saving
     expense.userId = expense.userId.toUpperCase();
 
     if (expense.description.trim().length < 3) {
@@ -123,9 +118,13 @@ const ExpenseForm = ({ refreshExpenses, editingExpense, setEditingExpense }) => 
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="p-4 bg-white text-black shadow-lg rounded-lg w-full max-w-md mx-auto">
-        <h2 className="text-xl font-bold text-center mb-4 text-black">{editingExpense ? "Edit Expense" : "Add Expense"}</h2>
-
+      <form
+        onSubmit={handleSubmit}
+        className="p-4 bg-white text-black dark:bg-gray-800 dark:text-white shadow-lg rounded-lg w-full max-w-md mx-auto"
+      >
+        <h2 className="text-xl font-bold text-center mb-4">
+          {editingExpense ? "Edit Expense" : "Add Expense"}
+        </h2>
 
         <input
           type="number"
@@ -134,7 +133,7 @@ const ExpenseForm = ({ refreshExpenses, editingExpense, setEditingExpense }) => 
           onChange={handleChange}
           placeholder="Amount (LKR)"
           required
-          className="w-full p-2 border rounded mb-2"
+          className="w-full p-2 border rounded mb-2 bg-white text-black dark:bg-gray-700 dark:text-white dark:border-gray-600"
         />
         <input
           type="date"
@@ -142,9 +141,15 @@ const ExpenseForm = ({ refreshExpenses, editingExpense, setEditingExpense }) => 
           value={expense.date}
           onChange={handleChange}
           required
-          className="w-full p-2 border rounded mb-2"
+          className="w-full p-2 border rounded mb-2 bg-white text-black dark:bg-gray-700 dark:text-white dark:border-gray-600"
         />
-        <select name="category" value={expense.category} onChange={handleChange} required className="w-full p-2 border rounded mb-2">
+        <select
+          name="category"
+          value={expense.category}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border rounded mb-2 bg-white text-black dark:bg-gray-700 dark:text-white dark:border-gray-600"
+        >
           <option value="">Select Category</option>
           <option value="food">Food</option>
           <option value="transport">Transport</option>
@@ -158,10 +163,16 @@ const ExpenseForm = ({ refreshExpenses, editingExpense, setEditingExpense }) => 
           value={expense.description}
           onChange={handleChange}
           placeholder="Description"
-          className="w-full p-2 border rounded mb-2"
+          className="w-full p-2 border rounded mb-2 bg-white text-black dark:bg-gray-700 dark:text-white dark:border-gray-600"
         />
 
-        <select name="role" value={expense.role} onChange={handleChange} required className="w-full p-2 border rounded mb-2">
+        <select
+          name="role"
+          value={expense.role}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border rounded mb-2 bg-white text-black dark:bg-gray-700 dark:text-white dark:border-gray-600"
+        >
           <option value="">Select Role</option>
           <option value="lcp">LCP</option>
           <option value="lcvp">LCVP</option>
@@ -173,33 +184,49 @@ const ExpenseForm = ({ refreshExpenses, editingExpense, setEditingExpense }) => 
           onChange={handleChange}
           placeholder="Role ID"
           required
-          className="w-full p-2 border rounded mb-2"
+          className="w-full p-2 border rounded mb-2 bg-white text-black dark:bg-gray-700 dark:text-white dark:border-gray-600"
         />
-        <select name="paymentMethod" value={expense.paymentMethod} onChange={handleChange} required className="w-full p-2 border rounded mb-4">
+        <select
+          name="paymentMethod"
+          value={expense.paymentMethod}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border rounded mb-4 bg-white text-black dark:bg-gray-700 dark:text-white dark:border-gray-600"
+        >
           <option value="">Select Payment Method</option>
           <option value="cash">Cash</option>
           <option value="card">Card</option>
           <option value="bankTransfer">Bank Transfer</option>
         </select>
 
-        <button type="submit" className="update">
-          <FaEdit className="mr-2" /> {editingExpense ? "Update Expense" : "Add Expense"}
+        <button
+          type="submit"
+          className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 w-full"
+        >
+          <FaEdit />
+          {editingExpense ? "Update Expense" : "Add Expense"}
         </button>
       </form>
 
-      {/* Action Buttons (Aligned in Right Corner) */}
       {editingExpense && (
         <div className="fixed top-4 right-4 flex gap-2">
-          <button type="button" className="delete" onClick={handleDelete}>
-            <FaTrash className="mr-2" /> Delete
+          <button
+            type="button"
+            className="flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+            onClick={handleDelete}
+          >
+            <FaTrash /> Delete
           </button>
-          <button type="button" className="cancel" onClick={() => setEditingExpense(null)}>
-            <FaTimes className="mr-2" /> Cancel
+          <button
+            type="button"
+            className="flex items-center gap-2 bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700"
+            onClick={() => setEditingExpense(null)}
+          >
+            <FaTimes /> Cancel
           </button>
         </div>
       )}
 
-      {/* Confirmation Modal */}
       <ConfirmModal
         isVisible={isModalVisible}
         message="Are you sure you want to delete this expense?"
@@ -207,12 +234,11 @@ const ExpenseForm = ({ refreshExpenses, editingExpense, setEditingExpense }) => 
         onCancel={cancelDelete}
       />
 
-      {/* Display custom alert message */}
       {alertMessage && (
         <CustomAlert
           message={alertMessage}
           type={alertType}
-          onClose={() => setAlertMessage("")}  // Close alert when the 'X' button is clicked
+          onClose={() => setAlertMessage("")}
         />
       )}
     </>

@@ -9,11 +9,9 @@ import com.aiesec.enums.UserRole;
 import com.aiesec.model.Department;
 import com.aiesec.model.Function;
 import com.aiesec.model.User;
-import com.aiesec.repository.DepartmentRepo;
 import com.aiesec.repository.UserRepository;
 import com.aiesec.repository.FunctionRepo;
 
-import io.jsonwebtoken.lang.Collections;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +36,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    @Autowired
-    private DepartmentRepo departmentRepository;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Autowired
     private FunctionRepo functionRepository;
@@ -58,17 +54,15 @@ public class UserService {
     user.setFirstName(dto.getFirstName());
     user.setLastName(dto.getLastName());
     user.setRole(dto.getRole());
-
-    Department department = departmentRepository.findById(dto.getDepartmentId())
-            .orElseThrow(() -> new RuntimeException("Department not found"));
-    user.setDepartment(department);
+    user.setBirthday(dto.getBirthday());
+    user.setJoinedDate(dto.getJoinedDate());
 
     Function function = functionRepository.findById(dto.getFunctionId())
             .orElseThrow(() -> new RuntimeException("Function not found"));
     user.setFunction(function);
 
     // Check team leader if role == Member
-    if (dto.getRole() == UserRole.Member) {
+    if (dto.getRole() != UserRole.LCP) {
         if (dto.getTeamLeaderAiesecEmail() == null || dto.getTeamLeaderAiesecEmail().isEmpty()) {
             throw new RuntimeException("teamLeaderAiesecEmail is required for MEMBER role");
         }
@@ -76,7 +70,7 @@ public class UserService {
         User teamLeader = userRepository.findByAiesecEmail(dto.getTeamLeaderAiesecEmail())
                 .orElseThrow(() -> new RuntimeException("Team leader not found"));
 
-        if (teamLeader.getRole() != UserRole.Team_Leader) {
+        if (teamLeader.getRole() == UserRole.Member) {
             throw new RuntimeException("Provided team leader email does not belong to a TEAM_LEADER");
         }
 
@@ -86,10 +80,11 @@ public class UserService {
 
     String tempPassword = generateTempPassword();
     user.setPassword(tempPassword);
+    
 
     userRepository.save(user);
 
-    sendTempPasswordEmail(user.getAiesecEmail(), tempPassword);
+    sendTempPasswordEmail(user.getEmail(), tempPassword, user.getAiesecEmail());
 
     return user;
 }
@@ -100,12 +95,6 @@ public class UserService {
     public User updateUser(String aiesecEmail, UserUpdateDTO dto) {
         User user = userRepository.findByAiesecEmail(aiesecEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (dto.getDepartmentId() != null) {
-            Department department = departmentRepository.findById(dto.getDepartmentId())
-                    .orElseThrow(() -> new RuntimeException("Department not found"));
-            user.setDepartment(department);
-        }
 
         if (dto.getFunctionId() != null) {
             Function function = functionRepository.findById(dto.getFunctionId())
@@ -205,6 +194,9 @@ public class UserService {
         }
         if (userDetails.getFaculty() != null) {
             user.setFaculty(userDetails.getFaculty());
+        }
+        if(userDetails.getTeamLeaderAiesecEmail() != null) {
+            user.setTeamLeaderAiesecEmail(userDetails.getTeamLeaderAiesecEmail());
         }
 
         return userRepository.save(user);
@@ -311,37 +303,83 @@ public class UserService {
         return startYear + "-" + (startYear + 1);
     }
 
-    public String updatePassword(String aiesecEmail, PasswordUpdateRequest request) {
-        User user = userRepository.findByAiesecEmail(aiesecEmail)
-                .orElseThrow(() -> new RuntimeException("User not found!"));
+    public String updatePassword(PasswordUpdateRequest request) {
 
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        User user = userRepository.findByAiesecEmail(request.getUserAiesecEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        System.out.println(request.getCurrentPassword());
+        System.out.println(user.getPassword());
+        
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            return "Current password is incorrect!";
+            throw new RuntimeException("Current password is incorrect");
         }
 
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            return "New password and confirm password do not match!";
+        if (request.getCurrentPassword().equals(request.getNewPassword())) {
+            throw new RuntimeException("New password must be different");
         }
 
-        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
-        user.setPassword(encodedPassword);
+        if (request.getNewPassword().length() < 6) {
+            throw new RuntimeException("Password must be at least 6 characters");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
 
-        return "Password updated successfully!";
+        return "Password updated successfully";
     }
 
-    private String generateTempPassword() {
+    public String generateTempPassword() {
         return UUID.randomUUID().toString().substring(0, 8);
     }
 
-    private void sendTempPasswordEmail(String toEmail, String tempPassword) {
-        String subject = "Your Temporary AIESEC Password";
-        String text = "Hello,\n\nYour temporary password is: " + tempPassword + "\n\nPlease log in and change it as soon as possible.";
+    public void sendTempPasswordEmail(String toEmail, String tempPassword, String aiesecEmail) {
+    String subject = "Your Temporary AIESEC Password";
+    String text = "Hello,\n\n" +
+                  "Your AIESEC email: " + aiesecEmail + "\n" +
+                  "Your temporary password: " + tempPassword + "\n\n" +
+                  "Please log in and change it as soon as possible.";
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject(subject);
-        message.setText(text);
-        mailSender.send(message);
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setTo(toEmail);
+    message.setSubject(subject);
+    message.setText(text);
+    mailSender.send(message);
+}
+
+ public List<UserDTO> getAllUsers() {
+        List<User> users = this.userRepository.findAll();
+        if (users == null || users.isEmpty()) {
+            return Collections.emptyList(); // or return a new ArrayList<UserDto>()
+        }
+        return users.stream().map(this::userToDto).toList();
+    }
+
+    public UserDTO userToDto(User user){
+        UserDTO userDto = new UserDTO();
+        userDto.setId(Long.valueOf(user.getId()));
+        userDto.setFirstName(user.getFirstName());
+        userDto.setNoOfTask(user.getNoOfTask());
+        userDto.setRole(user.getRole());
+
+        // Department
+        if (user.getDepartment() != null) {
+            Department Dep = new Department();
+            Dep.setId(user.getDepartment().getId());
+            Dep.setName(user.getDepartment().getName());
+            userDto.setDepartmentName(user.getDepartment().getName());
+        }
+
+        // ✅ Function
+        if (user.getFunction() != null) {
+            Function func = new Function();
+            func.setId(user.getFunction().getId());
+            func.setName(user.getFunction().getName());
+            userDto.setFunctionId(func);
+            userDto.setFunctionName(user.getFunction().getName());
+        }
+
+        return userDto;
     }
 }

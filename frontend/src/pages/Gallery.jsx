@@ -1,263 +1,530 @@
-import React from 'react'
+import React, { useEffect, useState, useCallback } from 'react';
+import { useSelector } from 'react-redux';
+import { Spin, Modal, Button, message, notification } from 'antd';
+import { DeleteOutlined, SelectOutlined, EyeOutlined, DownloadOutlined, CloseOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { deleteImageFromStorage } from '../service/deleteImageFromStorage';
 
-const ImageCard = ({ href, src, alt, label }) => {
-  return (
-    <a
-      href={href}
-      className="group relative flex h-48 items-end overflow-hidden rounded-lg bg-gray-100 shadow-lg md:h-80"
-    >
-      <img
-        src={src}
-        loading="lazy"
-        alt={alt}
-        className="absolute inset-0 h-full w-full object-cover object-center transition duration-200 group-hover:scale-110"
-      />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-800 via-transparent to-transparent opacity-50"></div>
-      <span className="relative ml-4 mb-3 inline-block text-sm text-white md:ml-5 md:text-lg">
-        {label}
-      </span>
-    </a>
-  );
-};
+const GalleryPage = () => {
+  // Get user data from Redux store
+  const { currentUser } = useSelector((state) => state.user);
+  
+  const [images, setImages] = useState([]);
+  const [filteredImages, setFilteredImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [selectedImages, setSelectedImages] = useState(new Set());
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [fullViewImage, setFullViewImage] = useState(null);
 
-const ResponsiveImageGallery = () => {
-  const galleryItems = [
-    {
-      id: 1,
-      href: "#",
-      src: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&q=75&fit=crop&w=600",
-      alt: "Photo by Minh Pham",
-      label: "VR",
-      colSpan: "",
-    },
-    {
-      id: 2,
-      href: "#",
-      src: "https://images.unsplash.com/photo-1542759564-7ccbb6ac450a?auto=format&q=75&fit=crop&w=1000",
-      alt: "Photo by Magicle",
-      label: "Tech",
-      colSpan: "md:col-span-2",
-    },
-    {
-      id: 3,
-      href: "#",
-      src: "https://images.unsplash.com/photo-1610465299996-30f240ac2b1c?auto=format&q=75&fit=crop&w=1000",
-      alt: "Photo by Martin Sanchez",
-      label: "Dev",
-      colSpan: "md:col-span-2",
-    },
-    {
-      id: 4,
-      href: "#",
-      src: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&q=75&fit=crop&w=600",
-      alt: "Photo by Lorenzo Herrera",
-      label: "Retro",
-      colSpan: "",
-    },
+  const categoryOptions = [
+    { key: 'all', label: 'All Events' },
+    { key: 'SOUTHFEST', label: 'SouthFest' },
+    { key: 'YOUTHSPACE', label: 'YouthSpace' },
+    { key: 'ODEYSSEY', label: 'Odeyssey' },
+    { key: 'PRESTIGE', label: 'Prestige' },
+    { key: 'OTHER', label: 'Other' },
   ];
 
+  // Check if user is logged in and has admin privileges
+  const isLoggedIn = !!currentUser;
+  const currentUserRole = currentUser?.role || '';
+  const userId = currentUser?.id || currentUser?._id || '';
+  const authToken = currentUser?.token || '';
+
+  // Check if user can edit (LCP or LCVP roles only)
+  const canEdit = (currentUserRole === 'LCP' || currentUserRole === 'LCVP') && isLoggedIn;
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        // Add authorization header if user is logged in
+        const headers = {};
+        if (authToken) {
+          headers['Authorization'] = `Bearer ${authToken}`;
+        }
+
+        const res = await fetch('http://localhost:8080/api/gallery', {
+          headers
+        });
+        
+        if (!res.ok) {
+          throw new Error('Failed to fetch images');
+        }
+        const data = await res.json();
+        
+        // ✅ FIXED: Map backend fields to frontend fields
+        const imagesWithIds = data.map((img, index) => ({
+          ...img,
+          id: img.galleryId || img.id || `img_${index}_${Date.now()}`, // Use galleryId as id
+          imageUrl: img.imageUrl,
+          category: img.category,
+          storagePath: img.storagePath,
+          uploadedAt: img.uploadedAt
+        }));
+        
+        setImages(imagesWithIds);
+        setFilteredImages(imagesWithIds);
+      } catch (error) {
+        console.error('Failed to fetch gallery images:', error);
+        
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchImages();
+  }, [authToken]);
+
+  useEffect(() => {
+    if (categoryFilter === 'all') {
+      setFilteredImages(images);
+    } else {
+      const filtered = images.filter(img => img.category === categoryFilter);
+      setFilteredImages(filtered);
+    }
+    setSelectedImages(new Set()); // Clear selections when filter changes
+  }, [categoryFilter, images]);
+
+  // Fixed handleImageClick function
+  const handleImageClick = useCallback((img, event) => {
+    // Prevent event bubbling
+    if (event) {
+      event.stopPropagation();
+    }
+
+    if (canEdit) {
+      // Toggle selection in admin mode
+      setSelectedImages(prevSelected => {
+        const newSelected = new Set(prevSelected);
+        const imageId = img.id;
+        
+        if (newSelected.has(imageId)) {
+          newSelected.delete(imageId);
+          console.log(`Deselected image: ${imageId}`);
+        } else {
+          newSelected.add(imageId);
+          console.log(`Selected image: ${imageId}`);
+        }
+        
+        console.log('Current selection:', Array.from(newSelected));
+        return newSelected;
+      });
+    } else {
+      // Show full view for regular users
+      setFullViewImage(img);
+    }
+  }, [canEdit]);
+
+  const handleSelectAll = useCallback(() => {
+    if (!canEdit) return;
+    
+    setSelectedImages(prevSelected => {
+      if (prevSelected.size === filteredImages.length) {
+        // Deselect all
+        return new Set();
+      } else {
+        // Select all
+        const allIds = new Set(filteredImages.map(img => img.id));
+        return allIds;
+      }
+    });
+  }, [canEdit, filteredImages]);
+
+  // Extract storage path from imageUrl for Supabase deletion
+  const extractStoragePath = (imageUrl) => {
+    try {
+      // Assuming your Supabase storage URLs follow the pattern:
+      // https://project.supabase.co/storage/v1/object/public/gallery/path/to/image.jpg
+      const url = new URL(imageUrl);
+      const pathSegments = url.pathname.split('/');
+      const galleryIndex = pathSegments.findIndex(segment => segment === 'gallery');
+      if (galleryIndex !== -1 && galleryIndex < pathSegments.length - 1) {
+        return pathSegments.slice(galleryIndex + 1).join('/');
+      }
+      return null;
+    } catch (error) {
+      console.error('Error extracting storage path:', error);
+      return null;
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedImages.size === 0) {
+      message.warning('No images selected for deletion');
+      return;
+    }
+    
+    // Double-check authorization
+    if (!canEdit) {
+      message.error('You do not have permission to delete images');
+      return;
+    }
+
+    setDeleting(true);
+    const selectedImageIds = Array.from(selectedImages);
+    
+    console.log('Deleting images with IDs:', selectedImageIds);
+    
+    try {
+      // Get full image objects for storage deletion
+      const imagesToDelete = images.filter(img => selectedImages.has(img.id));
+      
+      console.log('Images to delete:', imagesToDelete.map(img => ({ id: img.id, url: img.imageUrl })));
+      
+      // ✅ FIXED: Ensure IDs are numbers (galleryId is Long in backend)
+      const galleryIds = selectedImageIds.map(id => {
+        const numericId = Number(id);
+        if (isNaN(numericId)) {
+          throw new Error(`Invalid gallery ID: ${id}`);
+        }
+        return numericId;
+      });
+      
+      console.log('Gallery IDs to send to backend:', galleryIds);
+      
+      // Use batch delete endpoint with proper error handling
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      // Add authorization header
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+      
+      // ✅ FIXED: Send array of Long IDs to match backend expectation
+      const batchDeleteResponse = await fetch('http://localhost:8080/api/gallery/batch', {
+        method: 'DELETE',
+        headers,
+        body: JSON.stringify(galleryIds) // Send [1, 2, 3] format
+      });
+
+      // Log response for debugging
+      console.log('Backend response status:', batchDeleteResponse.status);
+
+      if (!batchDeleteResponse.ok) {
+        let errorMessage = `Backend deletion failed: ${batchDeleteResponse.status}`;
+        try {
+          const errorData = await batchDeleteResponse.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch (parseError) {
+          errorMessage = `HTTP ${batchDeleteResponse.status}: ${batchDeleteResponse.statusText}`;
+        }
+        throw new Error(errorMessage);
+      }
+
+      console.log('Backend deletion successful');
+
+      // ✅ FIXED: Delete images from Supabase storage using storagePath if available
+      const storageDeletePromises = imagesToDelete.map(async (img) => {
+        try {
+          // Use storagePath if available, otherwise extract from imageUrl
+          const storagePath = img.storagePath || extractStoragePath(img.imageUrl);
+          if (storagePath) {
+            await deleteImageFromStorage(storagePath);
+            console.log(`Deleted from storage: ${storagePath}`);
+          } else {
+            console.warn(`No storage path found for image: ${img.id}`);
+          }
+        } catch (storageError) {
+          console.error(`Failed to delete image from storage: ${img.id}`, storageError);
+          // Continue with other deletions even if one fails
+        }
+      });
+
+      // Wait for all storage deletions to complete
+      await Promise.allSettled(storageDeletePromises);
+      
+      // Remove deleted images from state
+      setImages(prevImages => prevImages.filter(img => !selectedImages.has(img.id)));
+      setSelectedImages(new Set());
+      
+      // Beautiful success notification
+      notification.success({
+        message: 'Images Deleted Successfully',
+        description: `${selectedImageIds.length} image${selectedImageIds.length > 1 ? 's' : ''} ${selectedImageIds.length > 1 ? 'have' : 'has'} been removed from the gallery.`,
+        icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+        placement: 'topRight',
+        duration: 4,
+        style: {
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        },
+      });
+      
+    } catch (error) {
+      console.error('Failed to delete images:', error);
+      message.error(`Failed to delete images: ${error.message}`);
+      
+      // ✅ FIXED: Refresh the gallery to sync with backend state
+      try {
+        const headers = {};
+        if (authToken) {
+          headers['Authorization'] = `Bearer ${authToken}`;
+        }
+        const res = await fetch('http://localhost:8080/api/gallery', { headers });
+        if (res.ok) {
+          const data = await res.json();
+          const imagesWithIds = data.map((img, index) => ({
+            ...img,
+            id: img.galleryId || img.id || `img_${index}_${Date.now()}`,
+            imageUrl: img.imageUrl,
+            category: img.category,
+            storagePath: img.storagePath,
+            uploadedAt: img.uploadedAt
+          }));
+          setImages(imagesWithIds);
+          setFilteredImages(imagesWithIds);
+        }
+      } catch (refreshError) {
+        console.error('Failed to refresh gallery:', refreshError);
+      }
+    } finally {
+      setDeleting(false);
+      setDeleteModalVisible(false);
+    }
+  };
+
+  const handleDownload = async (imageUrl, imageName) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = imageName || 'image.jpg';
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Failed to download image:', error);
+      message.error('Failed to download image');
+    }
+  };
+
+  const getCategoryLabel = (categoryKey) => {
+    const category = categoryOptions.find(opt => opt.key === categoryKey);
+    return category ? category.label : 'Other';
+  };
+
+  // Masonry-like layout function
+  const createMasonryLayout = (images) => {
+    const columns = 4; // Number of columns
+    const imageColumns = Array.from({ length: columns }, () => []);
+    
+    images.forEach((img, index) => {
+      const columnIndex = index % columns;
+      imageColumns[columnIndex].push(img);
+    });
+    
+    return imageColumns;
+  };
+
+  const masonryColumns = createMasonryLayout(filteredImages);
+
   return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen py-6 sm:py-8 lg:py-12">
-      <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
-        <div className="mb-4 flex items-center justify-between gap-8 sm:mb-8 md:mb-12">
-          <div className="flex items-center gap-12">
-            <h2 className="text-2xl font-bold text-gray-800 lg:text-3xl dark:text-white">
-              Gallery
-            </h2>
-
-            <p className="hidden max-w-screen-m text-gray-500 dark:text-gray-300 md:block">
-              Discover captivating moments frozen in time. Each image tells a unique story - from cutting-edge technology to timeless retro vibes. Our visual collection inspires creativity and sparks imagination.
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* AIESEC Header */}
+      <div className="bg-gradient-to-r from-blue-150 via-blue-200 to-blue-250 dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 text-white py-12 px-4 shadow-xl">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center mb-4">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent dark:from-purple-400 dark:via-blue-400 dark:to-cyan-400">
+              AIESEC in Ruhuna
+            </h1>
           </div>
-
-          <a
-            href="#"
-            className="inline-block rounded-lg border bg-white dark:bg-gray-700 dark:border-none px-4 py-2 text-center text-sm font-semibold text-gray-500 dark:text-gray-200 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:px-8 md:py-3 md:text-base"
-          >
-            More
-          </a>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 xl:gap-8">
-          {galleryItems.map((item) => (
-            <div key={item.id} className={item.colSpan}>
-              <ImageCard
-                href={item.href}
-                src={item.src}
-                alt={item.alt}
-                label={item.label}
-              />
-            </div>
-          ))}
+          <p className="text-center text-blue-100 text-xl bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent dark:from-purple-400 dark:via-blue-400 dark:to-cyan-400">
+            Event Gallery
+          </p>
+          <p className="text-center text-blue-200 text-lg mt-2 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent dark:from-purple-400 dark:via-blue-400 dark:to-cyan-400">
+            Showcasing our memorable moments and achievements
+          </p>
         </div>
       </div>
-import React, { useState } from 'react';
-import { Filter, Calendar, Users, Award, Star } from 'lucide-react';
 
-const AiesecGallery = () => {
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [selectedEvent, setSelectedEvent] = useState(null);
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Category Filter Tabs and Management Controls */}
+        <div className="mb-8">
+          <div className="flex flex-wrap gap-3 justify-center mb-6">
+            {categoryOptions.map(category => (
+              <button
+                key={category.key}
+                onClick={() => setCategoryFilter(category.key)}
+                className={`px-8 py-4 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
+                  categoryFilter === category.key
+                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg dark:from-blue-500 dark:to-blue-600'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md border border-gray-200 hover:border-blue-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 dark:border-gray-600 dark:hover:border-blue-500'
+                }`}
+              >
+                {category.label}
+              </button>
+            ))}
+          </div>
 
-  const events = [
-    // ... (same event data as before)
-  ];
-
-  const filterCategories = [
-    { id: 'all', label: 'All Events', icon: Filter },
-    { id: 'large-scale', label: 'Large Scale Events', icon: Star },
-    { id: 'lcm', label: 'LCM Events', icon: Users },
-    { id: 'induction', label: 'Induction Events', icon: Award },
-  ];
-
-  const filteredEvents = activeFilter === 'all'
-    ? events
-    : events.filter(event => event.category === activeFilter);
-
-  const getCategoryColor = (category) => {
-    switch (category) {
-      case 'large-scale': return 'from-blue-500 to-blue-700';
-      case 'lcm': return 'from-orange-500 to-orange-700';
-      case 'induction': return 'from-green-500 to-green-700';
-      default: return 'from-blue-500 to-blue-700';
-    }
-  };
-
-  const getEventIcon = (category) => {
-    switch (category) {
-      case 'large-scale': return <Star className="w-6 h-6" />;
-      case 'lcm': return <Users className="w-6 h-6" />;
-      case 'induction': return <Award className="w-6 h-6" />;
-      default: return <Star className="w-6 h-6" />;
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <header className="bg-gradient-to-r from-blue-600 to-light-blue-500 text-white py-16 text-center">
-        <h1 className="text-5xl font-bold mb-4">AIESEC Ruhuna</h1>
-        <p className="text-xl text-blue-100 mb-2">Event Gallery</p>
-        <p className="text-blue-200">Showcasing our memorable moments and achievements</p>
-      </header>
-
-      <main className="container mx-auto px-4 py-12">
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {filterCategories.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setActiveFilter(id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-300 ${
-                activeFilter === id
-                  ? 'bg-blue-600 text-white shadow-lg scale-105'
-                  : 'bg-white text-gray-600 hover:bg-blue-50 shadow-md'
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              {label}
-            </button>
-          ))}
+          {/* Management Controls - Only visible to LCP/LCVP users */}
+          {canEdit && (
+            <div className="flex flex-wrap gap-4 items-center justify-center">
+              <div className="flex items-center gap-4">
+                <div className="text-sm text-gray-600 bg-blue-50 px-4 py-2 rounded-full font-medium dark:bg-blue-900 dark:text-blue-200">
+                  {selectedImages.size} of {filteredImages.length} images selected
+                </div>
+                <Button
+                  type="default"
+                  icon={<SelectOutlined />}
+                  onClick={handleSelectAll}
+                  className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 font-medium dark:bg-blue-800 dark:text-blue-200 dark:border-blue-600 dark:hover:bg-blue-700 dark:hover:border-blue-500"
+                >
+                  {selectedImages.size === filteredImages.length ? 'Deselect All' : 'Select All'}
+                </Button>
+                <Button
+                  type="primary"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => setDeleteModalVisible(true)}
+                  disabled={selectedImages.size === 0}
+                  className="bg-red-600 hover:bg-red-700 text-white font-medium dark:bg-red-700 dark:hover:bg-red-600" 
+                >
+                  Delete Selected ({selectedImages.size})
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredEvents.map(event => (
-            <div key={event.id} className="group">
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden transition-transform duration-300 transform group-hover:scale-105">
-                <div className={`bg-gradient-to-r ${getCategoryColor(event.category)} p-4 text-white`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    {getEventIcon(event.category)}
-                    <h3 className="font-bold text-lg">{event.title}</h3>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm opacity-90">
-                    <Calendar className="w-4 h-4" />
-                    {event.date}
-                  </div>
-                </div>
-                <div className="p-4">
-                  <p className="text-gray-600 text-sm mb-3">{event.description}</p>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Users className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm text-gray-500">{event.participants} participants</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    {event.images.slice(0, 4).map(image => (
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex flex-col justify-center items-center h-60">
+            <Spin size="large" />
+            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading gallery images...</p>
+          </div>
+        ) : (
+          <>
+            {/* Images Grid - Masonry Layout */}
+            {filteredImages.length === 0 ? (
+              <div className="text-center py-16 bg-white rounded-xl shadow-sm dark:bg-gray-800">
+                <EyeOutlined className="text-6xl text-gray-400 mb-4 dark:text-gray-500" />
+                <h3 className="text-2xl text-gray-600 mb-2 dark:text-gray-300">No images found</h3>
+                <p className="text-gray-500 dark:text-gray-400">No images available for the selected category.</p>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                {masonryColumns.map((column, columnIndex) => (
+                  <div key={columnIndex} className="flex-1 flex flex-col gap-2">
+                    {column.map((img, index) => (
                       <div
-                        key={image.id}
-                        className="aspect-square bg-gradient-to-br from-blue-100 to-orange-100 rounded-lg flex items-center justify-center text-xs text-gray-600 hover:from-blue-200 hover:to-orange-200 cursor-pointer transition-all"
-                        onClick={() => setSelectedEvent(event)}
+                        key={img.id}
+                        className={`group relative overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-xl transform hover:scale-[1.02] dark:shadow-gray-700 dark:hover:shadow-gray-600 ${
+                          canEdit ? 'cursor-pointer' : 'cursor-zoom-in'
+                        } ${
+                          selectedImages.has(img.id) 
+                            ? 'ring-4 ring-blue-500 ring-opacity-50 shadow-2xl dark:ring-blue-400' 
+                            : ''
+                        }`}
+                        onClick={(e) => handleImageClick(img, e)}
                       >
-                        <span className="text-center px-2">{image.caption}</span>
+                        {/* Image */}
+                        <div className="relative bg-gray-100 dark:bg-gray-700">
+                          <img
+                            src={img.imageUrl}
+                            alt={`Gallery image ${index + 1}`}
+                            className="w-full h-auto object-cover"
+                            loading="lazy"
+                          />
+                          
+                          {/* Category Badge */}
+                          <div className="absolute top-2 left-2 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                            {getCategoryLabel(img.category)}
+                          </div>
+                          
+                          {/* Download Button - Only for non-admin users */}
+                          {!canEdit && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownload(img.imageUrl, `image_${img.id}.jpg`);
+                              }}
+                              className="absolute top-2 right-2 w-10 h-10 bg-black bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-opacity-70 dark:hover:bg-opacity-80"
+                            >
+                              <DownloadOutlined className="text-white text-lg" />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Selection Indicator - Only for LCP/LCVP users */}
+                        {canEdit && selectedImages.has(img.id) && (
+                          <div className="absolute top-2 right-2 w-8 h-8 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+
+                        {/* Selection Indicator - Only for LCP/LCVP users */}
+                        {canEdit && !selectedImages.has(img.id) && (
+                          <div className="absolute top-2 right-2 w-8 h-8 bg-white bg-opacity-90 dark:bg-gray-800 dark:bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
+                            <div className="w-4 h-4 border-2 border-blue-600 dark:border-blue-400 rounded-full"></div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
-                  <button
-                    onClick={() => setSelectedEvent(event)}
-                    className="w-full bg-gradient-to-r from-blue-500 to-orange-500 text-white py-2 rounded-lg font-medium hover:from-blue-600 hover:to-orange-600 transition"
-                  >
-                    View Gallery ({event.images.length} photos)
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </section>
-
-        {filteredEvents.length === 0 && (
-          <div className="text-center py-16">
-            <div className="text-gray-400 text-6xl mb-4">📸</div>
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">No events found</h3>
-            <p className="text-gray-500">Try selecting a different category</p>
-          </div>
-        )}
-      </main>
-
-      {selectedEvent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className={`bg-gradient-to-r ${getCategoryColor(selectedEvent.category)} p-6 text-white`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    {getEventIcon(selectedEvent.category)}
-                    <h2 className="text-2xl font-bold">{selectedEvent.title}</h2>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm opacity-90">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {selectedEvent.date}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      {selectedEvent.participants} participants
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelectedEvent(null)}
-                  className="text-white hover:text-gray-200 text-2xl"
-                >
-                  &times;
-                </button>
-              </div>
-              <p className="mt-4 text-blue-100">{selectedEvent.description}</p>
-            </div>
-
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {selectedEvent.images.map(image => (
-                  <div
-                    key={image.id}
-                    className="aspect-square bg-gradient-to-br from-blue-100 to-orange-100 rounded-lg flex items-center justify-center text-sm text-gray-600 hover:from-blue-200 hover:to-orange-200 transition p-4"
-                  >
-                    <span className="text-center">{image.caption}</span>
-                  </div>
                 ))}
               </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Full View Modal - Only for non-admin users */}
+      {fullViewImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-95 dark:bg-black dark:bg-opacity-98 flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-5xl max-h-full">
+            <button
+              onClick={() => setFullViewImage(null)}
+              className="absolute top-4 right-4 w-12 h-12 bg-white bg-opacity-20 dark:bg-gray-800 dark:bg-opacity-60 rounded-full flex items-center justify-center hover:bg-opacity-30 dark:hover:bg-opacity-80 transition-colors z-10"
+            >
+              <CloseOutlined className="text-white text-xl" />
+            </button>
+            <button
+              onClick={() => handleDownload(fullViewImage.imageUrl, `image_${fullViewImage.id}.jpg`)}
+              className="absolute top-4 left-4 w-12 h-12 bg-white bg-opacity-20 dark:bg-gray-800 dark:bg-opacity-60 rounded-full flex items-center justify-center hover:bg-opacity-30 dark:hover:bg-opacity-80 transition-colors z-10"
+            >
+              <DownloadOutlined className="text-white text-xl" />
+            </button>
+            <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-70 text-white px-4 py-2 rounded-lg">
+              <span className="text-sm font-medium">{getCategoryLabel(fullViewImage.category)}</span>
             </div>
+            <img
+              src={fullViewImage.imageUrl}
+              alt="Full view"
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal - Only for LCP/LCVP users */}
+      <Modal
+        title={
+          <div className="flex items-center gap-2">
+            <DeleteOutlined className="text-red-500 dark:text-red-400" />
+            <span className="dark:text-gray-200">Confirm Deletion</span>
+          </div>
+        }
+        open={deleteModalVisible}
+        onOk={handleDeleteSelected}
+        onCancel={() => setDeleteModalVisible(false)}
+        confirmLoading={deleting}
+        okText="Delete"
+        cancelText="Cancel"
+        okButtonProps={{ danger: true }}
+        className="delete-modal"
+      >
+        <p className="text-gray-700 dark:text-gray-300">Are you sure you want to delete {selectedImages.size} selected image(s)?</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">This action cannot be undone.</p>
+      </Modal>
     </div>
   );
 };
 
-export default ResponsiveImageGallery;
-export default AiesecGallery;
+export default GalleryPage;

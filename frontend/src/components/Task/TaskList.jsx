@@ -4,7 +4,6 @@ import Swal from "sweetalert2";
 import { Pencil, Trash2 } from "lucide-react";
 import notfound from "../asset/notfound.gif";
 
-
 const TaskList = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -20,6 +19,7 @@ const TaskList = () => {
 
     const [showModal, setShowModal] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
+    console.log('Task completedAt:', tasks.completedAt);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -41,7 +41,7 @@ const TaskList = () => {
     }, [id]);
 
     const assignedUsers = Array.from(
-        new Set(tasks.map((task) => task.assignedTo?.username).filter(Boolean))
+        new Set(tasks.map((task) => task.assignedTo?.firstName).filter(Boolean))
     );
 
     const filteredTasks = tasks.filter((task) => {
@@ -52,7 +52,7 @@ const TaskList = () => {
 
         const matchesPriority = selectedPriority ? task.priority === selectedPriority : true;
         const matchesStatus = selectedStatus ? task.workOfStatus === selectedStatus : true;
-        const matchesAssignedTo = assignedToFilter ? task.assignedTo?.username === assignedToFilter : true;
+        const matchesAssignedTo = assignedToFilter ? task.assignedTo?.firstName === assignedToFilter : true;
 
         const taskDeadline = task.deadLine ? new Date(task.deadLine) : null;
         const fromDate = deadlineFrom ? new Date(deadlineFrom) : null;
@@ -111,18 +111,16 @@ const TaskList = () => {
 
     const handleDownload = async (filePath) => {
         try {
-            const response = await fetch(`http://localhost:8080/${filePath}`);
+            // ensure it always starts with /
+            const path = filePath.startsWith('/') ? filePath : `/${filePath}`;
+            const response = await fetch(`http://localhost:8080${path}`);
             if (!response.ok) throw new Error("Failed to download file");
 
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
-
-            // Extract the filename
-            const fileName = filePath.split("/").pop();
-            link.setAttribute("download", fileName);
-
+            link.setAttribute("download", filePath.split("/").pop());
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -135,9 +133,16 @@ const TaskList = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-10 font-sans">
+
+            <button
+                onClick={() => navigate(-1)}  // Goes back one step in history
+                className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded shadow-sm"
+            >
+                ← Back
+            </button>
             {userDetails && (
                 <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mb-6 text-center">
-                    Task Overview for {userDetails.userName}
+                    Task Overview for {userDetails.firstName}
                 </h2>
             )}
 
@@ -163,96 +168,106 @@ const TaskList = () => {
                 />
             </div>
 
-            {filteredTasks.length > 0 ? (
-                <div className="overflow-x-auto rounded-xl shadow-2xl border border-gray-100">
-                    <table className="min-w-full text-sm text-left bg-white">
-                        <thead className="bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-900">
-                        <tr>
-                            <th className="py-4 px-6 whitespace-nowrap">Task</th>
-                            <th className="py-4 px-6 whitespace-nowrap">Description</th>
-                            <th className="py-4 px-6 whitespace-nowrap">
-                                <div className="flex items-center space-x-1">
-                                    Priority
-                                    <select
-                                        value={selectedPriority}
-                                        onChange={(e) => setSelectedPriority(e.target.value)}
-                                        className="w-5 h-5 p-0 border border-gray-300 rounded cursor-pointer text-transparent focus:text-black focus:outline-none"
-                                        title="Filter by Priority"
-                                    >
-                                        <option value=""></option>
-                                        <option value="HIGH" className="text-black">High</option>
-                                        <option value="MEDIUM" className="text-black">Medium</option>
-                                        <option value="LOW" className="text-black">Low</option>
-                                    </select>
-                                </div>
-                            </th>
-                            <th className="py-4 px-6 whitespace-nowrap">Deadline</th>
-                            <th className="py-4 px-6 whitespace-nowrap">
-                                <div className="flex items-center space-x-1">
-                                    Status
-                                    <select
-                                        value={selectedStatus}
-                                        onChange={(e) => setSelectedStatus(e.target.value)}
-                                        className="w-5 h-5 p-0 border border-gray-300 rounded cursor-pointer text-transparent focus:text-black focus:outline-none"
-                                        title="Filter by Status"
-                                    >
-                                        <option value=""></option>
-                                        <option value="completed" className="text-black">Completed</option>
-                                        <option value="in-progress" className="text-black">In Progress</option>
-                                        <option value="pending" className="text-black">Pending</option>
-                                    </select>
-                                </div>
-                            </th>
-                            <th className="py-4 px-6 whitespace-nowrap">
-                                <div className="flex items-center space-x-1">
-                                    Assigned To
-                                    <select
-                                        value={assignedToFilter}
-                                        onChange={(e) => setAssignedToFilter(e.target.value)}
-                                        className="w-5 h-5 p-0 border border-gray-300 rounded cursor-pointer text-transparent focus:text-black focus:outline-none"
-                                        title="Filter by Assigned To"
-                                    >
-                                        <option value=""></option>
-                                        {assignedUsers.map((username) => (
-                                            <option key={username} value={username} className="text-black">
-                                                {username}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </th>
-                            <th className="py-4 px-6 text-center whitespace-nowrap">More</th>
-                            <th className="py-4 px-6 text-center whitespace-nowrap">⚙️ Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {filteredTasks.map((task) => (
+            <div className="overflow-x-auto rounded-xl shadow-2xl border border-gray-100">
+                <table className="min-w-full text-sm text-left bg-white">
+                    <thead className="bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-900">
+                    <tr>
+                        <th className="py-4 px-6 whitespace-nowrap">Task</th>
+                        <th className="py-4 px-6 whitespace-nowrap">Description</th>
+                        <th className="py-4 px-6 whitespace-nowrap">
+                            <div className="flex items-center space-x-1">
+                                Priority
+                                <select
+                                    value={selectedPriority}
+                                    onChange={(e) => setSelectedPriority(e.target.value)}
+                                    className="w-5 h-5 p-0 border border-gray-300 rounded cursor-pointer text-transparent focus:text-black focus:outline-none"
+                                    title="Filter by Priority"
+                                >
+                                    <option value=""></option>
+                                    <option value="HIGH" className="text-black">High</option>
+                                    <option value="MEDIUM" className="text-black">Medium</option>
+                                    <option value="LOW" className="text-black">Low</option>
+                                </select>
+                            </div>
+                        </th>
+                        <th className="py-4 px-6 whitespace-nowrap">Deadline</th>
+                        <th className="py-4 px-6 whitespace-nowrap">
+                            <div className="flex items-center space-x-1">
+                                Status
+                                <select
+                                    value={selectedStatus}
+                                    onChange={(e) => setSelectedStatus(e.target.value)}
+                                    className="w-5 h-5 p-0 border border-gray-300 rounded cursor-pointer text-transparent focus:text-black focus:outline-none"
+                                    title="Filter by Status"
+                                >
+                                    <option value=""></option>
+                                    <option value="completed" className="text-black">Completed</option>
+                                    <option value="in-progress" className="text-black">In Progress</option>
+                                    <option value="pending" className="text-black">Pending</option>
+                                </select>
+                            </div>
+                        </th>
+                        <th className="py-4 px-6 whitespace-nowrap">
+                            <div className="flex items-center space-x-1">
+                                Assigned To
+                                <select
+                                    value={assignedToFilter}
+                                    onChange={(e) => setAssignedToFilter(e.target.value)}
+                                    className="w-5 h-5 p-0 border border-gray-300 rounded cursor-pointer text-transparent focus:text-black focus:outline-none"
+                                    title="Filter by Assigned To"
+                                >
+                                    <option value=""></option>
+                                    {assignedUsers.map((firstName) => (
+                                        <option key={firstName} value={firstName} className="text-black">
+                                            {firstName}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </th>
+                        <th className="py-4 px-6 text-center whitespace-nowrap">More</th>
+                        <th className="py-4 px-6 text-center whitespace-nowrap">⚙️ Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {filteredTasks.length > 0 ? (
+                        filteredTasks.map((task) => (
                             <tr key={task.taskId} className="border-t border-gray-100 hover:bg-indigo-50 transition">
                                 <td className="px-6 py-3 font-medium text-gray-900">{task.taskName}</td>
                                 <td className="px-6 py-3 text-gray-600">{task.description}</td>
                                 <td className="px-6 py-3">
-                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
-                                        task.priority === "HIGH"
-                                            ? "bg-red-100 text-red-800"
-                                            : task.priority === "MEDIUM"
-                                                ? "bg-yellow-100 text-yellow-700"
-                                                : "bg-green-100 text-green-700"
-                                    }`}>{task.priority}</span>
+                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
+                                            task.priority === "HIGH"
+                                                ? "bg-red-100 text-red-800"
+                                                : task.priority === "MEDIUM"
+                                                    ? "bg-yellow-100 text-yellow-700"
+                                                    : "bg-green-100 text-green-700"
+                                        }`}>{task.priority}</span>
                                 </td>
                                 <td className="px-6 py-3 text-gray-700">
                                     {new Date(task.deadLine).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-3">
-                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
-                                        task.workOfStatus === "completed"
-                                            ? "bg-green-200 text-green-900"
-                                            : task.workOfStatus === "in-progress"
-                                                ? "bg-yellow-200 text-yellow-900"
-                                                : "bg-red-100 text-red-800"
-                                    }`}>{task.workOfStatus}</span>
+    <span
+        className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md ${
+            task.workOfStatus === "completed"
+                ? "bg-green-200 text-green-900"
+                : task.workOfStatus === "in-progress"
+                    ? "bg-yellow-200 text-yellow-900"
+                    : "bg-red-100 text-red-800"
+        }`}
+        title={
+            task.workOfStatus === "completed" && task.completedAt
+                ? `Completed at: ${new Date(task.completedAt).toLocaleString()}`
+                : ""
+        }
+    >
+        {task.workOfStatus}
+    </span>
                                 </td>
+
                                 <td className="px-6 py-3 font-medium text-gray-800">
-                                    {task.assignedTo?.username || "Not Assigned"}
+                                    {task.assignedTo?.firstName || "Not Assigned"}
                                 </td>
                                 <td className="px-6 py-3 text-center">
                                     <button
@@ -279,20 +294,23 @@ const TaskList = () => {
                                     </button>
                                 </td>
                             </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </div>
-            ) : (
-                <p className="text-center text-gray-500 mt-10 text-lg">
-                    <img src={notfound} alt="sad" className="inline-block w-16 h-16" style={{ marginTop: "10px" }} />{" "}
-                    No tasks found
-                </p>
-            )}
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="8" className="text-center py-8">
+                                <img src={notfound} alt="sad" className="inline-block w-16 h-16 mb-3" />
+                                <p className="text-gray-500 text-lg">No tasks found</p>
+                            </td>
+                        </tr>
+                    )}
+                    </tbody>
+                </table>
+            </div>
 
             {showModal && selectedTask && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white text-gray-800 rounded-lg p-6 max-w-lg w-full shadow-lg relative">                        <button
+                    <div className="bg-white text-gray-800 rounded-lg p-6 max-w-lg w-full shadow-lg relative">
+                        <button
                             onClick={closeMoreModal}
                             className="absolute top-2 right-2 text-gray-500 hover:text-gray-900"
                         >
@@ -313,7 +331,6 @@ const TaskList = () => {
                                 "No proof document uploaded."
                             )}
                         </p>
-
                     </div>
                 </div>
             )}

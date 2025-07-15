@@ -14,7 +14,7 @@ export default function DashManageMember() {
     gender: "",
     joinedDate: "",
     role: "",
-    department: "",
+    teamLeaderAiesecEmail: "", 
     function: "",
   });
   const [editing, setEditing] = useState(false);
@@ -25,17 +25,44 @@ export default function DashManageMember() {
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
-  const roleOptions = ["lcp", "lcvp", "team_leader", "member"];
-  const departmentOptions = ["Finance", "Marketing", "IT", "HR", "Sales", "Product", "Operations", "OGX", "ICX", "BD", "TM", "PM", "ER", "IM"];
-  const functionOptions = ["Finance Analyst", "Marketing Executive", "Designer", "Developer", "Recruiter", "Sales Executive", "Product Owner", "Operations Associate", "OGX Associate", "ICX Associate"];
+  const [roleOptions, setRoleOptions] = useState([]);
+  const [functionOptions, setFunctionOptions] = useState([]);
+  const [assignedTeamOptions, setAssignedTeamOptions] = useState([]);
+
 
   useEffect(() => {
     fetchMembers();
+    fetchRoles();
+    fetchFunctions();
   }, []);
+
+  useEffect(() => {
+      const filtered = members.map((m) => m.aiesecEmail);
+      setAssignedTeamOptions(filtered);
+      console.log(functionOptions);
+  }, [formData.function, members]);
+
+  const fetchRoles = async () => {
+    try {
+      const res = await axios.get("http://localhost:8080/api/roles/all");
+      setRoleOptions(res.data);
+    } catch (err) {
+      setErrorMsg("Failed to fetch roles!");
+    }
+  };
+
+  const fetchFunctions = async () => {
+    try {
+      const res = await axios.get("http://localhost:8080/api/functions/");
+      setFunctionOptions(res.data);
+    } catch (err) {
+      setErrorMsg("Failed to fetch functions!");
+    }
+  };
 
   const fetchMembers = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/users/members");
+      const res = await axios.get("http://localhost:8080/api/users/getall");
       setMembers(res.data);
     } catch (err) {
       setErrorMsg("Failed to fetch members!");
@@ -73,7 +100,7 @@ export default function DashManageMember() {
         gender: "",
         joinedDate: "",
         role: "",
-        department: "",
+        teamLeaderAiesecEmail: "", 
         function: "",
       });
       setEditing(false);
@@ -123,7 +150,7 @@ export default function DashManageMember() {
             gender: "",
             joinedDate: "",
             role: "",
-            department: "",
+            teamLeaderAiesecEmail: "",
             function: "",
           });
           setEditing(false);
@@ -193,20 +220,6 @@ export default function DashManageMember() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium dark:text-gray-200">Department</label>
-              <select
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                className="w-full rounded-md border border-gray-300 text-gray-700 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">Select Department</option>
-                {departmentOptions.map((d) => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-            </div>
-            <div>
               <label className="block text-sm font-medium dark:text-gray-200">Function</label>
               <select
                 name="function"
@@ -216,7 +229,21 @@ export default function DashManageMember() {
               >
                 <option value="">Select Function</option>
                 {functionOptions.map((f) => (
-                  <option key={f} value={f}>{f}</option>
+                  <option key={f.id} value={f.id}>{f.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium dark:text-gray-200">Assigned Team Leader</label>
+              <select
+                name="teamLeaderAiesecEmail"
+                value={formData.teamLeaderAiesecEmail}
+                onChange={handleChange}
+                className="w-full rounded-md border border-gray-300 text-gray-700 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              >
+                <option value="">Select Team Leader</option>
+                {members.map((member) => (
+                  <option key={member.aiesecEmail} value={member.aiesecEmail}>{member.aiesecEmail} - {member.role} - {member.function?.name || '-'}</option>
                 ))}
               </select>
             </div>

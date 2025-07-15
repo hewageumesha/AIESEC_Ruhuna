@@ -1,174 +1,202 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Calendar, Users, Download, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Users, Filter, Download } from 'lucide-react';
+import { aiesecColors } from '../components/event/constants';
+import SummaryCard from '../components/event/SummaryCard';
+import EventRegistrationViewer from '../components/event/EventRegistrationViewer';
+import CSVDownloadButton from '../components/event/CSVDownloadButton';
+import apiService from '../components/event/apiService';
 
 const EventAnalytics = () => {
   const [events, setEvents] = useState([]);
   const [registrations, setRegistrations] = useState([]);
-
   const [selectedEvent, setSelectedEvent] = useState('all');
-  const [registrationType] = useState('both');
+  const [loadingEvents, setLoadingEvents] = useState(false);
+  const [loadingRegs, setLoadingRegs] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Fetch event list once on mount
+  // Fetch events list
   useEffect(() => {
-    axios.get('/analytics/events')
-      .then(res => setEvents(res.data))
-      .catch(err => console.error('Failed to fetch events:', err));
-  }, []);
-
-  // Fetch registrations whenever selectedEvent changes
-  useEffect(() => {
-    const params = {
-      eventId: selectedEvent === 'all' ? undefined : selectedEvent,
-      type: registrationType === 'both' ? 'all' : registrationType,
+    const fetchEvents = async () => {
+      setLoadingEvents(true);
+      setError(null);
+      try {
+        const response = await apiService.getEvents();
+        setEvents(Array.isArray(response) ? response : []);
+      } catch (err) {
+        console.error('Failed to fetch events:', err);
+        setError('Failed to load events');
+        setEvents([]);
+      } finally {
+        setLoadingEvents(false);
+      }
     };
 
-    axios.get('/analytics/registrations', { params })
-      .then(res => setRegistrations(res.data))
-      .catch(err => console.error('Failed to fetch registrations:', err));
-  }, [selectedEvent, registrationType]);
+    fetchEvents();
+  }, []);
 
-  // Registration summary data
+  // Fetch registrations for summary cards
+  useEffect(() => {
+    const fetchRegistrations = async () => {
+      setLoadingRegs(true);
+      setError(null);
+      try {
+        const eventId = selectedEvent === 'all' ? null : selectedEvent;
+        const response = await apiService.getRegistrationsByEvent('all', eventId);
+        setRegistrations(Array.isArray(response) ? response : []);
+      } catch (err) {
+        console.error('Failed to fetch registrations:', err);
+        setError('Failed to load registrations');
+        setRegistrations([]);
+      } finally {
+        setLoadingRegs(false);
+      }
+    };
+
+    fetchRegistrations();
+  }, [selectedEvent]);
+
+  // Compute summary card data
   const summaryData = useMemo(() => {
     const filteredRegs = selectedEvent === 'all'
       ? registrations
       : registrations.filter(reg => reg.eventId === parseInt(selectedEvent));
 
-    const memberCount = filteredRegs.filter(reg => reg.type === 'member').length;
-    const guestCount = filteredRegs.filter(reg => reg.type === 'guest').length;
+    const event = selectedEvent !== 'all'
+      ? events.find(e => e.id === parseInt(selectedEvent))
+      : null;
 
-    let publicCount = 0;
-    let memberOnlyCount = 0;
+    let memberCount = 0;
+    let guestCount = 0;
 
     if (selectedEvent === 'all') {
-      events.forEach(event => {
-        const eventRegs = filteredRegs.filter(reg => reg.eventId === event.id);
-        if (event.isPublic) publicCount += eventRegs.length;
-        else memberOnlyCount += eventRegs.length;
-      });
+      memberCount = filteredRegs.reduce((sum, reg) => sum + (reg.memberRegistrations || 0), 0);
+      guestCount = filteredRegs.reduce((sum, reg) => sum + (reg.guestRegistrations || 0), 0);
+    } else if (event?.isPublic) {
+      memberCount = filteredRegs.reduce((sum, reg) => sum + (reg.memberRegistrations || 0), 0);
+      guestCount = filteredRegs.reduce((sum, reg) => sum + (reg.guestRegistrations || 0), 0);
     } else {
-      const event = events.find(e => e.id === parseInt(selectedEvent));
-      if (event?.isPublic) publicCount = filteredRegs.length;
-      else memberOnlyCount = filteredRegs.length;
+      memberCount = filteredRegs.reduce((sum, reg) => sum + (reg.memberRegistrations || 0), 0);
+      guestCount = 0;
     }
 
     return {
       totalMembers: memberCount,
       totalGuests: guestCount,
-      publicEvents: publicCount,
-      memberOnlyEvents: memberOnlyCount,
       total: memberCount + guestCount
     };
   }, [selectedEvent, registrations, events]);
 
-  // Event table data
-  // (Removed unused eventTableData)
-
-  // Export CSV helper (same as your existing one)
-  const exportCSV = (data, filename) => {
-    if (data.length === 0) {
-      alert("No data to export");
-      return;
-    }
-
-    const csv = [
-      Object.keys(data[0]).join(','),
-      ...data.map(row => Object.values(row).join(','))
-    ].join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
-
-  // ... your existing JSX UI here, replacing mockEvents with events and mockRegistrations with registrations
-
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Event Analytics Dashboard</h1>
+    <div className="min-h-screen" style={{ backgroundColor: aiesecColors.lightGray }}>
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Event Analytics</h1>
+          <p className="text-gray-600">Monitor and analyze event registrations across AIESEC Ruhuna</p>
+        </div>
 
-        {/* Registration Summary */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="text-red-800">{error}</div>
+          </div>
+        )}
+
+        {/* Registration Summary Section */}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-8 border border-gray-200">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">Registration Summary</h2>
+            <div className="flex items-center space-x-3">
+              <div 
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: aiesecColors.blue }}
+              >
+                <Calendar className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Registration Summary</h2>
+                <p className="text-gray-600">Overview of event registrations-Going Count</p>
+              </div>
+            </div>
             <div className="flex items-center space-x-4">
-              <Filter className="w-5 h-5 text-gray-500" />
+              <Filter className="w-5 h-5 text-gray-400" />
               <select
                 value={selectedEvent}
-                onChange={(e) => setSelectedEvent(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 bg-white"
+                onChange={e => setSelectedEvent(e.target.value)}
+                className="border border-gray-300 rounded-lg px-4 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                disabled={loadingEvents}
               >
                 <option value="all">All Events</option>
                 {events.map(event => (
-                  <option key={event.id} value={event.id}>{event.name}</option>
+                  <option key={event.id} value={event.id}>
+                    {event.name || event.eventName}
+                  </option>
                 ))}
               </select>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="flex items-center">
-                <Users className="w-8 h-8 text-blue-600 mr-3" />
+          {loadingRegs ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: aiesecColors.blue }}></div>
+              <span className="ml-3 text-gray-600">Loading registrations...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <SummaryCard
+                label="Total Members"
+                icon={Users}
+                value={summaryData.totalMembers}
+                color="blue"
+              />
+              <SummaryCard
+                label="Total Guests"
+                icon={Users}
+                value={summaryData.totalGuests}
+                color="green"
+              />
+              <SummaryCard
+                label="Total Registrations"
+                icon={Users}
+                value={summaryData.total}
+                color="gray"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Event Registration Viewer with CSV Export */}
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div 
+                  className="w-10 h-10 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: aiesecColors.green }}
+                >
+                  <Users className="w-5 h-5 text-white" />
+                </div>
                 <div>
-                  <p className="text-sm text-gray-600">Total Members</p>
-                  <p className="text-2xl font-bold text-blue-600">{summaryData.totalMembers}</p>
+                  <h2 className="text-xl font-semibold text-gray-900">Event Registrations</h2>
+                  <p className="text-gray-600">Detailed view of all registrations</p>
                 </div>
               </div>
-            </div>
-
-            <div className="bg-green-50 p-4 rounded-lg">
-              <div className="flex items-center">
-                <Users className="w-8 h-8 text-green-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Total Guests</p>
-                  <p className="text-2xl font-bold text-green-600">{summaryData.totalGuests}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <div className="flex items-center">
-                <Calendar className="w-8 h-8 text-purple-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Public Events</p>
-                  <p className="text-2xl font-bold text-purple-600">{summaryData.publicEvents}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-orange-50 p-4 rounded-lg">
-              <div className="flex items-center">
-                <Calendar className="w-8 h-8 text-orange-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Member-Only</p>
-                  <p className="text-2xl font-bold text-orange-600">{summaryData.memberOnlyEvents}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-center">
-                <Users className="w-8 h-8 text-gray-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Total</p>
-                  <p className="text-2xl font-bold text-gray-600">{summaryData.total}</p>
-                </div>
+              
+              {/* CSV Export Button */}
+              <div className="flex items-center space-x-2">
+                <Download className="w-5 h-5 text-gray-400" />
+                <CSVDownloadButton
+                  type="all"
+                  eventId={selectedEvent === 'all' ? null : selectedEvent}
+                  status={null}
+                />
               </div>
             </div>
           </div>
+          
+          <div className="p-6">
+            <EventRegistrationViewer events={events} loading={loadingEvents} />
+          </div>
         </div>
-
-        {/* Registrations by Event - truncated for brevity, just replace mockEvents with events and mockRegistrations with registrations */}
-
-        {/* Continue rest of your component as before, replacing data sources */}
-
       </div>
     </div>
   );

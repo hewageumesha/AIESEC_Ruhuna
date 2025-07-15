@@ -27,9 +27,6 @@ public class EventExperience {
     @JoinColumn(name = "id", referencedColumnName = "id")
     private User user; // AIESEC member – nullable
 
-    @ManyToOne
-    @JoinColumn(name = "Guest_ID")
-    private GuestUser guestUser; // Guest – nullable
 
     @Column(name = "Rating")
     private Integer rating; // 1 to 5 scale

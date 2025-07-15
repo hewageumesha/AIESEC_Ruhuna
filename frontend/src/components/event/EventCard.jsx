@@ -1,15 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { message } from 'antd';
-
-const EventCard = ({ event, onDeleteSuccess }) => {
-  const { currentUser } = useSelector((state) => state.user);
-  const navigate = useNavigate();
-
-  const handleEdit = () => {
-    navigate(`/edit-event/${event.id}`);
-  };
 import { message, Tag } from 'antd';
 import { Calendar, MapPin } from 'lucide-react';
 
@@ -38,15 +29,11 @@ const EventCard = ({
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          // 'Authorization': `Bearer ${currentUser.token}`, // uncomment if you use token auth
         },
       });
 
       if (response.ok) {
         message.success('Event deleted successfully.');
-        if (onDeleteSuccess) onDeleteSuccess(event.id);
-      } else {
-        // Try to parse error message from response body
         onDeleteSuccess?.(event.id);
       } else {
         const data = await response.json();
@@ -58,23 +45,6 @@ const EventCard = ({
     }
   };
 
-  const canEditOrDelete = currentUser?.role === 'LCP' || currentUser?.role === 'LCVP';
-
-  return (
-    <div className="bg-white shadow-md rounded-xl p-4 w-full max-w-md mx-auto mb-4">
-      <img
-        src={event.imageUrl || 'https://via.placeholder.com/400x200'}
-        alt={event.title || event.eventName}
-        className="w-full h-48 object-cover rounded-md mb-4"
-      />
-      <h2 className="text-xl font-semibold mb-1">{event.title || event.eventName}</h2>
-      <p className="text-gray-600 mb-2">{event.description}</p>
-      <p className="text-sm text-gray-500">
-        📅 {new Date(event.date || event.startDate).toLocaleString()}
-      </p>
-
-      {canEditOrDelete && (
-        <div className="flex justify-end gap-2 mt-4">
   return (
     <div className="bg-white shadow-lg rounded-2xl p-4 transition hover:shadow-xl border border-gray-100 flex flex-col">
       <img

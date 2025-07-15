@@ -1,10 +1,12 @@
 package com.aiesec.controller;
+
 import com.aiesec.dto.CommentDTO;
 import com.aiesec.dto.PasswordUpdateRequest;
 import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserHierarchyDTO;
 import com.aiesec.dto.UserRequestDTO;
 import com.aiesec.dto.UserUpdateDTO;
+import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.model.User;
 
@@ -13,10 +15,15 @@ import com.aiesec.security.UserDetailsImpl;
 import com.aiesec.service.CommentService;
 import com.aiesec.service.UserService;
 
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -61,8 +68,42 @@ public String senMail() {
 
 
     @PostMapping("/add")
-    public User addUser(@RequestBody UserRequestDTO dto) {
+    public User addUser(@RequestBody Map<String, Object> body) {
+
+        try {
+        
+        String aiesecEmail = (String) body.get("aiesecEmail");
+        String email = (String) body.get("email");
+        Date birthday = body.get("birthday") != null ? java.sql.Date.valueOf(body.get("birthday").toString()) : null;
+        Long function = body.get("function") != null ? Long.parseLong(body.get("function").toString()) : null;
+        String firstName = (String) body.get("firstName");
+        String lastName = (String) body.get("lastName");
+        Date joinedDate = body.get("joinedDate") != null ? java.sql.Date.valueOf(body.get("joinedDate").toString()) : null;
+        Gender gender = body.get("gender") != null ? Gender.valueOf(body.get("gender").toString()) : null;
+        UserRole role = body.get("role") != null ? UserRole.valueOf(body.get("role").toString()) : null;
+        String team_leader_aiesecEmail = (String) body.get("teamLeaderAiesecEmail");
+
+        UserRequestDTO dto  = new UserRequestDTO();
+        dto.setAiesecEmail(aiesecEmail);
+        dto.setEmail(email);
+        dto.setFunctionId(function);
+        dto.setRole(role);
+        dto.setFirstName(firstName);
+        dto.setLastName(lastName);
+        dto.setTeamLeaderAiesecEmail(aiesecEmail);
+        dto.setBirthday(birthday);
+        dto.setJoinedDate(joinedDate);
+        dto.setGender(gender);
+        dto.setTeamLeaderAiesecEmail(team_leader_aiesecEmail);
+
+        String tempString = userService.generateTempPassword();
+        userService.sendTempPasswordEmail(email, tempString, aiesecEmail);
         return userService.addUser(dto);
+
+       } catch (Exception e) {
+            e.printStackTrace();
+            return new User();
+        }
     }
 
     @PostMapping("/update/{aiesecEmail}")
@@ -101,6 +142,13 @@ public String senMail() {
         return members;
     }
 
+    @GetMapping("/getall")
+    public List<User> getAll() {
+       List<User> members =  userRepo.findAll();
+       System.out.println(members.size());
+        return members;
+    }
+
 
     @PutMapping(value = "/profile/update/{aiesecEmail}")
     public User updateUserProfile(
@@ -118,10 +166,20 @@ public String senMail() {
     }
 
     @PostMapping("/update-password")
-    public String updatePassword(
-            @RequestParam String aiesecEmail, // you can pass this from logged-in user context instead of request param
-            @RequestBody PasswordUpdateRequest request
-    ) {
-        return userService.updatePassword(aiesecEmail, request);
+    public ResponseEntity<?> updatePassword(@RequestBody PasswordUpdateRequest request) {
+        try {
+            String message = userService.updatePassword(request);
+            return ResponseEntity.ok().body(message);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/aiesec-emails")
+    public List<String> getAllAiesecEmails() {
+        return userRepo.findAll()
+            .stream()
+            .map(User::getAiesecEmail)
+            .collect(Collectors.toList());
     }
 }

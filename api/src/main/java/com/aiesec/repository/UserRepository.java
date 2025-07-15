@@ -19,10 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long>{
     void deleteByAiesecEmail(String aieseEmail);
     List<User> findByRole(UserRole role);
     List<User> findByTeamLeaderAiesecEmail(String teamLeaderAiesecEmail);
-    List<User> findByDepartmentId(Long departmentId);
     List<User> findByFunctionId(Long functionId);
-    User findByUserName(String userName);
-
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.joinedDate BETWEEN :start AND :end")
     Long countUsersJoinedLastMonth(Date start, Date end);

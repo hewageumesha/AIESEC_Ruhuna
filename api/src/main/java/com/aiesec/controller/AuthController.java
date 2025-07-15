@@ -44,6 +44,14 @@ public class AuthController {
         // Get user from the database by AIESEC email
         Optional<User> existingUser = userService.getUserByAiesecEmail(user.getAiesecEmail());
 
+        System.out.println(user.getAiesecEmail());
+ 
+        if (existingUser.isPresent()) {
+            System.out.println(existingUser.get().getAiesecEmail());
+        } else {
+            System.out.println("No user found with this AIESEC email.");
+        }   
+
         // If no user is found with the given AIESEC email
         if (existingUser == null) {
             return ResponseEntity
@@ -66,10 +74,11 @@ public class AuthController {
 
         // Create a JSON object to return as the response
         JSONObject json = new JSONObject();
+        json.put("id",existingUser.get().getId());
         json.put("role", existingUser.get().getRole());
         json.put("aiesecEmail", existingUser.get().getAiesecEmail());
         json.put("token", token);
-        json.put("id",existingUser.get().getId());
+        json.put("noOfTask", existingUser.get().getNoOfTask());
 
         // Return the token and user details with a 200 OK status
         return ResponseEntity

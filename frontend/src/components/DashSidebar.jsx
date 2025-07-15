@@ -18,7 +18,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { signoutSuccess } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import TaskDashboardLCP from "./Task/TaskDashboardLCVP.jsx";
 
 export default function DashSidebar({ tab, subtab }) {
   const location = useLocation();
@@ -66,27 +65,6 @@ export default function DashSidebar({ tab, subtab }) {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [tab]);
-
-  const handleSignout = async () => {
-    try {
-      const res = await fetch('http://localhost:5173/api/auth/signout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error('Signout error:', errorText);
-      } else {
-        dispatch(signoutSuccess());
-        navigate('');
-      }
-    } catch (error) {
-      console.error('Fetch failed:', error.message);
-    }      
-  };
 
   const getUserRoleLabel = () => {
     if (currentUser != null) {
@@ -165,16 +143,6 @@ export default function DashSidebar({ tab, subtab }) {
                 )}
                 {(currentUser.role === 'LCP') && (
                 <>
-                  <Link to='/dashboard?tab=manageCommittee&subtab=department'>
-                    <Sidebar.Item
-                      active={tab === 'manageCommittee' && location.search.includes('subtab=department')}
-                      as='div'
-                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=department') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
-                      onClick={() => isMobile && setIsCommitteeExpanded(false)}
-                    >
-                      Department
-                    </Sidebar.Item>
-                  </Link>
                   <Link to='/dashboard?tab=manageCommittee&subtab=function'>
                     <Sidebar.Item
                       active={tab === 'manageCommittee' && location.search.includes('subtab=function')}
@@ -224,47 +192,26 @@ export default function DashSidebar({ tab, subtab }) {
               </Link>
             </>
           )}
-
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' || currentUser.role === 'Member') && (
-              <>
+          
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
+            <>
+              <Link to='/dashboard?tab=task'>
                 <Sidebar.Item
-                    active={tab === 'task'}
-                    icon={HiNewspaper}
-                    as='div'
-                    className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                    onClick={() => {
-                      const currentUser = JSON.parse(localStorage.getItem("user"));
-                      console.log("🧭 Navigating for user:", currentUser);
-                      if (currentUser && currentUser.id) {
-                        switch(currentUser.role) {
-                          case "LCP":
-                            navigate(`/user/${currentUser.id}/TaskDashboard`);
-                            break;
-                          case "LCVP":
-                            navigate(`/user/${currentUser.id}/TaskDashboardLCVP`);
-                            break;
-                          case "Team_Leader":
-                            navigate(`/user/${currentUser.id}/TaskDashboardTL`);
-                            break;
-                          case "Member":
-                            navigate(`/user/${currentUser.id}/TaskDashboardMember`);
-                            break;
-                          default:
-                            navigate("/login");
-                        }
-                      } else {
-                        console.error("User not found in localStorage!");
-                        navigate("/login");
-                      }
-                    }}
-
+                  active={tab === 'task'}
+                  icon={HiNewspaper}
+                  as='div'
+                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  onClick={() => {
+                    setIsCommitteeExpanded(false);
+                    setIsProfileExpanded(false);
+                  }}
                 >
                   <span className="font-medium">Tasks</span>
                 </Sidebar.Item>
-              </>
+              </Link>
+            </>
           )}
-
-          <Link to='/dashboard?tab=event'>
+              <Link to='/dashboard?tab=event'>
                 <Sidebar.Item
                   active={tab === 'event'}
                   icon={HiRectangleStack}
@@ -278,7 +225,7 @@ export default function DashSidebar({ tab, subtab }) {
                   <span className="font-medium">Events</span>
                 </Sidebar.Item>
               </Link>
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' ) && (
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
             <>
               <Link to='/dashboard?tab=birthday'>
                 <Sidebar.Item
@@ -334,20 +281,6 @@ export default function DashSidebar({ tab, subtab }) {
                   </Link>
               </div>
             )}
-          </div>
-          
-          <div onClick={handleSignout}>
-            <Sidebar.Item
-              icon={HiArrowSmRight}
-              className="cursor-pointer hover:bg-red-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              as='div'
-              onClick={() => {
-                setIsCommitteeExpanded(false);
-                setIsProfileExpanded(false);
-              }}
-            >
-              <span className="font-medium text-red-600 dark:text-red-400">Sign Out</span>
-            </Sidebar.Item>
           </div>
         </Sidebar.ItemGroup>
       </Sidebar.Items>

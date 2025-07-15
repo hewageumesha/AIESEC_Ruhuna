@@ -83,7 +83,15 @@ const CreateTask = () => {
                         icon: 'success',
                         confirmButtonText: 'OK'
                     }).then(() => {
-                        navigate(`/user/${id}/TaskDashboard`);
+                        if (loggedInUser.role === "LCP") {
+                            navigate(`/user/${id}/TaskDashboard`);
+                        } else if (loggedInUser.role === "LCVP") {
+                            navigate(`/user/${id}/TaskDashboardLCVP`);
+                        } else if (loggedInUser.role === "Team_Leader") {
+                            navigate(`/user/${id}/TaskDashboardTL`);
+                        } else {
+                            navigate(`/user/${id}/TaskDashboard`); // fallback
+                        }
                     });
                 } else {
                     throw new Error('Task creation failed');
@@ -97,6 +105,21 @@ const CreateTask = () => {
 
     return (
         <div className="create-task-wrapper">
+            <button
+                className="btn-back"
+                onClick={() => navigate(-1)}
+                style={{
+                    backgroundColor: "#3498db",
+                    color: "white",
+                    padding: "8px 16px",
+                    borderRadius: "6px",
+                    border: "none",
+                    cursor: "pointer",
+                    marginBottom: "16px"
+                }}
+            >
+                ← Back
+            </button>
             <h2 className="create-task-title">Create New Task</h2>
 
             {/* Step 1: Task Details */}
@@ -194,24 +217,24 @@ const CreateTask = () => {
                             .filter(user => {
                                 if (!loggedInUser) return false;
 
-                                const sameDepartment = user.departmentId === loggedInUser.departmentId;
+                                const sameDepartment = (user.department?.id ?? user.departmentId ?? null) ===
+                                    (loggedInUser.department?.id ?? loggedInUser.departmentId ?? null);
+
                                 const sameFunction = (!user.functionId?.id && !loggedInUser.functionId?.id)
                                     || (user.functionId?.id === loggedInUser.functionId?.id);
 
-                                console.log(`Checking user ${user.userName}: role=${user.role}, department=${user.departmentId}, function=${JSON.stringify(user.functionId)}`);
-                                console.log(`sameDepartment: ${sameDepartment}, sameFunction: ${sameFunction}`);
-                                console.log("LoggedInUser object:", JSON.stringify(loggedInUser));
+                                console.log(`Checking user ${user.firstName}: role=${user.role}, sameDept=${sameDepartment}, sameFunc=${sameFunction}`);
 
                                 if (loggedInUser.role === "LCP") {
                                     return ["LCVP", "Team_Leader", "Member"].includes(user.role);
                                 }
 
                                 if (loggedInUser.role === "LCVP") {
-                                    return ["Team_Leader", "Member"].includes(user.role) && sameDepartment && sameFunction;
+                                    return ["Team_Leader", "Member"].includes(user.role) && sameFunction;
                                 }
 
                                 if (loggedInUser.role === "Team_Leader") {
-                                    return user.role === "Member" && sameDepartment && sameFunction;
+                                    return user.role === "Member" &&  sameFunction;
                                 }
 
                                 return false;
@@ -219,9 +242,11 @@ const CreateTask = () => {
 
 
 
+
+
                             .map(user => (
                                 <option key={user.id} value={user.id}>
-                                    {user.userName} ({user.role} - {user.departmentName})
+                                    {user.firstName} ({user.role} - {user.functionName})
                                 </option>
                             ))}
                     </select>

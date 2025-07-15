@@ -19,72 +19,83 @@ export default function UpdatePassword() {
   const [loading, setLoading] = useState(false);
 
   const { currentUser } = useSelector((state) => state.user);
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-    });
-  };
-
-  const togglePasswordVisibility = (field) => {
-    setShowPasswords({
-      ...showPasswords,
-      [field]: !showPasswords[field],
-    });
-  };
+console.log("currentUser:", currentUser);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (formData.currentPassword === formData.newPassword) {
-      return setErrorMsg("New password must be different from current password");
+  // You can skip this check if always defined
+  if (!currentUser) {
+    return setErrorMsg("User not found. Please log in again.");
+  }
+
+  if (formData.currentPassword === formData.newPassword) {
+    return setErrorMsg("New password must be different from current password");
+  }
+
+  if (formData.newPassword !== formData.confirmPassword) {
+    return setErrorMsg("New passwords do not match");
+  }
+
+  if (formData.newPassword.length < 6) {
+    return setErrorMsg("Password must be at least 6 characters");
+  }
+
+  try {
+    setLoading(true);
+    setErrorMsg("");
+    setSuccessMsg("");
+
+    const res = await fetch("http://localhost:8080/api/users/update-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userAiesecEmail: currentUser.aiesecEmail,
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
+      }),
+    });
+
+    let data = {};
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      data = await res.json();
+    } else {
+      data = { message: await res.text() };
     }
 
-    if (formData.newPassword !== formData.confirmPassword) {
-      return setErrorMsg("New passwords do not match");
-    }
+    setLoading(false);
 
-    if (formData.newPassword.length < 6) {
-      return setErrorMsg("Password must be at least 6 characters");
-    }
-
-    try {
-      setLoading(true);
-      setErrorMsg("");
-      setSuccessMsg("");
-
-      const res = await fetch("/api/user/update-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: currentUser._id,
-          currentPassword: formData.currentPassword,
-          newPassword: formData.newPassword,
-        }),
+    if (!res.ok) {
+      setErrorMsg(data.message || "Failed to update password");
+    } else {
+      setSuccessMsg("Password updated successfully!");
+      setFormData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       });
-
-      const data = await res.json();
-      setLoading(false);
-
-      if (!res.ok) {
-        setErrorMsg(data.message || "Failed to update password");
-      } else {
-        setSuccessMsg("Password updated successfully!");
-        setFormData({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
-        setTimeout(() => setSuccessMsg(""), 3000);
-      }
-    } catch (error) {
-      setLoading(false);
-      setErrorMsg(error.message || "An error occurred");
+      setTimeout(() => setSuccessMsg(""), 3000);
     }
-  };
+  } catch (error) {
+    setLoading(false);
+    setErrorMsg(error.message || "An error occurred");
+  }
+};
+
+const handleChange = (e) => {
+  setFormData({
+    ...formData,
+    [e.target.id]: e.target.value,
+  });
+};
+
+const togglePasswordVisibility = (field) => {
+  setShowPasswords((prev) => ({
+    ...prev,
+    [field]: !prev[field],
+  }));
+};
 
   return (
     <div className="max-w-3xl mx-auto p-4">

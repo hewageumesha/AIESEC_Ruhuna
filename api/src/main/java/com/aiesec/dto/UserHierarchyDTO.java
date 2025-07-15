@@ -10,7 +10,6 @@ public class UserHierarchyDTO {
     private String name;
     private String aiesecEmail;
     private UserRole role;
-    private String departmentName;
     private String functionName;
     private String profilePicture;
     private String phoneNumber;
@@ -38,12 +37,6 @@ public class UserHierarchyDTO {
     }
     public void setRole(UserRole role) {
         this.role = role;
-    }
-    public String getDepartmentName() {
-        return departmentName;
-    }
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
     }
     public String getFunctionName() {
         return functionName;

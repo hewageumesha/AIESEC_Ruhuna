@@ -36,10 +36,10 @@ export default function DashProfile() {
       setFormData(profile.data);
 
       if (profile.data.role === 'Member') {
-        const teamLeader = await axios.get(`http://localhost:8080/api/users/team-leader/${profile.data.id}`, {
-          headers: { Authorization: `Bearer ${currentUser.token}` }
-        });
-        setProfileData({ ...profile.data, teamLeader: teamLeader.data });
+        //const teamLeader = await axios.get(`http://localhost:8080/api/users/team-leader/${profile.data.id}`, {
+        //  headers: { Authorization: `Bearer ${currentUser.token}` }
+        //});
+        setProfileData({ ...profile.data });
       }
     } catch (error) {
       console.error('Error fetching profile data:', error);
@@ -99,7 +99,7 @@ export default function DashProfile() {
     try {
       dispatch(updateStart());
       const updatedData = { ...profileData, ...formData };
-      const res = await fetch(`http://localhost:8080/api/users/update`, {
+      const res = await fetch(`http://localhost:8080/api/users/update/${currentUser.aiesecEmail}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${currentUser.token}`,
@@ -139,10 +139,6 @@ export default function DashProfile() {
               <p className="text-sm text-gray-600 dark:text-gray-400">{profileData.aiesecEmail}</p>
             </div>
             <div className="mb-8">
-              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Department</label>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{profileData.department?.name}</p>
-            </div>
-            <div className="mb-8">
               <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Function</label>
               <p className="text-sm text-gray-600 dark:text-gray-400">{profileData.function?.name}</p>
             </div>
@@ -150,7 +146,7 @@ export default function DashProfile() {
               <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Role</label>
               <p className="text-sm text-gray-600 dark:text-gray-400">{profileData.role}</p>
             </div>
-            {currentUser.role === 'Member' && (
+            {currentUser.role === 'Member' || currentUser.role === 'Team_Leader'&& (
               <div className="mb-8">
                 <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Assigned Team Leader</label>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{profileData.teamLeaderAiesecEmail}</p>

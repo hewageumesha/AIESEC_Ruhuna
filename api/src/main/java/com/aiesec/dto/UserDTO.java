@@ -7,7 +7,9 @@ import java.util.List;
 import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
+import com.aiesec.model.Department;
 import com.aiesec.model.Function;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,9 +17,9 @@ import lombok.Setter;
 @Setter
 public class UserDTO {
     private Long id;
-    private String userName;
+    private String firstName;
     private String lastName;
-    private String aiesecEmail;  // Add this field
+    private String aiesecEmail;
     private String email;
     private String phone;
     private String about;
@@ -33,10 +35,8 @@ public class UserDTO {
     private String profilePicture;
     private UserRole role;
     private UserStatus status;
-    private Function functionId;
-    private String functionName; 
-    private Long departmentId;
-    private String departmentName;  
+    private Function functionId;  
+    private String functionName;    
     private String teamLeaderAiesecEmail;
     private String teamLeaderName;
     private List<UserDTO> teamMembers;
@@ -44,6 +44,9 @@ public class UserDTO {
     private List<String> commentsCreated;
     private String password;
     private int noOfTask;
+    private Department departmentId;
+    private String departmentName;
+
 
 
     public Long getId() {
@@ -52,14 +55,6 @@ public class UserDTO {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
     public String getLastName() {
@@ -189,22 +184,6 @@ public class UserDTO {
         this.functionName = functionName;
     }
 
-    public Long getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
-    }
-
-    public String getDepartmentName() {
-        return departmentName;
-    }
-
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
-    }
-
     public String getTeamLeaderAiesecEmail() {
         return teamLeaderAiesecEmail;
     }
@@ -266,6 +245,30 @@ public class UserDTO {
 
     public void setFaculty(String faculty) {
         this.faculty = faculty;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public int getNoOfTask() {
+        return noOfTask;
+    }
+
+    public void setNoOfTask(int noOfTask) {
+        this.noOfTask = noOfTask;
     }
     
 }

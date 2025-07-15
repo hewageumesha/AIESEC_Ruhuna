@@ -4,15 +4,16 @@ import com.aiesec.dto.EventDTO;
 import com.aiesec.mapper.EventMapper;
 import com.aiesec.mapper.MerchandiseMapper;
 import com.aiesec.model.event.Event;
-import com.aiesec.mapper.EventMapper;
+import com.aiesec.model.event.Merchandise;
 import com.aiesec.repository.event.EventRepository;
 import com.aiesec.repository.event.MerchandiseRepository;
 import com.aiesec.service.interfaces.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -22,43 +23,39 @@ import java.util.stream.Collectors;
 public class EventServiceimpl implements EventService {
 
     private final EventRepository eventRepository;
-    
     private final MerchandiseRepository merchandiseRepository;
 
     @Autowired
-    public EventServiceimpl(EventRepository eventRepository) {
+    public EventServiceimpl(EventRepository eventRepository, MerchandiseRepository merchandiseRepository) {
         this.eventRepository = eventRepository;
-        merchandiseRepository = null;
+        this.merchandiseRepository = merchandiseRepository;
     }
+
     @Override
     public EventDTO createEvent(EventDTO eventDTO) {
+        // Convert DTO to Entity
         Event event = EventMapper.toEntity(eventDTO);
 
+        // Set isPublic with fallback to false
+        event.setIsPublic(Boolean.TRUE.equals(eventDTO.getIsPublic()));
 
-        if (eventDTO.getHasTshirtOrder() == null) {
-            event.setHasTshirtOrder(false);
+        // Check and attach merchandise
+        if (eventDTO.getMerchandise() != null && !eventDTO.getMerchandise().isEmpty()) {
+            List<Merchandise> merchList = eventDTO.getMerchandise().stream()
+                    .map(dto -> MerchandiseMapper.toEntity(dto, event)) // link unsaved event
+                    .collect(Collectors.toList());
 
-if (eventDTO.getHasMerchandise() == null) {
-    event.setHasMerchandise(false);
-
+            event.setMerchandiseList(merchList);
+            event.setHasMerchandise(true);
         } else {
-            event.setHasTshirtOrder(eventDTO.getHasTshirtOrder());
+            event.setHasMerchandise(false);
         }
 
+        // Save event — merchandise list is saved via CascadeType.ALL
+        Event savedEvent = eventRepository.save(event);
 
-        if (eventDTO.getVisibility() == null || eventDTO.getVisibility().isEmpty()) {
-            event.setVisibility("Private");
-
-// Use Boolean isPublic instead of String visibility
-if (eventDTO.getIsPublic() == null) {
-    event.setIsPublic(false); // Default to private
-
-
-        } else {
-            event.setVisibility(eventDTO.getVisibility());
-        }
-
-        return EventMapper.toDTO(eventRepository.save(event));
+        // Return mapped DTO
+        return EventMapper.toDTO(savedEvent);
     }
 
     @Override
@@ -77,6 +74,7 @@ if (eventDTO.getIsPublic() == null) {
             event.setIsPublic(updatedEvent.getIsPublic());
             event.setIsVirtual(updatedEvent.getIsVirtual());
             event.setVirtualLink(updatedEvent.getVirtualLink());
+            event.setHasMerchandise(updatedEvent.getHasMerchandise());
 
             return EventMapper.toDTO(eventRepository.save(event));
         }
@@ -94,14 +92,36 @@ if (eventDTO.getIsPublic() == null) {
     @Override
     public EventDTO getEventById(Long id) {
         return eventRepository.findById(id)
-                .map(EventMapper::toDTO)
+                .map(event -> {
+                    EventDTO dto = EventMapper.toDTO(event);
+
+                    if (Boolean.TRUE.equals(dto.getHasMerchandise())) {
+                        List<Merchandise> merchList = merchandiseRepository.findByEventEventId(id);
+                        dto.setMerchandise(
+                                merchList.stream()
+                                        .map(MerchandiseMapper::toDTO)
+                                        .collect(Collectors.toList())
+                        );
+                    }
+
+                    return dto;
+                })
                 .orElse(null);
     }
 
+
+
     @Override
+    @Transactional
     public void deleteEvent(Long eventId) {
-        eventRepository.deleteById(eventId);
+        Optional<Event> optionalEvent = eventRepository.findById(eventId);
+        if (optionalEvent.isPresent()) {
+            eventRepository.delete(optionalEvent.get());
+        } else {
+            throw new RuntimeException("Event not found with ID: " + eventId);
+        }
     }
+
 
     @Override
     public List<EventDTO> getUpcomingEvents() {
@@ -115,7 +135,33 @@ if (eventDTO.getIsPublic() == null) {
     @Override
     public List<EventDTO> getPublicUpcomingEvents() {
         LocalDate now = LocalDate.now();
-        return eventRepository.findByIsPublicTrueAndStartDateAfter(now)
+        return eventRepository.findByIsPublicTrueAndStartDateGreaterThanEqual(now)
+                .stream()
+                .map(EventMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public List<EventDTO> getPrivateUpcomingEvents() {
+        LocalDate now = LocalDate.now();
+        return eventRepository.findByIsPublicFalseAndStartDateGreaterThanEqual(now)
+                .stream()
+                .map(EventMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EventDTO> getAllPublicEvents() {
+        return eventRepository.findByIsPublicTrue()
+                .stream()
+                .map(EventMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EventDTO> getAllPrivateEvents() {
+        return eventRepository.findByIsPublicFalse()
                 .stream()
                 .map(EventMapper::toDTO)
                 .collect(Collectors.toList());
@@ -126,33 +172,13 @@ if (eventDTO.getIsPublic() == null) {
         Optional<Event> optionalEvent = eventRepository.findById(eventId);
         if (optionalEvent.isPresent()) {
             Event event = optionalEvent.get();
-            event.setHasTshirtOrder(Boolean.TRUE.equals(hasTshirtOrder));
+            event.setHasMerchandise(Boolean.TRUE.equals(hasTshirtOrder));
             eventRepository.save(event);
         } else {
             throw new RuntimeException("Event not found with ID: " + eventId);
         }
     }
 
-    @Override
-
-    public void updateEventVisibility(Long eventId, String visibility) {
-
-    public Page<EventDTO> filterEvents(String search, String status, String date, Pageable pageable) {
-        return null;
-    }
-
-    @Override
-    public void updateTshirtOrder(Long eventId, Boolean hasTshirtOrder) {
-
-        Optional<Event> optionalEvent = eventRepository.findById(eventId);
-        if (optionalEvent.isPresent()) {
-            Event event = optionalEvent.get();
-            event.setVisibility(visibility != null && !visibility.isEmpty() ? visibility : "Private");
-            eventRepository.save(event);
-        } else {
-            throw new RuntimeException("Event not found with ID: " + eventId);
-        }
-    }
 
 
     @Override
@@ -161,15 +187,4 @@ if (eventDTO.getIsPublic() == null) {
         Page<Event> events = eventRepository.filterEvents(search, status, date, pageable);
         return events.map(EventMapper::toDTO);
     }
-
-
-
-
-
-    //@Override
-    //public List<EventDTO> getEventsByGroup(String groupName) {
-        //return List.of(); // Dummy return for now
-    //}
-
 }
-

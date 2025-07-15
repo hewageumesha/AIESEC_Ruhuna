@@ -1,7 +1,6 @@
 package com.aiesec.controller.event;
 
-
-import com.aiesec.dto.GalleryDTO; 
+import com.aiesec.dto.GalleryDTO;
 import com.aiesec.service.interfaces.GalleryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,34 +19,38 @@ public class GalleryController {
         this.galleryService = galleryService;
     }
 
-    // ✅ Add a new image to the gallery (only for LCP, LCVP roles)
-    @PostMapping("/{eventId}")
-    public ResponseEntity<GalleryDTO> addImageToGallery(
-            @PathVariable Long eventId,
-            @RequestBody GalleryDTO galleryDTO) {
+    // Upload image with imageUrl and category only
+    @PostMapping
+    public ResponseEntity<GalleryDTO> uploadGalleryImage(@RequestBody GalleryDTO galleryDTO) {
         GalleryDTO savedImage = galleryService.uploadGalleryImage(galleryDTO);
         return ResponseEntity.ok(savedImage);
     }
 
-    // ✅ Get all images for a specific event
-    @GetMapping("/event/{eventId}")
-    public ResponseEntity<List<GalleryDTO>> getGalleryByEvent(@PathVariable Long eventId) {
-        List<GalleryDTO> galleryList = galleryService.getGalleryImagesByEventId(eventId);
-        return ResponseEntity.ok(galleryList);
-    }
-
-    // ✅ Get all gallery images (for the home page – past events)
+    // Get all images
     @GetMapping
     public ResponseEntity<List<GalleryDTO>> getAllGalleryImages() {
         List<GalleryDTO> allImages = galleryService.getAllGalleryImages();
         return ResponseEntity.ok(allImages);
     }
 
-    // ✅ Delete a gallery image by ID (only for LCP, LCVP)
+    // Get images filtered by category (pass ?category=CategoryName)
+    @GetMapping("/category")
+    public ResponseEntity<List<GalleryDTO>> getGalleryByCategory(@RequestParam String category) {
+        List<GalleryDTO> images = galleryService.getGalleryImagesByCategory(category);
+        return ResponseEntity.ok(images);
+    }
+
+    // Delete image by id(single delete)
     @DeleteMapping("/{galleryId}")
     public ResponseEntity<Void> deleteGalleryImage(@PathVariable Long galleryId) {
         galleryService.deleteGalleryImage(galleryId);
         return ResponseEntity.noContent().build();
     }
-}
 
+    //Multiple delete
+    @DeleteMapping("/batch")
+    public ResponseEntity<Void> deleteMultipleGalleryImages(@RequestBody List<Long> galleryIds) {
+        galleryService.deleteGalleryImagesByIds(galleryIds);
+        return ResponseEntity.noContent().build();
+    }
+}
