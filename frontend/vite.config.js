@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
 
   return {
 
-    base: process.env.VITE_BASE_PATH || "/AIESEC_in_Ruhuna",
+    //base: process.env.VITE_BASE_PATH || "/AIESEC_in_Ruhuna",
 
     server: {
       port: 5173,

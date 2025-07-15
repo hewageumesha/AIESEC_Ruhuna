@@ -36,9 +36,6 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -308,9 +305,13 @@ public class UserService {
 
     public String updatePassword(PasswordUpdateRequest request) {
 
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         User user = userRepository.findByAiesecEmail(request.getUserAiesecEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        System.out.println(request.getCurrentPassword());
+        System.out.println(user.getPassword());
+        
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
             throw new RuntimeException("Current password is incorrect");
         }

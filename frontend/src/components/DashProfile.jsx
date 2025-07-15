@@ -36,10 +36,10 @@ export default function DashProfile() {
       setFormData(profile.data);
 
       if (profile.data.role === 'Member') {
-        const teamLeader = await axios.get(`http://localhost:8080/api/users/team-leader/${profile.data.id}`, {
-          headers: { Authorization: `Bearer ${currentUser.token}` }
-        });
-        setProfileData({ ...profile.data, teamLeader: teamLeader.data });
+        //const teamLeader = await axios.get(`http://localhost:8080/api/users/team-leader/${profile.data.id}`, {
+        //  headers: { Authorization: `Bearer ${currentUser.token}` }
+        //});
+        setProfileData({ ...profile.data });
       }
     } catch (error) {
       console.error('Error fetching profile data:', error);
@@ -99,7 +99,7 @@ export default function DashProfile() {
     try {
       dispatch(updateStart());
       const updatedData = { ...profileData, ...formData };
-      const res = await fetch(`http://localhost:8080/api/users/update`, {
+      const res = await fetch(`http://localhost:8080/api/users/update/${currentUser.aiesecEmail}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${currentUser.token}`,

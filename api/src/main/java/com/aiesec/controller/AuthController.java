@@ -44,6 +44,14 @@ public class AuthController {
         // Get user from the database by AIESEC email
         Optional<User> existingUser = userService.getUserByAiesecEmail(user.getAiesecEmail());
 
+        System.out.println(user.getAiesecEmail());
+ 
+        if (existingUser.isPresent()) {
+            System.out.println(existingUser.get().getAiesecEmail());
+        } else {
+            System.out.println("No user found with this AIESEC email.");
+        }   
+
         // If no user is found with the given AIESEC email
         if (existingUser == null) {
             return ResponseEntity

@@ -243,7 +243,7 @@ export default function DashManageMember() {
               >
                 <option value="">Select Team Leader</option>
                 {members.map((member) => (
-                  <option key={member.aiesecEmail} value={member.aiesecEmail}>{member.aiesecEmail} - {member.role} - {member.function.name}</option>
+                  <option key={member.aiesecEmail} value={member.aiesecEmail}>{member.aiesecEmail} - {member.role} - {member.function?.name || '-'}</option>
                 ))}
               </select>
             </div>
