@@ -36,11 +36,9 @@ public class AiesecMemberEventRegistrationServiceImpl implements AiesecMemberEve
             throw new IllegalStateException("User with ID " + dto.getUserId() + " is already registered for event ID " + dto.getEventId());
         }
 
-        // ✅ Fetch event using eventRepository
         Event event = eventRepository.findById(dto.getEventId())
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        // ✅ Apply registration closing logic
         LocalDateTime registrationCloseDate = event.getStartDate()
                 .atStartOfDay()
                 .minusDays(event.getRegistrationCloseBeforeDays());
@@ -49,10 +47,18 @@ public class AiesecMemberEventRegistrationServiceImpl implements AiesecMemberEve
             throw new IllegalStateException("Registrations are closed for this event.");
         }
 
-        AiesecMemberEventRegistration entity = AiesecMemberEventRegistrationMapper.toEntity(dto);
+        // ✅ Manual safe mapping
+        AiesecMemberEventRegistration entity = new AiesecMemberEventRegistration();
+        entity.setUserId(dto.getUserId());
+        entity.setEventId(dto.getEventId());
+        entity.setInterestStatus(dto.getInterestStatus());
+        entity.setComment(dto.getComment());
+        entity.setRegisteredAt(LocalDateTime.now());
+
         AiesecMemberEventRegistration saved = registrationRepository.save(entity);
         return AiesecMemberEventRegistrationMapper.toDTO(saved);
     }
+
 
     @Override
     public List<AiesecMemberEventRegistrationDTO> getByUserIdAndEventId(Long userId, Long eventId) {

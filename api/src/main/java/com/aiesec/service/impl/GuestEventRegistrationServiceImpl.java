@@ -41,10 +41,13 @@ public class GuestEventRegistrationServiceImpl implements GuestEventRegistration
         Event event = eventRepository.findById(dto.getEventId())
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        // ✅ Registration closing logic
+        // ✅ Null-safe: Handle null registrationCloseBeforeDays
+        Integer daysBefore = event.getRegistrationCloseBeforeDays();
+        int closeBeforeDays = (daysBefore != null) ? daysBefore : 0; // fallback default to 0 if not set
+
         LocalDateTime registrationCloseDate = event.getStartDate()
                 .atStartOfDay()
-                .minusDays(event.getRegistrationCloseBeforeDays());
+                .minusDays(closeBeforeDays);
 
         if (LocalDateTime.now().isAfter(registrationCloseDate)) {
             throw new IllegalStateException("Registrations are closed for this event.");
@@ -56,6 +59,7 @@ public class GuestEventRegistrationServiceImpl implements GuestEventRegistration
         System.out.println("Saved entity: " + saved);
         return GuestEventRegistrationMapper.toDTO(saved);
     }
+
 
     @Override
     public List<GuestEventRegistrationDTO> getAllByEventId(Long eventId) {
@@ -88,14 +92,10 @@ public class GuestEventRegistrationServiceImpl implements GuestEventRegistration
         return summary;
     }
 
-
     @Override
     public Page<GuestEventRegistrationDTO> getPagedByEventId(Long eventId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("registeredAt").descending());
         Page<GuestEventRegistration> pageResult = registrationRepository.findByEvent_EventId(eventId, pageable);
         return pageResult.map(GuestEventRegistrationMapper::toDTO);
     }
-
-
-
 }
