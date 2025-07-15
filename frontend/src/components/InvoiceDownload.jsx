@@ -5,7 +5,7 @@ const InvoiceDownload = () => {
   const handleDownload = async () => {
     try {
       // Change the URL if necessary to include the full backend URL with the correct port
-      const response = await axios.get("http://localhost:8080/api/invoice/download", { responseType: "blob" });
+      const response = await axios.get("https://aiesecinruhuna-production.up.railway.app/api/invoice/download", { responseType: "blob" });
       const blob = new Blob([response.data], { type: "application/pdf" });
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(blob);
