@@ -32,7 +32,7 @@ const DashEvent = () => {
       if (filters.status) params.status = filters.status;
       if (filters.date) params.date = filters.date;
 
-      const response = await axios.get('http://localhost:8080/api/events/filter', {
+      const response = await axios.get('https://aiesecinruhuna-production.up.railway.app/api/events/filter', {
         params,
       });
 
@@ -55,7 +55,7 @@ const DashEvent = () => {
   const handleDelete = async (eventId, e) => {
     e.stopPropagation();
     try {
-      await axios.delete(`http://localhost:8080/api/events/${eventId}`);
+      await axios.delete(`https://aiesecinruhuna-production.up.railway.app/api/events/${eventId}`);
       message.success('Event deleted successfully');
       fetchFilteredEvents();
     } catch (error) {
@@ -85,14 +85,16 @@ const DashEvent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 sm:p-6 lg:p-8 transition-colors duration-300">
       {/* Enhanced Header Section */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
         <div>
           <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
             Event Management
           </h2>
-          <p className="text-gray-600 text-sm lg:text-base">Manage and showcase your events with style</p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm lg:text-base transition-colors duration-300">
+            Manage and showcase your events with style
+          </p>
         </div>
 
         {canEditOrDelete() && (
@@ -142,7 +144,7 @@ const DashEvent = () => {
 
       {/* Add Event Form */}
       {showAddForm && canEditOrDelete() && (
-        <div className="mb-8 bg-white/80 backdrop-blur-sm border border-white/20 rounded-xl shadow-xl p-6 lg:p-8">
+        <div className="mb-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 rounded-xl shadow-xl p-6 lg:p-8 transition-colors duration-300">
           <AddEventForm onEventAdded={fetchFilteredEvents} />
         </div>
       )}
@@ -161,7 +163,9 @@ const DashEvent = () => {
         <div className="flex justify-center items-center min-h-[400px]">
           <div className="text-center">
             <Spin size="large" />
-            <p className="mt-4 text-gray-500">Loading amazing events...</p>
+            <p className="mt-4 text-gray-500 dark:text-gray-400 transition-colors duration-300">
+              Loading amazing events...
+            </p>
           </div>
         </div>
       ) : (
@@ -171,9 +175,9 @@ const DashEvent = () => {
               <Card
                 hoverable
                 onClick={() => handleCardClick(event.eventId)}
-                className="relative overflow-hidden transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 shadow-lg hover:shadow-2xl border-0 bg-white/90 backdrop-blur-sm cursor-pointer rounded-2xl"
+                className="event-card relative overflow-hidden transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 shadow-lg hover:shadow-2xl border-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm cursor-pointer rounded-2xl"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 100%)',
+                  background: 'var(--card-bg)',
                   backdropFilter: 'blur(10px)',
                 }}
                 cover={
@@ -189,8 +193,8 @@ const DashEvent = () => {
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 via-blue-500/0 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     
                     {/* Floating action button */}
-                    <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm rounded-full p-3 transform translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 shadow-lg hover:shadow-xl">
-                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="absolute bottom-4 right-4 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-full p-3 transform translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 shadow-lg hover:shadow-xl">
+                      <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
                     </div>
@@ -258,22 +262,22 @@ const DashEvent = () => {
                 <div className="p-6">
                   <Meta
                     title={
-                      <span className="font-bold text-xl text-gray-800 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-600 group-hover:via-blue-600 group-hover:to-cyan-600 group-hover:bg-clip-text transition-all duration-300 line-clamp-2 leading-tight">
+                      <span className="font-bold text-xl text-gray-800 dark:text-gray-100 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-600 group-hover:via-blue-600 group-hover:to-cyan-600 group-hover:bg-clip-text transition-all duration-300 line-clamp-2 leading-tight">
                         {event.eventName}
                       </span>
                     }
                     description={
-                      <div className="text-gray-600 mt-4 space-y-3">
+                      <div className="text-gray-600 dark:text-gray-300 mt-4 space-y-3 transition-colors duration-300">
                         <div className="flex items-center space-x-3">
                           <div className="w-2 h-2 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 rounded-full animate-pulse"></div>
                           <span className="text-sm font-medium">
-                            <strong className="text-indigo-700">Date:</strong> {event.startDate} to {event.endDate}
+                            <strong className="text-indigo-700 dark:text-indigo-300">Date:</strong> {event.startDate} to {event.endDate}
                           </span>
                         </div>
                         <div className="flex items-center space-x-3">
                           <div className="w-2 h-2 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-full animate-pulse delay-300"></div>
                           <span className="text-sm font-medium">
-                            <strong className="text-purple-700">Time:</strong> {event.eventTime} - {event.endTime}
+                            <strong className="text-purple-700 dark:text-purple-300">Time:</strong> {event.eventTime} - {event.endTime}
                           </span>
                         </div>
                       </div>
@@ -301,14 +305,18 @@ const DashEvent = () => {
       {/* Enhanced Empty State */}
       {!loading && events.length === 0 && (
         <div className="text-center py-16">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 max-w-md mx-auto shadow-xl">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-12 max-w-md mx-auto shadow-xl transition-colors duration-300">
             <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <div className="text-gray-700 text-xl font-semibold mb-2">No events found</div>
-            <p className="text-gray-500">Try adjusting your filters or create your first amazing event!</p>
+            <div className="text-gray-700 dark:text-gray-200 text-xl font-semibold mb-2 transition-colors duration-300">
+              No events found
+            </div>
+            <p className="text-gray-500 dark:text-gray-400 transition-colors duration-300">
+              Try adjusting your filters or create your first amazing event!
+            </p>
           </div>
         </div>
       )}
@@ -326,13 +334,13 @@ const DashEvent = () => {
         destroyOnClose
         width="90%"
         style={{ maxWidth: '700px' }}
-        className="top-4"
+        className="top-4 dark-modal"
         styles={{
           mask: { backdropFilter: 'blur(8px)' },
           content: { 
             borderRadius: '16px', 
             overflow: 'hidden',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%)',
+            background: 'var(--modal-bg)',
             backdropFilter: 'blur(10px)'
           }
         }}
@@ -343,8 +351,18 @@ const DashEvent = () => {
         />
       </Modal>
 
-      {/* Enhanced Custom CSS */}
+      {/* Enhanced Custom CSS with Dark Mode Support */}
       <style jsx>{`
+        :root {
+          --card-bg: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 100%);
+          --modal-bg: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
+        }
+        
+        .dark {
+          --card-bg: linear-gradient(135deg, rgba(31,41,55,0.9) 0%, rgba(31,41,55,0.8) 100%);
+          --modal-bg: linear-gradient(135deg, rgba(31,41,55,0.95) 0%, rgba(31,41,55,0.9) 100%);
+        }
+        
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
@@ -370,6 +388,10 @@ const DashEvent = () => {
           box-shadow: 0 25px 50px -12px rgba(139, 92, 246, 0.25);
         }
         
+        .dark .group:hover .ant-card {
+          box-shadow: 0 25px 50px -12px rgba(139, 92, 246, 0.4);
+        }
+        
         .ant-btn-primary:hover {
           transform: translateY(-2px) !important;
           box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4) !important;
@@ -383,8 +405,76 @@ const DashEvent = () => {
           color: #6B7280 !important;
         }
         
+        .dark .ant-card-meta-description {
+          color: #D1D5DB !important;
+        }
+        
         .ant-modal-content {
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+        }
+        
+        .dark .ant-modal-content {
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        /* Dark mode modal styles */
+        .dark .dark-modal .ant-modal-content {
+          background: var(--modal-bg) !important;
+          color: #F3F4F6 !important;
+        }
+        
+        .dark .dark-modal .ant-modal-header {
+          background: transparent !important;
+          border-bottom: 1px solid rgba(75, 85, 99, 0.3) !important;
+        }
+        
+        .dark .dark-modal .ant-modal-title {
+          color: #F3F4F6 !important;
+        }
+        
+        .dark .dark-modal .ant-modal-close {
+          color: #9CA3AF !important;
+        }
+        
+        .dark .dark-modal .ant-modal-close:hover {
+          color: #F3F4F6 !important;
+        }
+        
+        /* Enhanced event card styles */
+        .event-card {
+          transition: all 0.3s ease, box-shadow 0.3s ease !important;
+        }
+        
+        .dark .event-card {
+          border: 1px solid rgba(75, 85, 99, 0.2) !important;
+        }
+        
+        .event-card:hover {
+          transform: translateY(-8px) scale(1.02) !important;
+        }
+        
+        .dark .event-card:hover {
+          border-color: rgba(139, 92, 246, 0.3) !important;
+        }
+        
+        /* Improved spin component for dark mode */
+        .dark .ant-spin-dot-item {
+          background-color: #8B5CF6 !important;
+        }
+        
+        /* Enhanced popconfirm styles */
+        .dark .ant-popover-inner {
+          background: #1F2937 !important;
+          color: #F3F4F6 !important;
+        }
+        
+        .dark .ant-popover-arrow-content {
+          background: #1F2937 !important;
+        }
+        
+        .dark .ant-popover-title {
+          color: #F3F4F6 !important;
+          border-bottom-color: rgba(75, 85, 99, 0.3) !important;
         }
         
         @media (max-width: 640px) {
@@ -407,6 +497,59 @@ const DashEvent = () => {
           .backdrop-blur-sm {
             backdrop-filter: blur(4px);
           }
+        }
+        
+        /* Dark mode transitions */
+        * {
+          transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        /* Custom scrollbar for dark mode */
+        .dark ::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        .dark ::-webkit-scrollbar-track {
+          background: #1F2937;
+        }
+        
+        .dark ::-webkit-scrollbar-thumb {
+          background: #4B5563;
+          border-radius: 4px;
+        }
+        
+        .dark ::-webkit-scrollbar-thumb:hover {
+          background: #6B7280;
+        }
+        
+        /* Enhanced focus states for accessibility */
+        .dark button:focus,
+        .dark .ant-btn:focus {
+          outline: 2px solid #8B5CF6;
+          outline-offset: 2px;
+        }
+        
+        /* Better contrast for dark mode text */
+        .dark .text-gray-600 {
+          color: #D1D5DB !important;
+        }
+        
+        .dark .text-gray-500 {
+          color: #9CA3AF !important;
+        }
+        
+        .dark .text-gray-700 {
+          color: #E5E7EB !important;
+        }
+        
+        /* Enhanced card hover effects for dark mode */
+        .dark .group:hover .event-card {
+          background: linear-gradient(135deg, rgba(55,65,81,0.95) 0%, rgba(55,65,81,0.9) 100%) !important;
+        }
+        
+        /* Better visibility for floating action button in dark mode */
+        .dark .group:hover .absolute.bottom-4.right-4 {
+          background: rgba(31, 41, 55, 0.95) !important;
         }
       `}</style>
     </div>

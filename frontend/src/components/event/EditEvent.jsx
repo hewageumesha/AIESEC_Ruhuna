@@ -48,7 +48,7 @@ const EditEvent = () => {
     const fetchEvent = async () => {
       try {
         setLoading(true);
-        const { data } = await axios.get(`http://localhost:8080/api/events/${id}`);
+        const { data } = await axios.get(`https://aiesecinruhuna-production.up.railway.app/api/events/${id}`);
         
         if (data) {
           setEventImageUrl(data.imageUrl || '');
@@ -70,7 +70,7 @@ const EditEvent = () => {
           // Fetch merchandise data if available
           if (data.hasMerchandise) {
             try {
-              const merchResponse = await axios.get(`http://localhost:8080/api/merchandise/event/${id}`);
+              const merchResponse = await axios.get(`https://aiesecinruhuna-production.up.railway.app/api/merchandise/event/${id}`);
               if (merchResponse.data && merchResponse.data.length > 0) {
                 const merchTypes = [...new Set(merchResponse.data.map(item => item.type))]; // Remove duplicates
                 const merchData = {};
@@ -262,11 +262,11 @@ const EditEvent = () => {
       };
 
       // Update the event
-      await axios.put(`http://localhost:8080/api/events/${id}`, payload);
+      await axios.put(`https://aiesecinruhuna-production.up.railway.app/api/events/${id}`, payload);
 
       // Delete all existing merchandise for this event
       try {
-        await axios.delete(`http://localhost:8080/api/merchandise/event/${id}`);
+        await axios.delete(`https://aiesecinruhuna-production.up.railway.app/api/merchandise/event/${id}`);
       } catch (error) {
         console.warn('No existing merchandise to delete');
       }
@@ -282,7 +282,7 @@ const EditEvent = () => {
             images: merch.images.map((img) => img.url),
             available: true,
           };
-          return axios.post('http://localhost:8080/api/merchandise', merchPayload);
+          return axios.post('https://aiesecinruhuna-production.up.railway.app/api/merchandise', merchPayload);
         });
 
         await Promise.all(merchandisePromises);

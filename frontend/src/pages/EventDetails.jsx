@@ -78,7 +78,7 @@ const EventDateBadge = ({ startDate }) => {
 const EventNavigation = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { id: 'about', label: 'About', icon: Info },
-    { id: 'comments', label: 'Comments', icon: Users },
+    
   ];
 
   return (
@@ -526,7 +526,7 @@ const EventDetailsPage = () => {
     const fetchEvent = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`http://localhost:8080/api/events/${id}`);
+        const res = await axios.get(`https://aiesecinruhuna-production.up.railway.app/api/events/${id}`);
         const eventData = res.data;
 
         if (!eventData.isPublic && !currentUser) {
@@ -540,7 +540,7 @@ const EventDetailsPage = () => {
         // Fetch merchandise if event has merchandise
         if (eventData.hasMerchandise) {
           try {
-            const merchRes = await axios.get(`http://localhost:8080/api/merchandise/event/${id}`);
+            const merchRes = await axios.get(`https://aiesecinruhuna-production.up.railway.app/api/merchandise/event/${id}`);
             
             // Handle different response formats and ensure it's an array
             let merchData = merchRes.data;

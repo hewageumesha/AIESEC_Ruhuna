@@ -29,7 +29,7 @@ const GalleryUploader = () => {
 
         const imageUrl = `https://brxpilwosdsnlvmorixi.supabase.co/storage/v1/object/public/eventimages/${filename}`;
 
-        await axios.post('http://localhost:8080/api/gallery', {
+        await axios.post('https://aiesecinruhuna-production.up.railway.app/api/gallery', {
           category,
           imageUrl,
         });

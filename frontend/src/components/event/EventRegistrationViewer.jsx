@@ -119,7 +119,7 @@ const EventRegistrationViewer = ({ events, loading: eventsLoading }) => {
   }, [statusDistribution]);
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <div 
@@ -129,17 +129,17 @@ const EventRegistrationViewer = ({ events, loading: eventsLoading }) => {
             <Eye className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Registration Viewer</h2>
-            <p className="text-gray-600">View detailed registration data for any event</p>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Registration Viewer</h2>
+            <p className="text-gray-600 dark:text-gray-300">View detailed registration data for any event</p>
           </div>
         </div>
         
         <div className="flex items-center space-x-4">
-          <Filter className="w-5 h-5 text-gray-400" />
+          <Filter className="w-5 h-5 text-gray-400 dark:text-gray-500" />
           <select
             value={selectedEvent}
             onChange={(e) => setSelectedEvent(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px]"
+            className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px]"
             disabled={eventsLoading}
           >
             <option value="">Select an event</option>
@@ -153,21 +153,21 @@ const EventRegistrationViewer = ({ events, loading: eventsLoading }) => {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <div className="text-red-800">{error}</div>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+          <div className="text-red-800 dark:text-red-200">{error}</div>
         </div>
       )}
 
       {selectedEvent && (
         <div className="space-y-8">
           {/* Event Info */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   {selectedEventData?.name || selectedEventData?.eventName}
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   {selectedEventData?.isPublic ? 'Public Event - Members & Guests' : 'Private Event - Members Only'}
                 </p>
               </div>
@@ -176,14 +176,14 @@ const EventRegistrationViewer = ({ events, loading: eventsLoading }) => {
                   <div className="text-2xl font-bold" style={{ color: aiesecColors.blue }}>
                     {memberPagination?.totalElements || 0}
                   </div>
-                  <div className="text-sm text-gray-600">Members</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Members</div>
                 </div>
                 {selectedEventData?.isPublic && (
                   <div className="text-center">
                     <div className="text-2xl font-bold" style={{ color: aiesecColors.green }}>
                       {guestPagination?.totalElements || 0}
                     </div>
-                    <div className="text-sm text-gray-600">Guests</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">Guests</div>
                   </div>
                 )}
                 {/* Status Distribution Chart */}
@@ -222,7 +222,7 @@ const EventRegistrationViewer = ({ events, loading: eventsLoading }) => {
               >
                 <Users className="w-4 h-4 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Member Registrations</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Member Registrations</h3>
             </div>
             <DataTable
               data={memberData}
@@ -243,7 +243,7 @@ const EventRegistrationViewer = ({ events, loading: eventsLoading }) => {
                 >
                   <Users className="w-4 h-4 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">Guest Registrations</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Guest Registrations</h3>
               </div>
               <DataTable
                 data={guestData}
@@ -259,9 +259,9 @@ const EventRegistrationViewer = ({ events, loading: eventsLoading }) => {
 
       {!selectedEvent && (
         <div className="text-center py-12">
-          <Eye className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Select an Event</h3>
-          <p className="text-gray-500">Choose an event from the dropdown above to view registration details</p>
+          <Eye className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Select an Event</h3>
+          <p className="text-gray-500 dark:text-gray-400">Choose an event from the dropdown above to view registration details</p>
         </div>
       )}
     </div>

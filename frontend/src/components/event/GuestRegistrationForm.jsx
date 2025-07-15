@@ -14,7 +14,7 @@ const GuestRegistrationForm = ({ eventId, onSuccess }) => {
       console.log("Submitting guest registration:", payload);
 
       const { data } = await axios.post(
-        '/api/guest-registrations',
+        'https://aiesecinruhuna-production.up.railway.app/api/guest-registrations',
         payload
       );
 
@@ -44,7 +44,7 @@ const GuestRegistrationForm = ({ eventId, onSuccess }) => {
         name="name"
         rules={[{ required: true, message: "Please enter your full name" }]}
       >
-        <Input placeholder="John Doe" />
+        <Input placeholder="Enter your full name" />
       </Form.Item>
 
       <Form.Item
