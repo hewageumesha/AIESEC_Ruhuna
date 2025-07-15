@@ -44,7 +44,7 @@ const GuestRegistrationForm = ({ eventId, onSuccess }) => {
         name="name"
         rules={[{ required: true, message: "Please enter your full name" }]}
       >
-        <Input placeholder="John Doe" />
+        <Input placeholder="Enter your full name" />
       </Form.Item>
 
       <Form.Item

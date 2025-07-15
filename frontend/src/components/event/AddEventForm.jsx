@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Form, Input, DatePicker, TimePicker, Button, Upload, Radio, message, Select, notification
+  Form, Input, DatePicker, TimePicker, Button, Upload, Radio, message, Select, notification, InputNumber
 } from 'antd';
 import { InboxOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -25,7 +25,7 @@ const AddEventForm = () => {
 
   const showSuccessNotification = (eventName, isPublic) => {
     notification.success({
-      message: 'Event Created Successfully! 🎉',
+      message: 'Event Created Successfully! ',
       description: (
         <div>
           <p><strong>{eventName}</strong> has been created and is now {isPublic ? 'publicly available' : 'private to AIESEC members'}.</p>
@@ -145,6 +145,7 @@ const AddEventForm = () => {
         isVirtual: eventType === 'virtual',
         location: eventType === 'virtual' ? '' : values.location,
         virtualLink: eventType === 'virtual' ? values.location : '',
+        registrationCloseBeforeDays: values.registrationCloseBeforeDays,
         hasMerchandise, 
         merchandise: selectedMerchTypes.map((type) => ({
           type,
@@ -184,7 +185,7 @@ const AddEventForm = () => {
       navigate(values.visibility === 'public' ? `/public-event` : `/event/${eventId}`);
     } catch (error) {
       console.error('Error creating event:', error);
-      message.error('❌ Failed to publish event.');
+     
     } finally {
       setIsSubmitting(false);
     }
@@ -258,6 +259,23 @@ const AddEventForm = () => {
             <TimePicker use12Hours format="h:mm A" className="w-full" />
           </Form.Item>
         </div>
+
+        <Form.Item 
+          name="registrationCloseBeforeDays" 
+          label="Registration Close Before (Days)" 
+          rules={[
+            { required: true, message: 'Please enter the number of days before the event when registration closes' },
+            { type: 'number', min: 0, max: 365, message: 'Value must be between 0 and 365 days' }
+          ]}
+        >
+          <InputNumber 
+            className="w-full" 
+            min={0} 
+            max={365} 
+            placeholder="Enter number of days (0-365)"
+            addonAfter="days"
+          />
+        </Form.Item>
 
         <Form.Item label="Event Type">
           <Radio.Group 
