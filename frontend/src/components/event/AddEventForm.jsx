@@ -155,7 +155,7 @@ const AddEventForm = () => {
         })),
       };
 
-      const response = await axios.post('http://localhost:8080/api/events', payload);
+      const response = await axios.post('https://aiesecinruhuna-production.up.railway.app/api/events', payload);
       const eventId = response.data.eventId;
 
       if (hasMerchandise && selectedMerchTypes.length > 0) {
@@ -168,7 +168,7 @@ const AddEventForm = () => {
             images: merch.images.map((img) => img.url),
             available: true,
           };
-          return axios.post('http://localhost:8080/api/merchandise', merchPayload);
+          return axios.post('https://aiesecinruhuna-production.up.railway.app/api/merchandise', merchPayload);
         });
 
         await Promise.all(merchandisePromises);

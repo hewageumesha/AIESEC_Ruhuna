@@ -44,7 +44,7 @@ const GalleryPage = () => {
           headers['Authorization'] = `Bearer ${authToken}`;
         }
 
-        const res = await fetch('http://localhost:8080/api/gallery', {
+        const res = await fetch('https://aiesecinruhuna-production.up.railway.app/api/gallery', {
           headers
         });
         
@@ -193,7 +193,7 @@ const GalleryPage = () => {
       }
       
       // ✅ FIXED: Send array of Long IDs to match backend expectation
-      const batchDeleteResponse = await fetch('http://localhost:8080/api/gallery/batch', {
+      const batchDeleteResponse = await fetch('https://aiesecinruhuna-production.up.railway.app/api/gallery/batch', {
         method: 'DELETE',
         headers,
         body: JSON.stringify(galleryIds) // Send [1, 2, 3] format
@@ -262,7 +262,7 @@ const GalleryPage = () => {
         if (authToken) {
           headers['Authorization'] = `Bearer ${authToken}`;
         }
-        const res = await fetch('http://localhost:8080/api/gallery', { headers });
+        const res = await fetch('https://aiesecinruhuna-production.up.railway.app/api/gallery', { headers });
         if (res.ok) {
           const data = await res.json();
           const imagesWithIds = data.map((img, index) => ({

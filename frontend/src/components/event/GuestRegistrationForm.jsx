@@ -14,7 +14,7 @@ const GuestRegistrationForm = ({ eventId, onSuccess }) => {
       console.log("Submitting guest registration:", payload);
 
       const { data } = await axios.post(
-        '/api/guest-registrations',
+        'https://aiesecinruhuna-production.up.railway.app/api/guest-registrations',
         payload
       );
 

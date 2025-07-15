@@ -32,7 +32,7 @@ const DashEvent = () => {
       if (filters.status) params.status = filters.status;
       if (filters.date) params.date = filters.date;
 
-      const response = await axios.get('http://localhost:8080/api/events/filter', {
+      const response = await axios.get('https://aiesecinruhuna-production.up.railway.app/api/events/filter', {
         params,
       });
 
@@ -55,7 +55,7 @@ const DashEvent = () => {
   const handleDelete = async (eventId, e) => {
     e.stopPropagation();
     try {
-      await axios.delete(`http://localhost:8080/api/events/${eventId}`);
+      await axios.delete(`https://aiesecinruhuna-production.up.railway.app/api/events/${eventId}`);
       message.success('Event deleted successfully');
       fetchFilteredEvents();
     } catch (error) {
