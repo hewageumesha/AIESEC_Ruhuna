@@ -31,7 +31,7 @@ const PublicEventsPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 via-indigo-50 to-cyan-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 via-indigo-50 to-cyan-50 relative overflow-hidden dark:bg-gray-800">
       {/* Enhanced Background Decoration with More Dynamic Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Primary floating orbs */}
