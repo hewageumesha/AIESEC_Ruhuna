@@ -11,7 +11,7 @@ public class CorsGlobalConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true); // Needed if using cookies or auth
+        config.setAllowCredentials(false); // Needed if using cookies or auth
         config.addAllowedOrigin("*"); // Set your frontend domain
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
