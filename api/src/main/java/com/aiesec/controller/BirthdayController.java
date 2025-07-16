@@ -5,6 +5,7 @@ import com.aiesec.repository.BirthdayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,7 +21,8 @@ public class BirthdayController {
    
     @GetMapping("/birthdays")
     public List<Birthday> getAll() {
-        return repository.findAll();
+        //return repository.findAll();
+        return new ArrayList<Birthday>();
     }
 
     @PostMapping("/birthdays")
