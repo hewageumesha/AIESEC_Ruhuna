@@ -22,14 +22,12 @@ public interface UserRepository extends JpaRepository<User, Long>{
     List<User> findByTeamLeaderAiesecEmail(String teamLeaderAiesecEmail);
     List<User> findByFunctionId(Long functionId);
 
-
     @Query("SELECT COUNT(u) FROM User u WHERE u.joinedDate BETWEEN :start AND :end")
     Long countUsersJoinedLastMonth(Date start, Date end);
 
     // Get latest 5 users
     List<User> findTop5ByOrderByJoinedDateDesc();
     User getUserById(Long id);
-    
 
     @Transactional
     @Modifying

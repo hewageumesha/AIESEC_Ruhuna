@@ -95,6 +95,4 @@ public class GuestEventRegistrationController {
         Page<GuestEventRegistrationDTO> pagedResult = registrationService.getPagedByEventId(eventId, page, size);
         return ResponseEntity.ok(pagedResult);
     }
-
-
 }

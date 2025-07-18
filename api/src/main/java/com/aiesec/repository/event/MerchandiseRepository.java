@@ -16,8 +16,4 @@ public interface MerchandiseRepository extends JpaRepository<Merchandise, Long> 
     @Transactional
     @Query("DELETE FROM Merchandise m WHERE m.event.eventId = :eventId")
     void deleteByEventId(@Param("eventId") Long eventId);
-
-
-
-
 }

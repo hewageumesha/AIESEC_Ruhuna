@@ -21,9 +21,4 @@ public interface AiesecMemberEventRegistrationService {
     @Transactional
     AiesecMemberEventRegistration updateRegistration(Long id, RegistrationDTO dto);
     Page<AiesecMemberEventRegistrationDTO> getPagedByEventId(Long eventId, int page, int size);
-
-
-
-
-
 }

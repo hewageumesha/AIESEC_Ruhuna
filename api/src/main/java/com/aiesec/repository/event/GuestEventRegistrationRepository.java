@@ -45,8 +45,4 @@ public interface GuestEventRegistrationRepository extends JpaRepository<GuestEve
     Page<GuestEventRegistration> findByEvent_EventId(Long eventId, Pageable pageable);
     @Query("SELECT g FROM GuestEventRegistration g WHERE g.event.eventId = :eventId AND (:status IS NULL OR g.interestStatus = :status)")
     Page<GuestEventRegistration> findByEventIdAndStatus(@Param("eventId") Long eventId, @Param("status") InterestStatus status, Pageable pageable);
-
-
-
-
 }

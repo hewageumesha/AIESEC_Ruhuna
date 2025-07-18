@@ -53,12 +53,11 @@ public class AuthController {
         }   
 
         // If no user is found with the given AIESEC email
-        if (!existingUser.isPresent()) {
-    return ResponseEntity
-        .status(HttpStatus.NOT_FOUND)
-        .body("User not found with email: " + user.getAiesecEmail());
-}
-
+        if (existingUser == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)  // 404 Not Found
+                    .body("User not found with email: " + user.getAiesecEmail());
+        }
 
         // Create a new instance of BCryptPasswordEncoder
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();

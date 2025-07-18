@@ -62,8 +62,4 @@ public class RegistrationAnalyticsController {
     public List<Map<String, Object>> getAllEventsForAnalytics() {
         return analyticsService.getAllEventsForAnalytics();
     }
-
-
-
-
 }

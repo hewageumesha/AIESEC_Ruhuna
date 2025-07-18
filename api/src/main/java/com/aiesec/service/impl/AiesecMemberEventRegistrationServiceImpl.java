@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class AiesecMemberEventRegistrationServiceImpl implements AiesecMemberEventRegistrationService {
 
     private final AiesecMemberEventRegistrationRepository registrationRepository;
-    private final EventRepository eventRepository; // ✅ Inject EventRepository
+    private final EventRepository eventRepository;
 
     @Override
     public AiesecMemberEventRegistrationDTO register(AiesecMemberEventRegistrationDTO dto) {
@@ -39,15 +39,17 @@ public class AiesecMemberEventRegistrationServiceImpl implements AiesecMemberEve
         Event event = eventRepository.findById(dto.getEventId())
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
+        // Null-safe registration close date handling
+        int closeBeforeDays = event.getRegistrationCloseBeforeDays() != null ? event.getRegistrationCloseBeforeDays() : 0;
+
         LocalDateTime registrationCloseDate = event.getStartDate()
                 .atStartOfDay()
-                .minusDays(event.getRegistrationCloseBeforeDays());
+                .minusDays(closeBeforeDays);
 
         if (LocalDateTime.now().isAfter(registrationCloseDate)) {
             throw new IllegalStateException("Registrations are closed for this event.");
         }
 
-        // ✅ Manual safe mapping
         AiesecMemberEventRegistration entity = new AiesecMemberEventRegistration();
         entity.setUserId(dto.getUserId());
         entity.setEventId(dto.getEventId());
@@ -58,7 +60,6 @@ public class AiesecMemberEventRegistrationServiceImpl implements AiesecMemberEve
         AiesecMemberEventRegistration saved = registrationRepository.save(entity);
         return AiesecMemberEventRegistrationMapper.toDTO(saved);
     }
-
 
     @Override
     public List<AiesecMemberEventRegistrationDTO> getByUserIdAndEventId(Long userId, Long eventId) {

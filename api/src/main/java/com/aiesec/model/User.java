@@ -309,6 +309,4 @@ public class User {
     public void setNoOfTask(int noOfTask) {
         this.noOfTask = noOfTask;
     }
-
-
 }

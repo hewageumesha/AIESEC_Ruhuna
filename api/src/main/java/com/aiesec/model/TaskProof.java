@@ -11,9 +11,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class TaskProof {
-
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer proofId;

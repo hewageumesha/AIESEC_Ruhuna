@@ -9,7 +9,6 @@ import com.aiesec.model.ForgotPassword;
 import com.aiesec.model.User;
 
 public interface ForgotPasswordRepository extends JpaRepository<ForgotPassword, Integer>{
-
     @Query("SELECT forgotPassword FROM ForgotPassword forgotPassword WHERE forgotPassword.otp = ?1 AND forgotPassword.user = ?2")
     Optional<ForgotPassword> findByOtpAndUser(Integer otp, User User);
 }

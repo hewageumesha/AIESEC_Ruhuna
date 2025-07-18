@@ -45,10 +45,4 @@ public interface AiesecMemberEventRegistrationRepository extends JpaRepository<A
             "(:eventId IS NULL OR r.event.eventId = :eventId) AND " +
             "(:status IS NULL OR r.interestStatus = :status)")
     List<AiesecMemberEventRegistration> findFiltered(@Param("eventId") Long eventId, @Param("status") InterestStatus status);
-
-
-
-
-
-
 }

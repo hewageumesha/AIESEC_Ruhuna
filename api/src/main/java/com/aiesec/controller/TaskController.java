@@ -130,11 +130,5 @@ public class TaskController {
         TaskDto taskDto = taskService.getTaskByIdAndUserId(taskId, id);
         return ResponseEntity.ok(taskDto);
     }
-
-
-
-
-
-
 }
 

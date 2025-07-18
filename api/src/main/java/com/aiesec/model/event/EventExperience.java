@@ -36,7 +36,4 @@ public class EventExperience {
 
     //@Column(name = "date_created", nullable = false)
     //private LocalDate dateCreated;
-
-
-
 }

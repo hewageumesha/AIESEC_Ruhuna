@@ -11,13 +11,11 @@ import java.util.List;
 public interface TaskRepo extends JpaRepository<Task, Integer> {
     List<Task> findByUser(User user);
 
-
     List<Task> findByAssignedToId(Integer id);
     List<Task> findByAssignedToId(Long assignedToId);
 
     @Query("SELECT t.workOfStatus, COUNT(t) FROM Task t GROUP BY t.workOfStatus")
     List<Object[]> countTasksByWorkStatus();
-
 
     List<Task> findByWorkOfStatusAndCompletedAtBefore(String status, LocalDateTime dateTime);
 

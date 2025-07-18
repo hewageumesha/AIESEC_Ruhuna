@@ -7,5 +7,4 @@ import java.util.List;
 
 public interface GalleryRepository extends JpaRepository<EventGallery, Long> {
     List<EventGallery> findByCategory(String category);
-
 }

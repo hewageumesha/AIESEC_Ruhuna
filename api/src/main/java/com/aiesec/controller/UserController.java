@@ -210,6 +210,4 @@ public String senMail() {
 
         return ResponseEntity.ok(simpleUser);
     }
-
-
 }

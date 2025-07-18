@@ -3,10 +3,7 @@ package com.aiesec.dto;
 
 import lombok.Data;
 
-
-
 @Data
-
 public class GuestRegistrationSummaryDTO {
     private Long eventId;
     private String eventName;

@@ -54,8 +54,4 @@ public class Task {
     private java.util.List<TaskProof> proofs = new java.util.ArrayList<>();
 
     // Optional: Provide setter that maps from DTO (can be removed if unused)
-
-
-
-
 }

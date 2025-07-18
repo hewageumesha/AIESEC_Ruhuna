@@ -30,6 +30,4 @@ public class MerchandiseController {
     public void deleteMerchandiseByEventId(@PathVariable Long eventId) {
         merchandiseService.deleteByEventId(eventId);
     }
-
-
 }
