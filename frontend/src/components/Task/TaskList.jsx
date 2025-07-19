@@ -113,7 +113,7 @@ const TaskList = () => {
         try {
             // ensure it always starts with /
             const path = filePath.startsWith('/') ? filePath : `/${filePath}`;
-            const response = await fetch(`https://aiesecinruhuna-production.up.railway.app${path}`);
+            const response = await fetch(`http://localhost:8080${path}`);
             if (!response.ok) throw new Error("Failed to download file");
 
             const blob = await response.blob();

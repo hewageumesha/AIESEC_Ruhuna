@@ -172,6 +172,20 @@ export default function DashSidebar({ tab, subtab }) {
                   <span className="font-medium">Finance</span>
                 </Sidebar.Item>
               </Link>
+              <Link to='/dashboard?tab=birthday'>
+                <Sidebar.Item
+                  active={tab === 'birthday'}
+                  icon={HiCreditCard}
+                  as='div'
+                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  onClick={() => {
+                    setIsCommitteeExpanded(false);
+                    setIsProfileExpanded(false);
+                  }}
+                >
+                  <span className="font-medium">Birthday</span>
+                </Sidebar.Item>
+              </Link>
             </>
           )}
 

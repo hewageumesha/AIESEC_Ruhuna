@@ -20,7 +20,7 @@ const AddBirthday = () => {
       // Send POST request
       await axios.post("https://aiesecinruhuna-production.up.railway.app/api/birthdays", formData);
 
-      await axios.post("https://aiesecinruhuna-production.up.railway.app//api/birthdays", formData);
+      // await axios.post("https://aiesecinruhuna-production.up.railway.app//api/birthdays", formData);
 
       setSuccessMsg("🎉 Birthday added successfully!");
       setFormData({ name: "", date: "", role: "", email: "", photo: "" });

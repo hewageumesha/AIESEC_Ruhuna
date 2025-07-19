@@ -10,14 +10,14 @@ const CreateTask: React.FC = () => {
     const [assignTo, setAssignTo] = useState('');
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/departments')
+        fetch('https://aiesecinruhuna-production.up.railway.app/api/departments')
             .then(res => res.json())
             .then(data => setDepartments(data));
     }, []);
 
     useEffect(() => {
         if (selectedDepartment) {
-            fetch(`http://localhost:8080/api/functions/${selectedDepartment}`)
+            fetch(`https://aiesecinruhuna-production.up.railway.app/api/functions/${selectedDepartment}`)
                 .then(res => res.json())
                 .then(data => setFunctions(data));
         }
@@ -25,7 +25,7 @@ const CreateTask: React.FC = () => {
 
     useEffect(() => {
         if (selectedDepartment && selectedFunction) {
-            fetch(`http://localhost:8080/api/users/${selectedDepartment}/${selectedFunction}`)
+            fetch(`https://aiesecinruhuna-production.up.railway.app/api/users/${selectedDepartment}/${selectedFunction}`)
                 .then(res => res.json())
                 .then(data => setUsers(data));
         }

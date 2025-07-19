@@ -19,7 +19,7 @@ const MemberRegistrationForm = ({ eventId, onSuccess }) => {
 
       try {
         const res = await axios.get(
-          `https://aiesecinruhuna-production.up.railway.app/api/member-event-registrations/user/${userId}/event/${eventId}`
+          `/api/member-event-registrations/user/${userId}/event/${eventId}`
         );
         if (res.data && res.data.length > 0) {
           setExistingRegistration(res.data[0]);
@@ -57,7 +57,7 @@ const MemberRegistrationForm = ({ eventId, onSuccess }) => {
       if (existingRegistration) {
         // Update existing registration (PUT)
         res = await axios.put(
-          `https://aiesecinruhuna-production.up.railway.app/api/member-event-registrations/${existingRegistration.id}`,
+          `/api/member-event-registrations/${existingRegistration.id}`,
           payload
         );
         message.success("Your registration has been updated.");

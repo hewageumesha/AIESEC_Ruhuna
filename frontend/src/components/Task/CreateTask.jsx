@@ -70,7 +70,7 @@ const CreateTask = () => {
             },
         };
 
-        fetch(`http://localhost:8080/api/user/${id}/task/`, {
+        fetch(`https://aiesecinruhuna-production.up.railway.app/api/user/${id}/task/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(taskData),

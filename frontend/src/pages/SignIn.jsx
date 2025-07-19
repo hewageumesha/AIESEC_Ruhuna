@@ -60,7 +60,7 @@ export default function SignIn() {
 
     try {
       dispatch(signInStart());
-      const res = await fetch('https://aiesecruhuna-production.up.railway.app/api/auth/signin', {
+      const res = await fetch('https://aiesecinruhuna-production.up.railway.app/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
