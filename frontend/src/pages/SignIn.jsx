@@ -8,6 +8,7 @@ import {
   signInSuccess,
   signInFailure,
 } from '../redux/user/userSlice';
+import { HiEye, HiEyeOff } from 'react-icons/hi';
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
@@ -18,6 +19,7 @@ export default function SignIn() {
   const {loading, error: errorMessage} = useSelector(state => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     // Clear error when user starts typing
@@ -60,11 +62,13 @@ export default function SignIn() {
 
     try {
       dispatch(signInStart());
-      const res = await fetch('https://aiesecinruhuna-production.up.railway.app/api/auth/signin', {
+      const res = await fetch('http://localhost:8080/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
+
+      
 
       const data = await res.json();
       if (!res.ok) {
@@ -121,12 +125,12 @@ export default function SignIn() {
                 }
               />
             </div>
-            <div>
-              <Label value='Your Password' className='font-semibold' />
-              <TextInput 
-                type='password' 
-                placeholder='⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤' 
-                id='password'  
+            <div className="relative">
+              <Label value="Your Password" className="font-semibold" />
+              <TextInput
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                placeholder="Password"
                 onChange={handleChange}
                 color={fieldErrors.password ? 'failure' : ''}
                 helperText={
@@ -137,8 +141,17 @@ export default function SignIn() {
                   )
                 }
               />
+              <div className="absolute inset-y-0 right-3 flex items-center">
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-gray-500"
+                >
+                  {showPassword ? <HiEyeOff size={20} /> : <HiEye size={20} />}
+                </button>
+              </div>
             </div>
-            
+     
             {/* Display server error messages */}
             {errorMessage && (
               <Alert color="failure" className="mb-4">

@@ -1,45 +1,39 @@
 package com.aiesec.mapper;
 
 import com.aiesec.dto.GuestEventRegistrationDTO;
-import com.aiesec.model.event.Event;
 import com.aiesec.model.event.GuestEventRegistration;
 
+import java.time.LocalDateTime;
+
 public class GuestEventRegistrationMapper {
-
-    public static GuestEventRegistrationDTO toDTO(GuestEventRegistration entity) {
-        if (entity == null) return null;
-
-        GuestEventRegistrationDTO dto = new GuestEventRegistrationDTO();
-        dto.setGuestUserId(entity.getGuestUserId());
-        dto.setEventId(entity.getEvent() != null ? entity.getEvent().getEventId() : null);
-        dto.setName(entity.getName());
-        dto.setEmail(entity.getEmail());
-        dto.setPhone(entity.getPhone());
-        dto.setInterestStatus(entity.getInterestStatus());
-        dto.setComment(entity.getComment());
-        dto.setRegisteredAt(entity.getRegisteredAt());
-
-        return dto;
-    }
 
     public static GuestEventRegistration toEntity(GuestEventRegistrationDTO dto) {
         if (dto == null) return null;
 
-        GuestEventRegistration entity = new GuestEventRegistration();
-        entity.setGuestUserId(dto.getGuestUserId());
-        entity.setName(dto.getName());
-        entity.setEmail(dto.getEmail());
-        entity.setPhone(dto.getPhone());
-        entity.setInterestStatus(dto.getInterestStatus());
-        entity.setComment(dto.getComment());
-        entity.setRegisteredAt(dto.getRegisteredAt());
+        return GuestEventRegistration.builder()
+                .guestUserId(dto.getGuestUserId())
+                .eventId(dto.getEventId())
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .phone(dto.getPhone())
+                .interestStatus(dto.getInterestStatus())
+                .comment(dto.getComment())
+                .registeredAt(dto.getRegisteredAt() != null ? dto.getRegisteredAt() : LocalDateTime.now())
+                .build();
+    }
 
-        if (dto.getEventId() != null) {
-            Event event = new Event();
-            event.setEventId(dto.getEventId());
-            entity.setEvent(event);
-        }
+    public static GuestEventRegistrationDTO toDTO(GuestEventRegistration entity) {
+        if (entity == null) return null;
 
-        return entity;
+        return GuestEventRegistrationDTO.builder()
+                .guestUserId(entity.getGuestUserId())
+                .eventId(entity.getEventId())
+                .name(entity.getName())
+                .email(entity.getEmail())
+                .phone(entity.getPhone())
+                .interestStatus(entity.getInterestStatus())
+                .comment(entity.getComment())
+                .registeredAt(entity.getRegisteredAt())
+                .build();
     }
 }

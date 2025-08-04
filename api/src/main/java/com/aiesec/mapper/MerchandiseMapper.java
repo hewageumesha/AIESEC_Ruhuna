@@ -3,27 +3,34 @@ package com.aiesec.mapper;
 import com.aiesec.dto.MerchandiseDTO;
 import com.aiesec.model.event.Event;
 import com.aiesec.model.event.Merchandise;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MerchandiseMapper {
-    public static Merchandise toEntity(MerchandiseDTO dto, Event event) {
-        return Merchandise.builder()
-                .merchandiseId(dto.getMerchandiseId())
-                .type(dto.getType())
-                .description(dto.getDescription())
-                .images(dto.getImages())
-                .available(dto.isAvailable())
-                .event(event)
+
+    // Convert from Entity to DTO
+    public static MerchandiseDTO toDTO(Merchandise merchandise) {
+        if (merchandise == null) return null;
+
+        return MerchandiseDTO.builder()
+                .id(merchandise.getId())
+                .available(merchandise.isAvailable())
+                .description(merchandise.getDescription())
+                .imageUrls(merchandise.getImageUrls())
+                .eventId(merchandise.getEvent() != null ? merchandise.getEvent().getEventId() : null)
                 .build();
     }
 
-    public static MerchandiseDTO toDTO(Merchandise merchandise) {
-        return MerchandiseDTO.builder()
-                .merchandiseId(merchandise.getMerchandiseId())
-                .eventId(merchandise.getEvent().getEventId())
-                .type(merchandise.getType())
-                .description(merchandise.getDescription())
-                .images(merchandise.getImages())
-                .available(merchandise.isAvailable())
+    // Convert from DTO to Entity
+    public static Merchandise toEntity(MerchandiseDTO dto, Event event) {
+        if (dto == null || event == null) return null;
+
+        return Merchandise.builder()
+                .id(dto.getId())
+                .available(dto.isAvailable())
+                .description(dto.getDescription())
+                .imageUrls(dto.getImageUrls())
+                .event(event)
                 .build();
     }
 }

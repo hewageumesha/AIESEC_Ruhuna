@@ -8,7 +8,6 @@ import com.aiesec.dto.UserRequestDTO;
 import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
-import com.aiesec.exception.ResourcesNotFoundException;
 import com.aiesec.model.User;
 
 import com.aiesec.repository.UserRepository;
@@ -19,11 +18,15 @@ import com.aiesec.service.UserService;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -48,28 +51,6 @@ public class UserController {
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         return ResponseEntity.ok(userRepo.getUserById(id));
     }
-
-@Autowired
-private JavaMailSender mailSender;
-
-@GetMapping("/sendmail")
-public String senMail() {
-    SimpleMailMessage message = new SimpleMailMessage();
-    message.setTo("n.u.m.hewage@gmail.com");
-    message.setSubject("Test Mail");
-    message.setText("This is a test email from Spring Boot!");
-
-    mailSender.send(message);
-
-    return "Mail sent successfully!";
-}
-
-    @GetMapping("/id/{id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable Integer id) {
-        UserDTO user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
-    }
-
 
     @PostMapping("/add")
     public User addUser(@RequestBody Map<String, Object> body) {
@@ -154,16 +135,16 @@ public String senMail() {
     }
 
 
-    @PutMapping(value = "/profile/update/{aiesecEmail}")
-    public User updateUserProfile(
+    @PutMapping(value = "/profile/update/{aiesecEmail}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<User> updateUserProfile(
             @PathVariable String aiesecEmail,
-            @RequestPart User userDetails,
-            @RequestPart(required = false) MultipartFile profilePhoto) throws Exception {
+            @RequestPart("userDetails") User userDetails,
+            @RequestPart(value = "profilePhoto", required = false) MultipartFile profilePhoto) throws Exception {
         
-        return userService.updateUserProfile(aiesecEmail, userDetails, profilePhoto);
+        User updatedUser = userService.updateUserProfile(aiesecEmail, userDetails, profilePhoto);
+        return ResponseEntity.ok(updatedUser);
     }
     
-
     @GetMapping("/hierarchy")
     public ResponseEntity<List<Map<String, Object>>> getCommitteeHierarchy() {
         return ResponseEntity.ok(userService.getCommitteeHierarchy());
@@ -187,27 +168,8 @@ public String senMail() {
             .collect(Collectors.toList());
     }
 
-    @GetMapping("/profile/id/{id}")
-    public ResponseEntity<Map<String, Object>> getProfileById(@PathVariable Integer id) {
-        User user = userRepo.findById(Long.valueOf(id))
-                .orElseThrow(() -> new ResourcesNotFoundException("User", "id", id));
-
-        Map<String, Object> simpleUser = new HashMap<>();
-        simpleUser.put("id", user.getId());
-        simpleUser.put("firstName", user.getFirstName());
-        simpleUser.put("role", user.getRole().toString());
-        simpleUser.put("departmentId", user.getDepartment() != null ? user.getDepartment().getId() : null);
-
-        // ✅ Add functionId as an object {id, name}
-        if (user.getFunction() != null) {
-            Map<String, Object> functionMap = new HashMap<>();
-            functionMap.put("id", user.getFunction().getId());
-            functionMap.put("name", user.getFunction().getName());
-            simpleUser.put("functionId", functionMap);
-        } else {
-            simpleUser.put("functionId", null);
-        }
-
-        return ResponseEntity.ok(simpleUser);
+    @GetMapping("/totalaieseccount")
+    public ResponseEntity<Map<String, Long>> getAiesecUserStats() {
+        return ResponseEntity.ok(userService.getAiesecUserStats());
     }
 }

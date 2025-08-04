@@ -17,14 +17,16 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch('https://aiesecinruhuna-production.up.railway.app/api/auth/forgot-password', {
+      const res = await fetch(`http://localhost:8080/forgot-password/verifyMail/${email}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email }), // Not required in this case but fine to include
       });
 
       const data = await res.json();
+      console.log('Response:', res.status, data);
       setMessage(data.message);
+
       if (res.ok) setStep(2);
     } catch (error) {
       setMessage('An error occurred. Please try again.');
@@ -39,7 +41,7 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch('https://aiesecinruhuna-production.up.railway.app/api/auth/verify-code', {
+      const res = await fetch(`http://localhost:8080/forgot-password/verifyOtp/${code}/${email}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code }),
@@ -47,6 +49,7 @@ export default function ForgotPassword() {
 
       const data = await res.json();
       setMessage(data.message);
+
       if (res.ok) setStep(3);
     } catch (error) {
       setMessage('An error occurred. Please try again.');
@@ -65,7 +68,7 @@ export default function ForgotPassword() {
         return setMessage('Passwords do not match');
       }
 
-      const res = await fetch('https://aiesecinruhuna-production.up.railway.app/api/auth/reset-password', {
+      const res = await fetch(`http://localhost:8080/forgot-password/changePassword/${email}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password: newPassword, confirmPassword }),
@@ -73,6 +76,7 @@ export default function ForgotPassword() {
 
       const data = await res.json();
       setMessage(data.message);
+
       if (res.ok) window.location.href = '/signin';
     } catch (error) {
       setMessage('An error occurred. Please try again.');
@@ -85,14 +89,15 @@ export default function ForgotPassword() {
     <div className='min-h-screen mt-20'>
       <div className='flex p-10 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-5'>
         {/* left */}
-        <div className=''>
-          <Link to="/" className="flborder-b-2 flex justify-between items-centerex items-center">
-              <img src='/AiR_logo.png' alt="AIESEC UOR Logo" className="h-24 w-auto sm:h-28 " />
+        <div>
+          <Link to="/" className="flex items-center">
+            <img src='/AiR_logo.png' alt="AIESEC UOR Logo" className="h-24 w-auto sm:h-28" />
           </Link>
-          <p className='text-sm st-5'>
+          <p className='text-sm mt-5'>
             Reset your password with your AIESEC email.
           </p>
         </div>
+
         {/* right */}
         <div className='flex-1'>
           {step === 1 && (
@@ -104,12 +109,12 @@ export default function ForgotPassword() {
                   type='email' 
                   placeholder='AIESEC Email' 
                   onChange={(e) => setEmail(e.target.value)} 
-                  required
+                  required 
                 />
               </div>
-              <Button 
-                className="bg-gradient-to-r from-[#037ef3] via-[#5aa9f4] to-[#a3d4f7] text-white" 
-                type='submit' 
+              <Button
+                className="bg-gradient-to-r from-[#037ef3] via-[#5aa9f4] to-[#a3d4f7] text-white"
+                type='submit'
                 disabled={loading}
               >
                 {loading ? (
@@ -134,12 +139,12 @@ export default function ForgotPassword() {
                   type='text' 
                   placeholder='6-digit code' 
                   onChange={(e) => setCode(e.target.value)} 
-                  required
+                  required 
                 />
               </div>
-              <Button 
-                className="bg-gradient-to-r from-[#037ef3] via-[#5aa9f4] to-[#a3d4f7] text-white" 
-                type='submit' 
+              <Button
+                className="bg-gradient-to-r from-[#037ef3] via-[#5aa9f4] to-[#a3d4f7] text-white"
+                type='submit'
                 disabled={loading}
               >
                 {loading ? (
@@ -162,23 +167,23 @@ export default function ForgotPassword() {
                 <Label value='New Password' className='font-semibold' />
                 <TextInput 
                   type='password' 
-                  placeholder='⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤' 
+                  placeholder='●●●●●●●●' 
                   onChange={(e) => setNewPassword(e.target.value)} 
-                  required
+                  required 
                 />
               </div>
               <div>
                 <Label value='Confirm Password' className='font-semibold' />
                 <TextInput 
                   type='password' 
-                  placeholder='⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤ ⬤' 
+                  placeholder='●●●●●●●●' 
                   onChange={(e) => setConfirmPassword(e.target.value)} 
-                  required
+                  required 
                 />
               </div>
-              <Button 
-                className="bg-gradient-to-r from-[#037ef3] via-[#5aa9f4] to-[#a3d4f7] text-white" 
-                type='submit' 
+              <Button
+                className="bg-gradient-to-r from-[#037ef3] via-[#5aa9f4] to-[#a3d4f7] text-white"
+                type='submit'
                 disabled={loading}
               >
                 {loading ? (

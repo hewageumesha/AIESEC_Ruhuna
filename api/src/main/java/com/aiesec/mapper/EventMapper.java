@@ -2,10 +2,6 @@ package com.aiesec.mapper;
 
 import com.aiesec.dto.EventDTO;
 import com.aiesec.model.event.Event;
-import com.aiesec.model.event.Merchandise;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class EventMapper {
 
@@ -23,20 +19,13 @@ public class EventMapper {
                 .isPublic(event.getIsPublic())
                 .isVirtual(event.getIsVirtual())
                 .virtualLink(event.getVirtualLink())
-                .hasMerchandise(event.getHasMerchandise())
-                .registrationCloseBeforeDays(event.getRegistrationCloseBeforeDays()) // ✅ new field
-                .merchandise(
-                        event.getMerchandiseList() != null ?
-                                event.getMerchandiseList().stream()
-                                        .map(MerchandiseMapper::toDTO)
-                                        .collect(Collectors.toList())
-                                : null
-                )
+                .hasTshirtOrder(event.isHasTshirtOrder())
+                .visibility(event.getVisibility())
                 .build();
     }
 
     public static Event toEntity(EventDTO dto) {
-        Event event = Event.builder()
+        return Event.builder()
                 .eventId(dto.getEventId())
                 .eventName(dto.getEventName())
                 .description(dto.getDescription())
@@ -49,20 +38,8 @@ public class EventMapper {
                 .isPublic(dto.getIsPublic())
                 .isVirtual(dto.getIsVirtual())
                 .virtualLink(dto.getVirtualLink())
-                .hasMerchandise(false) // default
-                .registrationCloseBeforeDays(dto.getRegistrationCloseBeforeDays()) // ✅ new field
+                .hasTshirtOrder(dto.getHasTshirtOrder())
+                .visibility(dto.getVisibility())
                 .build();
-
-        // Attach merchandise if present
-        if (dto.getMerchandise() != null && !dto.getMerchandise().isEmpty()) {
-            List<Merchandise> merchandiseList = dto.getMerchandise().stream()
-                    .map(m -> MerchandiseMapper.toEntity(m, event))
-                    .collect(Collectors.toList());
-
-            event.setMerchandiseList(merchandiseList);
-            event.setHasMerchandise(true);
-        }
-
-        return event;
     }
 }

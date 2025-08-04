@@ -23,4 +23,5 @@ public class PasswordUpdateRequest {
     public void setUserAiesecEmail(String userAiesecEmail) {
         this.userAiesecEmail = userAiesecEmail;
     }
+
 }

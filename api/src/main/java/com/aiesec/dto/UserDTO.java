@@ -7,22 +7,15 @@ import java.util.List;
 import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
-import com.aiesec.model.Department;
 import com.aiesec.model.Function;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 public class UserDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    private String aiesecEmail;
+    private String aiesecEmail;  // Add this field
     private String email;
     private String phone;
-    private String about;
     private String streetAddress;
     private String city;
     private String stateORProvince;
@@ -41,13 +34,7 @@ public class UserDTO {
     private String teamLeaderName;
     private List<UserDTO> teamMembers;
     private List<String> commentsForUser; 
-    private List<String> commentsCreated;
-    private String password;
-    private int noOfTask;
-    private Department departmentId;
-    private String departmentName;
-
-
+    private List<String> commentsCreated; 
 
     public Long getId() {
         return id;
@@ -55,6 +42,14 @@ public class UserDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getLastName() {
@@ -223,14 +218,6 @@ public class UserDTO {
     public void setCommentsCreated(List<String> commentsCreated) {
         this.commentsCreated = commentsCreated;
     }
-        public String getAbout() {
-        return about;
-    }
-
-    public void setAbout(String about) {
-        this.about = about;
-    }
-
     public String getS_department() {
         return s_department;
     }
@@ -245,30 +232,6 @@ public class UserDTO {
 
     public void setFaculty(String faculty) {
         this.faculty = faculty;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public int getNoOfTask() {
-        return noOfTask;
-    }
-
-    public void setNoOfTask(int noOfTask) {
-        this.noOfTask = noOfTask;
     }
     
 }

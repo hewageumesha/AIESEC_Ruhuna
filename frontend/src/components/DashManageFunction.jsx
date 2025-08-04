@@ -19,7 +19,7 @@ export default function DashManageFunction() {
 
   const fetchFunctions = async () => {
     try {
-      const res = await axios.get("https://aiesecinruhuna-production.up.railway.app/api/functions/");
+      const res = await axios.get("http://localhost:8080/api/functions/");
       setFunctions(res.data);
     } catch (err) {
       setErrorMsg("Failed to fetch functions!");
@@ -33,10 +33,10 @@ export default function DashManageFunction() {
   const handleSubmit = async () => {
     try {
       if (editingId) {
-        await axios.put(`https://aiesecinruhuna-production.up.railway.app/api/functions/update/${editingId}`, formData);
+        await axios.put(`http://localhost:8080/api/functions/update/${editingId}`, formData);
         setSuccessMsg("Function updated successfully!");
       } else {
-        await axios.post("https://aiesecinruhuna-production.up.railway.app/api/functions/add", formData);
+        await axios.post("http://localhost:8080/api/functions/add", formData);
         setSuccessMsg("Function added successfully!");
       }
       setFormData({ name: "" });
@@ -59,7 +59,7 @@ export default function DashManageFunction() {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`https://aiesecinruhuna-production.up.railway.app/api/functions/delete/${deleteId}`);
+      await axios.delete(`http://localhost:8080/api/functions/delete/${deleteId}`);
       setSuccessMsg("Function deleted successfully!");
       setShowModal(false);
       fetchFunctions();

@@ -1,12 +1,10 @@
 package com.aiesec.controller.event;
 
 import com.aiesec.dto.GuestEventRegistrationDTO;
-import com.aiesec.dto.GuestRegistrationSummaryDTO;
 import com.aiesec.service.interfaces.GuestEventRegistrationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -14,11 +12,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/guest-registrations")
+@RequestMapping("/api/guest-registrations")
 @RequiredArgsConstructor
 public class GuestEventRegistrationController {
 
@@ -50,12 +47,6 @@ public class GuestEventRegistrationController {
         return ResponseEntity.ok(registrations);
     }
 
-    @GetMapping("/analytics/summary")
-    public ResponseEntity<List<GuestRegistrationSummaryDTO>> getAnalyticsSummary() {
-        return ResponseEntity.ok(registrationService.getSummaryByEvent());
-    }
-
-
     // Inner class for structured error response
     public static class ApiError {
         private String error;
@@ -73,26 +64,5 @@ public class GuestEventRegistrationController {
         public String getMessage() {
             return message;
         }
-    }
-
-    @GetMapping("/analytics/summary/status")
-    public ResponseEntity<?> getStatusSummaryByEvent(@RequestParam Long eventId) {
-        try {
-            Map<String, Integer> summary = registrationService.getStatusSummaryByEvent(eventId);
-            return ResponseEntity.ok(summary);
-        } catch (Exception e) {
-            e.printStackTrace();  // Log the real error
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Internal server error", "message", e.getMessage()));
-        }
-    }
-
-    @GetMapping("/event/{eventId}/paged")
-    public ResponseEntity<Page<GuestEventRegistrationDTO>> getPagedRegistrations(
-            @PathVariable Long eventId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Page<GuestEventRegistrationDTO> pagedResult = registrationService.getPagedByEventId(eventId, page, size);
-        return ResponseEntity.ok(pagedResult);
     }
 }

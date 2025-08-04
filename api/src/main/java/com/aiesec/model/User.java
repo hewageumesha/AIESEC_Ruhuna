@@ -3,10 +3,8 @@ package com.aiesec.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.Setter;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +15,7 @@ import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-@Getter
-@Setter
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -70,12 +67,6 @@ public class User {
     private String s_department;
 
     private String faculty;
-
-    private int noOfTask=0;
-
-    @ManyToOne
-    @JoinColumn(name = "department_id")
-    private Department department;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
@@ -302,11 +293,5 @@ public class User {
     public void setFaculty(String faculty) {
         this.faculty = faculty;
     }
-    public int getNoOfTask() {
-        return noOfTask;
-    }
-
-    public void setNoOfTask(int noOfTask) {
-        this.noOfTask = noOfTask;
-    }
+    
 }

@@ -1,10 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Alert, Button, TextInput } from 'flowbite-react';
-import { updateStart, updateSuccess, updateFailure, signoutSuccess } from '../redux/user/userSlice';
+import {
+  updateStart,
+  updateSuccess,
+  updateFailure,
+} from '../redux/user/userSlice';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import UpdatePassword from './UpdatePassword'; // ✅ Make sure to implement or import this component
+import UpdatePassword from './UpdatePassword';
 
 export default function DashProfile() {
   const { currentUser, loading } = useSelector((state) => state.user);
@@ -18,46 +22,75 @@ export default function DashProfile() {
   const filePickerRef = useRef();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const location = useLocation();
   const urlParams = new URLSearchParams(location.search);
   const subtab = urlParams.get("subtab");
+  const todayStr = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     fetchProfileData();
-  }, [currentUser]);
+  }, [currentUser, refreshTrigger]);
 
   const fetchProfileData = async () => {
     try {
-      const profile = await axios.get(`https://aiesecinruhuna-production.up.railway.app/api/users/profile/${currentUser.aiesecEmail}`, {
-        headers: { Authorization: `Bearer ${currentUser.token}` }
-      });
-      setProfileData(profile.data);
-      setFormData(profile.data);
+      const profile = await axios.get(
+        `http://localhost:8080/api/users/profile/${currentUser.aiesecEmail}`,
+        {
+          headers: {
+            Authorization: `Bearer ${currentUser.token}`,
+          },
+        }
+      );
+      let fullProfile = profile.data;
 
-      if (profile.data.role === 'Member') {
-        //const teamLeader = await axios.get(`https://aiesecinruhuna-production.up.railway.app/api/users/team-leader/${profile.data.id}`, {
-        //  headers: { Authorization: `Bearer ${currentUser.token}` }
-        //});
-        setProfileData({ ...profile.data });
+      if (fullProfile.role === 'Member') {
+        const teamLeader = await axios.get(
+          `http://localhost:8080/api/users/team-leader/${fullProfile.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${currentUser.token}`,
+            },
+          }
+        );
+        fullProfile = { ...fullProfile, teamLeader: teamLeader.data };
       }
+
+      setProfileData(fullProfile);
+      setFormData(fullProfile); 
     } catch (error) {
       console.error('Error fetching profile data:', error);
     }
   };
 
-  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validatePhoneNumber = (phone) => phone.replace(/\D/g, '').length === 10;
-  const validateBirthday = (date) => {
+  const validateEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePhoneNumber = (phone) =>
+    phone.replace(/\D/g, '').length === 10;
+    const validateBirthday = (date) => {
     const re = /^\d{4}-\d{2}-\d{2}$/;
     if (!re.test(date)) return false;
+
     const birthday = new Date(date);
-    return birthday instanceof Date && !isNaN(birthday) && birthday < new Date();
+    if (!(birthday instanceof Date) || isNaN(birthday)) return false;
+
+    const today = new Date();
+    // Normalize both to midnight to avoid time zone issues
+    const birthdayMidnight = new Date(birthday.getFullYear(), birthday.getMonth(), birthday.getDate());
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    // Birthday must be before today (no future or today)
+    return birthdayMidnight < todayMidnight;
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit for example
+        alert('File size exceeds 5MB. Please choose a smaller file.');
+        return;
+      }
       setImageFile(file);
       setImageFileUrl(URL.createObjectURL(file));
     }
@@ -69,11 +102,17 @@ export default function DashProfile() {
 
     const errors = { ...validationErrors };
     if (id === 'email') {
-      errors.email = validateEmail(value) ? '' : 'Please enter a valid email address';
+      errors.email = validateEmail(value)
+        ? ''
+        : 'Please enter a valid email address';
     } else if (id === 'phoneNumber') {
-      errors.phoneNumber = validatePhoneNumber(value) ? '' : 'Phone number must be 10 digits';
+      errors.phoneNumber = validatePhoneNumber(value)
+        ? ''
+        : 'Phone number must be 10 digits';
     } else if (id === 'birthday') {
-      errors.birthday = validateBirthday(value) ? '' : 'Please enter a valid date (YYYY-MM-DD)';
+      errors.birthday = validateBirthday(value)
+        ? ''
+        : 'Please enter a valid date (YYYY-MM-DD)';
     }
     setValidationErrors(errors);
   };
@@ -89,36 +128,69 @@ export default function DashProfile() {
       (formData.birthday && !validateBirthday(formData.birthday))
     ) {
       setValidationErrors({
-        email: !validateEmail(formData.email) ? 'Please enter a valid email address' : '',
-        phoneNumber: !validatePhoneNumber(formData.phoneNumber) ? 'Phone number must be 10 digits' : '',
-        birthday: !validateBirthday(formData.birthday) ? 'Please enter a valid date (YYYY-MM-DD)' : '',
+        email: !validateEmail(formData.email)
+          ? 'Please enter a valid email address'
+          : '',
+        phoneNumber: !validatePhoneNumber(formData.phoneNumber)
+          ? 'Phone number must be 10 digits'
+          : '',
+        birthday: !validateBirthday(formData.birthday)
+          ? 'Please enter a valid date (YYYY-MM-DD)'
+          : '',
       });
       return;
     }
 
     try {
       dispatch(updateStart());
-      const updatedData = { ...profileData, ...formData };
-      const res = await fetch(`https://aiesecinruhuna-production.up.railway.app/api/users/update/${currentUser.aiesecEmail}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${currentUser.token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updatedData),
-      });
+
+      const form = new FormData();
+      form.append(
+        'userDetails',
+        new Blob([JSON.stringify({ ...profileData, ...formData })], {
+          type: 'application/json',
+        })
+      );
+      if (imageFile) {
+        form.append('profilePhoto', imageFile);
+      }
+
+      const res = await fetch(
+        `http://localhost:8080/api/users/profile/update/${currentUser.aiesecEmail}`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${currentUser.token}`,
+          },
+          body: form,
+        }
+      );
+
       const data = await res.json();
+
       if (!res.ok) {
         dispatch(updateFailure(data.message));
         setUpdateUserError(data.message);
       } else {
         dispatch(updateSuccess(data));
         setUpdateUserSuccess('Profile updated successfully');
-        fetchProfileData();
+        setRefreshTrigger(prev => prev + 1);
+        await refreshUserProfile();
       }
     } catch (error) {
       dispatch(updateFailure(error.message));
       setUpdateUserError(error.message);
+    }
+  };
+
+  const refreshUserProfile = async () => {
+    try {
+      const res = await axios.get(`http://localhost:8080/api/users/profile/${currentUser.aiesecEmail}`, {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      });
+      dispatch(updateSuccess(res.data)); // ✅ Redux is updated with new profilePicture
+    } catch (err) {
+      console.error('Failed to refresh user profile:', err);
     }
   };
 
@@ -129,52 +201,67 @@ export default function DashProfile() {
       ) : (
         <>
           <h1 className="text-2xl font-bold mb-6">Profile</h1>
-          {/* Profile Info Card */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-[rgb(26,35,58)]">
-            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-50">Profile Information</h2>
-            <p className="text-sm text-gray-600 mb-8 dark:text-gray-400">This information will be displayed publicly so be careful what you share.</p>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-50">
+              Profile Information
+            </h2>
+            <p className="text-sm text-gray-600 mb-8 dark:text-gray-400">
+              This information will be displayed publicly so be careful what you share.
+            </p>
 
             <div className="mb-8">
-              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">AIESEC Email</label>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{profileData.aiesecEmail}</p>
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
+                AIESEC Email
+              </label>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {profileData.aiesecEmail}
+              </p>
             </div>
-            <div className="mb-8">
-              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Function</label>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{profileData.function?.name}</p>
-            </div>
-            <div className="mb-8">
-              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Role</label>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{profileData.role}</p>
-            </div>
-            {currentUser.role === 'Member' || currentUser.role === 'Team_Leader'&& (
+
+            {profileData.role !== 'LCP' && (
               <div className="mb-8">
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Assigned Team Leader</label>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{profileData.teamLeaderAiesecEmail}</p>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
+                  Function
+                </label>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {profileData.function?.name || 'N/A'}
+                </p>
               </div>
             )}
+
             <div className="mb-8">
-              <label htmlFor="about" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">About</label>
-              <textarea
-                id="about"
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-800 dark:bg-gray-800"
-                placeholder="Write something about you..."
-                value={formData.about || ''}
-                onChange={handleChange}
-              />
-              <p className="text-sm text-gray-600 mb-2 dark:text-gray-400">Write a few sentences about yourself.</p>
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
+                Role
+              </label>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {profileData.role}
+              </p>
             </div>
+
+            {(currentUser.role === 'Member' || currentUser.role === 'Team_Leader') && (
+              <div className="mb-8">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
+                  Assigned Team Leader
+                </label>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {profileData.teamLeaderAiesecEmail}
+                </p>
+              </div>
+            )}
+
             <div className="mb-8">
-              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Photo</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
+                Photo
+              </label>
               <div className="flex items-center">
                 <div className="mr-4">
                   <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden">
                     {imageFileUrl ? (
                       <img src={imageFileUrl} alt="Profile" className="w-full h-full object-cover" />
                     ) : profileData.profilePicture ? (
-                      <img src={profileData.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                      <img src={`${profileData.profilePicture}?t=${new Date().getTime()}`} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-gray-300"></div>
+                      <div className="w-full h-full bg-gray-300" />
                     )}
                   </div>
                 </div>
@@ -194,8 +281,12 @@ export default function DashProfile() {
 
           {/* Personal Info Card */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-[rgb(26,35,58)]">
-            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-50">Personal Information</h2>
-            <p className="text-sm text-gray-600 mb-8 dark:text-gray-400">Use a permanent address where you can receive mail.</p>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-50">
+              Personal Information
+            </h2>
+            <p className="text-sm text-gray-600 mb-8 dark:text-gray-400">
+              Use a permanent address where you can receive mail.
+            </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -211,7 +302,7 @@ export default function DashProfile() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label htmlFor="birthday" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Birthday</label>
-                <TextInput id="birthday" type="text" value={formData.birthday || ''} onChange={handleChange} />
+                <TextInput id="birthday" type="date" max={todayStr} value={formData.birthday || ''} onChange={handleChange} />
                 {validationErrors.birthday && <p className="text-red-500 text-xs">{validationErrors.birthday}</p>}
               </div>
               <div>
@@ -266,7 +357,7 @@ export default function DashProfile() {
           </div>
 
           <div className="flex justify-end space-x-3">
-            <Button color="light">Cancel</Button>
+            <Button color="light" onClick={() => navigate(0)}>Cancel</Button>
             <Button type="submit" onClick={handleSubmit} disabled={loading}>
               {loading ? 'Saving...' : 'Save'}
             </Button>

@@ -15,12 +15,24 @@ export default function Header() {
     const navigate = useNavigate();
 
     const handleSignout = async () => {
-        try {
-            dispatch(signoutSuccess());
-            navigate('');
-        } catch (error) {
-          console.log(error.message);
-        }
+    try {
+        // 1. Remove the token from storage
+        sessionStorage.removeItem('token'); // or localStorage.removeItem('token')
+
+        // 2. Optionally call backend to log sign-out (for logging/statistics)
+        await fetch('/api/auth/signout', {
+        method: 'POST',
+        credentials: 'include',
+        });
+
+        // 3. Update Redux state
+        dispatch(signoutSuccess());
+
+        // 4. Redirect to login or home page
+        navigate('/sign-in'); // or navigate('/')
+    } catch (error) {
+        console.log('Signout error:', error.message);
+    }
     };
     
     return (
@@ -39,13 +51,13 @@ export default function Header() {
                         label = {
                             <Avatar 
                             alt = 'user'
-                            img = {currentUser.profilePicture}
+                            img={`${currentUser.profilePicture}?t=${new Date().getTime()}`}
                             rounded
                             />
                         }
                     >
                         <Dropdown.Header>
-                            <span className='block text-sm'> @ {currentUser.firstName}  {currentUser.lastName} </span>
+                            <span className='block text-sm'> {currentUser.firstName}  {currentUser.lastName} </span>
                             <span className='block text-sm font-medium truncate'>
                                 {currentUser.aiesecEmail}
                             </span>
@@ -84,8 +96,8 @@ export default function Header() {
                     Functional Area
                 </Link>
             </Navbar.Link >
-           <Navbar.Link active={path === '/public-event'} as={'div'}>
-                <Link to="/public-event" className='font-semibold'>
+            <Navbar.Link active={path === '/event'} as={'div'}>
+                <Link to="event" className='font-semibold'>
                     Event
                 </Link>
             </Navbar.Link>

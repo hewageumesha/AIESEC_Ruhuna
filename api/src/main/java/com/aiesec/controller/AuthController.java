@@ -3,7 +3,10 @@ package com.aiesec.controller;
 // Import required classes and annotations
 import com.aiesec.model.User;
 import com.aiesec.security.JwtUtil;
+import com.aiesec.service.SessionService;
 import com.aiesec.service.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,73 +30,64 @@ public class AuthController {
 
     // Injecting the UserService to handle user-related operations
     @Autowired
-
-
     private UserService userService;
+
+    @Autowired
+    private SessionService sessionService;
 
     // Endpoint to sign in a user (Login)
     @PostMapping("/signin")
-    public ResponseEntity<Object> signIn(@RequestBody User user) {
-        // Validate that email and password are provided
+    public ResponseEntity<Object> signIn(@RequestBody User user, HttpServletRequest request) {
         if (user.getAiesecEmail() == null || user.getPassword() == null) {
-            return ResponseEntity
-                    .badRequest()  // 400 Bad Request
-                    .body("Email and password must be provided");
+            return ResponseEntity.badRequest().body("Email and password must be provided");
         }
 
-        // Get user from the database by AIESEC email
         Optional<User> existingUser = userService.getUserByAiesecEmail(user.getAiesecEmail());
 
-        System.out.println(user.getAiesecEmail());
- 
-        if (existingUser.isPresent()) {
-            System.out.println(existingUser.get().getAiesecEmail());
-        } else {
-            System.out.println("No user found with this AIESEC email.");
-        }   
-
-        // If no user is found with the given AIESEC email
-        if (existingUser == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)  // 404 Not Found
-                    .body("User not found with email: " + user.getAiesecEmail());
+        if (!existingUser.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with email: " + user.getAiesecEmail());
         }
 
-        // Create a new instance of BCryptPasswordEncoder
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-        // Validate the password by comparing it to the hashed password in the database
         if (!passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword())) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)  // 401 Unauthorized
-                    .body("Invalid password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
         }
 
-        // If authentication is successful, generate a JWT token using the email
+        // Log login event
+        String ipAddress = request.getRemoteAddr();
+        String userAgent = request.getHeader("User-Agent");
+        sessionService.logLogin(existingUser.get().getAiesecEmail(), ipAddress, userAgent);
+
         String token = jwtUtil.generateToken(existingUser.get().getAiesecEmail());
 
-        // Create a JSON object to return as the response
         JSONObject json = new JSONObject();
-        json.put("id",existingUser.get().getId());
         json.put("role", existingUser.get().getRole());
         json.put("aiesecEmail", existingUser.get().getAiesecEmail());
         json.put("token", token);
-        json.put("noOfTask", existingUser.get().getNoOfTask());
 
-        // Return the token and user details with a 200 OK status
-        return ResponseEntity
-                .ok()  // 200 OK
-                .body(json.toString());
+        return ResponseEntity.ok().body(json.toString());
     }
 
-     // Endpoint to sign out a user (currently just sends a success message)
     @PostMapping("/signout")
-    public ResponseEntity<Map<String, String>> signOut() {
+    public ResponseEntity<Map<String, String>> signOut(@RequestHeader("Authorization") String authorizationHeader) {
+        String token = authorizationHeader.substring(7); // Remove "Bearer "
+        String userEmail = jwtUtil.extractUsername(token);
 
-        // Since JWT is stateless, sign-out is handled on the client side
+        sessionService.logLogout(userEmail);
+
         Map<String, String> response = new HashMap<>();
         response.put("message", "Logged out successfully");
-        return ResponseEntity.ok(response); // Return 200 OK with the message
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/session-expired")
+    public ResponseEntity<?> sessionExpired() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Session expired due to inactivity.");
+    }
+
+    @GetMapping("/sessions")
+    public ResponseEntity<?> getAllSessionLogs() {
+        return ResponseEntity.ok(sessionService.getAllSessionsWithRoles());
     }
 }
-

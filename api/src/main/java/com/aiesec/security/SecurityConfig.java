@@ -25,11 +25,17 @@ public class SecurityConfig {
                                 .requestMatchers("/api/users/**").permitAll()
                                 .requestMatchers("/api/events/**").permitAll()
                                 .requestMatchers("/api/tshirts/**").permitAll()
+                                .requestMatchers("/api/**").permitAll()
                                 .requestMatchers("/**").permitAll() // TEMP: allow all for debugging
 
-                                .requestMatchers("/api/uploads/**").permitAll()
+                                .requestMatchers("/uploads/**").permitAll()
                                 .requestMatchers("/api/comments/**").permitAll()
                                 .anyRequest().authenticated()
+                )
+                .sessionManagement(session -> session
+                    .invalidSessionUrl("/api/auth/session-expired")
+                    .maximumSessions(1)
+                    .maxSessionsPreventsLogin(false) // Optional: allow new login to replace old one
                 );
         return http.build();
     }

@@ -276,8 +276,8 @@ const GlobalIntern = () => {
         <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12">
           <div className="lg:w-1/3 lg:sticky lg:top-20 lg:h-fit">
             <div className="p-8 rounded-lg">
-              <h2 className="text-5xl font-bold text-center mb-12 text-[#0CB9C1]">Become a intern</h2>
-              <p className="text-2xl text-center mb-8 dark:text-gray-300">It takes only 4 steps to become a intern</p>
+              <h2 className="text-5xl font-bold text-center mb-12 text-[#0CB9C1]">Become a volunteer</h2>
+              <p className="text-2xl text-center mb-8 dark:text-gray-300">It takes only 4 steps to become a volunteer</p>
               <div className="flex justify-center">
                 <div className="h-1 w-24 bg-[#0CB9C1]"></div>
               </div>

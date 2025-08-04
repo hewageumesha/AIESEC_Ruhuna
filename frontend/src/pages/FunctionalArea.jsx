@@ -72,7 +72,7 @@ const FunctionalAreas = () => {
   const backOfficeData = [
     {
       id: 1,
-      title: 'What Is the Back Office',
+      title: 'Back Office',
       description: `While the Front Office is busy running the exchange programs and interacting with the outside world, the Back Office functions make sure everything is running properly behind the scenes. They handle the internal operations of AIESEC in Ruhuna, such as managing finances, recruiting and developing members, building partnerships, promoting AIESEC’s brand, and ensuring legal compliance. 
       \n\n The Back Office might not interact with exchange participants directly, but without them, no program could run successfully. They provide the stability, planning, and resources needed to deliver quality experiences.
       \n\n Here’s a closer look at the key Back Office functions.`

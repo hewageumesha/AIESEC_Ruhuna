@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -13,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class EventDTO {
-
     private Long eventId;
     private String eventName;
     private String description;
@@ -26,13 +24,11 @@ public class EventDTO {
     private LocalTime endTime;
 
     private LocalDate endDate;
-    private Integer registrationCloseBeforeDays;
-
     private String location;
     private String imageUrl;
     private Boolean isPublic;
     private Boolean isVirtual;
     private String virtualLink;
-    private Boolean hasMerchandise;
-    private List<MerchandiseDTO> merchandise;
+    private String visibility;
+    private Boolean hasTshirtOrder;
 }

@@ -1,6 +1,8 @@
 package com.aiesec.dto;
 
-import java.util.Date;
+
+
+import java.sql.Date;
 
 import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;

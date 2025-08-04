@@ -14,30 +14,30 @@ export default function DashboardComp() {
   const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [events, setEvents] = useState([]);
-  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalAiesecUsers, setTotalAiesecUsers] = useState(0);
   const [totalTasks, setTotalTasks] = useState(0);
   const [totalEvents, setTotalEvents] = useState(0);
-  const [lastMonthUsers, setLastMonthUsers] = useState(0);
+  const [lastMonthAiesecUsers, setLastMonthAiesecUsers] = useState(0);
   const [lastMonthTasks, setLastMonthTasks] = useState(0);
   const [lastMonthEvents, setLastMonthEvents] = useState(0);
   const { currentUser } = useSelector((state) => state.user);
+
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchAiesecUsers = async () => {
       try {
-        const res = await fetch('/backend/user/getusers?limit=5');
+        const res = await fetch('http://localhost:8080/api/users/totalaieseccount');
         const data = await res.json();
         if (res.ok) {
-          setUsers(data.users);
-          setTotalUsers(data.totalUsers);
-          setLastMonthUsers(data.lastMonthUsers);
+          setTotalAiesecUsers(data.totalAiesecUsers);
+          setLastMonthAiesecUsers(data.lastMonthAiesecUsers);
         }
       } catch (error) {
-        console.log(error.message);
+        console.log('Error fetching AIESEC users count:', error.message);
       }
     };
     const fetchTasks = async () => {
       try {
-        const res = await fetch('/backend/task/gettasks?limit=5');
+        const res = await fetch('http://localhost:8080/api/task/gettasks?limit=5');
         const data = await res.json();
         if (res.ok) {
           setTasks(data.tasks);
@@ -50,7 +50,7 @@ export default function DashboardComp() {
     };
     const fetchEvents = async () => {
       try {
-        const res = await fetch('/backend/event/geteventss?limit=5');
+        const res = await fetch('http://localhost:8080/api/event/geteventss?limit=5');
         const data = await res.json();
         if (res.ok) {
           setEvents(data.events);
@@ -62,10 +62,10 @@ export default function DashboardComp() {
       }
     };
     if (currentUser != null){
-      if ((currentUser.isAdmin || currentUser.role === 'lcp') || currentUser.role === 'lcvp' || currentUser.role === 'tl') {
-        fetchUsers();
+      if ((currentUser.role === 'LCP') || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') {
         fetchTasks();
         fetchEvents();
+        fetchAiesecUsers();
       }
     }
   }, [currentUser]);
@@ -76,14 +76,14 @@ export default function DashboardComp() {
                 <div className='flex justify-between'>
                     <div className=''>
                     <h3 className='text-gray-500 text-md uppercase'>Total Users</h3>
-                    <p className='text-2xl'>{totalUsers}</p>
+                    <p className='text-2xl'>{totalAiesecUsers}</p>
                     </div>
                     <HiOutlineUserGroup className='bg-blue-600  text-white rounded-full text-5xl p-3 shadow-lg' />
                 </div>
                 <div className='flex  gap-2 text-sm'>
                     <span className='text-red-400 flex items-center'>
                     <HiArrowNarrowUp />
-                    {/* {lastMonthUsers} */}
+                    {lastMonthAiesecUsers}
                     </span>
                     <div className='text-gray-500'>Last month</div>
                 </div>

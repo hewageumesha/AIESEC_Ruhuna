@@ -11,27 +11,12 @@ const GuestRegistrationForm = ({ eventId, onSuccess }) => {
     setLoading(true);
     try {
       const payload = { ...values, eventId };
-      console.log("Submitting guest registration:", payload);
-
-      const { data } = await axios.post(
-        '/api/guest-registrations',
-        payload
-      );
-
+      const { data } = await axios.post("/api/guest-registrations", payload);
       message.success("Successfully registered!");
-      onSuccess?.(data); // Call success callback if provided
+      onSuccess?.(data); // Optional chaining used for safety
     } catch (err) {
-      console.error("❌ Guest registration error:", err);
-
-      const resData = err.response?.data;
-
-      if (Array.isArray(resData)) {
-        message.error(resData.join(", "));
-      } else if (resData?.message) {
-        message.error(resData.message);
-      } else {
-        message.error("Registration failed.");
-      }
+      const errorMsg = err.response?.data?.message || "Registration failed.";
+      message.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -44,7 +29,7 @@ const GuestRegistrationForm = ({ eventId, onSuccess }) => {
         name="name"
         rules={[{ required: true, message: "Please enter your full name" }]}
       >
-        <Input placeholder="Enter your full name" />
+        <Input placeholder="John Doe" />
       </Form.Item>
 
       <Form.Item

@@ -6,13 +6,12 @@ import com.aiesec.dto.UserHierarchyDTO;
 import com.aiesec.dto.UserRequestDTO;
 import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.UserRole;
-import com.aiesec.exception.ResourcesNotFoundException;
-import com.aiesec.model.Department;
 import com.aiesec.model.Function;
 import com.aiesec.model.User;
 import com.aiesec.repository.UserRepository;
 import com.aiesec.repository.FunctionRepo;
 
+import io.jsonwebtoken.lang.Collections;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -159,49 +165,60 @@ public class UserService {
     }
 
     public User updateUserProfile(String aiesecEmail, User userDetails, MultipartFile profilePhoto) throws IOException {
-        User user = userRepository.findByAiesecEmail(aiesecEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    User user = userRepository.findByAiesecEmail(aiesecEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        //Update allowed fields
-        if (userDetails.getFirstName() != null) {
-            user.setAiesecEmail(userDetails.getAiesecEmail());
-        }
-        if (userDetails.getLastName() != null) {
-            user.setLastName(userDetails.getLastName());
-        }
-        if (userDetails.getBirthday() != null) {
-            user.setBirthday(userDetails.getBirthday());
-        }
-        if (userDetails.getGender() != null) {
-            user.setGender(userDetails.getGender());
-        }
-        if (userDetails.getEmail() != null) {
-            user.setEmail(userDetails.getEmail());
-        }
-        if (userDetails.getStateORProvince() != null) {
-            user.setStateORProvince(userDetails.getStateORProvince());
-        }
-        if (userDetails.getCity() != null) {
-            user.setCity(userDetails.getCity());
-        }
-        if (userDetails.getStreetAddress() != null) {
-            user.setStreetAddress(userDetails.getStreetAddress());
-        }
-        if (userDetails.getZIPORPostalCode() != null) {
-            user.setZIPORPostalCode(userDetails.getZIPORPostalCode());
-        }
-        if (userDetails.getS_department() != null) {
-            user.setS_department(userDetails.getS_department());
-        }
-        if (userDetails.getFaculty() != null) {
-            user.setFaculty(userDetails.getFaculty());
-        }
-        if(userDetails.getTeamLeaderAiesecEmail() != null) {
-            user.setTeamLeaderAiesecEmail(userDetails.getTeamLeaderAiesecEmail());
-        }
+    if (userDetails.getFirstName() != null) {
+        user.setFirstName(userDetails.getFirstName());
+    }
+    if (userDetails.getLastName() != null) {
+        user.setLastName(userDetails.getLastName());
+    }
+    if (userDetails.getBirthday() != null) {
+        user.setBirthday(userDetails.getBirthday());
+    }
+    if (userDetails.getGender() != null) {
+        user.setGender(userDetails.getGender());
+    }
+    if (userDetails.getEmail() != null) {
+        user.setEmail(userDetails.getEmail());
+    }
+    if (userDetails.getStateORProvince() != null) {
+        user.setStateORProvince(userDetails.getStateORProvince());
+    }
+    if (userDetails.getCity() != null) {
+        user.setCity(userDetails.getCity());
+    }
+    if (userDetails.getStreetAddress() != null) {
+        user.setStreetAddress(userDetails.getStreetAddress());
+    }
+    if (userDetails.getZIPORPostalCode() != null) {
+        user.setZIPORPostalCode(userDetails.getZIPORPostalCode());
+    }
+    if (userDetails.getS_department() != null) {
+        user.setS_department(userDetails.getS_department());
+    }
+    if (userDetails.getFaculty() != null) {
+        user.setFaculty(userDetails.getFaculty());
+    }
+    if (userDetails.getTeamLeaderAiesecEmail() != null) {
+        user.setTeamLeaderAiesecEmail(userDetails.getTeamLeaderAiesecEmail());
+    }
 
-        return userRepository.save(user);
-   }
+    // ✅ HANDLE PROFILE PHOTO
+    if (profilePhoto != null && !profilePhoto.isEmpty()) {
+        String filename = UUID.randomUUID().toString() + "_" + profilePhoto.getOriginalFilename();
+        Path path = Paths.get("uploads", filename);
+        Files.createDirectories(path.getParent()); // Ensure /uploads exists
+        Files.write(path, profilePhoto.getBytes());
+
+        // Update profile picture URL
+        String photoUrl = "http://localhost:8080/uploads/" + filename;
+        user.setProfilePicture(photoUrl);
+    }
+
+    return userRepository.save(user);
+}
 
     public User getUserProfile(String aiesecEmail) {
         return userRepository.findByAiesecEmail(aiesecEmail)
@@ -306,13 +323,9 @@ public class UserService {
 
     public String updatePassword(PasswordUpdateRequest request) {
 
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         User user = userRepository.findByAiesecEmail(request.getUserAiesecEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        System.out.println(request.getCurrentPassword());
-        System.out.println(user.getPassword());
-        
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
             throw new RuntimeException("Current password is incorrect");
         }
@@ -336,57 +349,31 @@ public class UserService {
     }
 
     public void sendTempPasswordEmail(String toEmail, String tempPassword, String aiesecEmail) {
-    String subject = "Your Temporary AIESEC Password";
-    String text = "Hello,\n\n" +
-                  "Your AIESEC email: " + aiesecEmail + "\n" +
-                  "Your temporary password: " + tempPassword + "\n\n" +
-                  "Please log in and change it as soon as possible.";
+        String subject = "Your Temporary AIESEC Password";
+        String text = "Hello,\n\n" +
+                    "Your AIESEC email: " + aiesecEmail + "\n" +
+                    "Your temporary password: " + tempPassword + "\n\n" +
+                    "Please log in and change it as soon as possible.";
 
-    SimpleMailMessage message = new SimpleMailMessage();
-    message.setTo(toEmail);
-    message.setSubject(subject);
-    message.setText(text);
-    mailSender.send(message);
-}
-
- public List<UserDTO> getAllUsers() {
-        List<User> users = this.userRepository.findAll();
-        if (users == null || users.isEmpty()) {
-            return Collections.emptyList(); // or return a new ArrayList<UserDto>()
-        }
-        return users.stream().map(this::userToDto).toList();
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject(subject);
+        message.setText(text);
+        mailSender.send(message);
     }
 
-    public UserDTO userToDto(User user){
-        UserDTO userDto = new UserDTO();
-        userDto.setId(Long.valueOf(user.getId()));
-        userDto.setFirstName(user.getFirstName());
-        userDto.setNoOfTask(user.getNoOfTask());
-        userDto.setRole(user.getRole());
+    public Map<String, Long> getAiesecUserStats() {
+        long total = userRepository.countUsersWithAiesecEmail();
 
-        // Department
-        if (user.getDepartment() != null) {
-            Department Dep = new Department();
-            Dep.setId(user.getDepartment().getId());
-            Dep.setName(user.getDepartment().getName());
-            userDto.setDepartmentName(user.getDepartment().getName());
-        }
+        LocalDate now = LocalDate.now();
+        LocalDate firstDayLastMonth = now.minusMonths(1).withDayOfMonth(1);
+        LocalDate lastDayLastMonth = now.withDayOfMonth(1).minusDays(1);
 
-        // ✅ Function
-        if (user.getFunction() != null) {
-            Function func = new Function();
-            func.setId(user.getFunction().getId());
-            func.setName(user.getFunction().getName());
-            userDto.setFunctionId(func);
-            userDto.setFunctionName(user.getFunction().getName());
-        }
+        long lastMonth = userRepository.countUsersWithAiesecEmailJoinedLastMonth(firstDayLastMonth, lastDayLastMonth);
 
-        return userDto;
-    }
-
-    public UserDTO getUserById(Integer id) {
-
-        User user=this.userRepository.findById(Long.valueOf(id)).orElseThrow(()-> new ResourcesNotFoundException("User","User Id",(long)id));
-        return this.userToDto(user);
+        Map<String, Long> result = new HashMap<>();
+        result.put("totalAiesecUsers", total);
+        result.put("lastMonthAiesecUsers", lastMonth);
+        return result;
     }
 }

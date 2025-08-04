@@ -13,6 +13,7 @@ import DashManageMember from '../components/DashManageMember';
 import UpdatePassword from '../components/UpdatePassword';
 import DashManageFunction from '../components/DashManageFunction';
 import React from 'react';
+import DashSessionLogs from '../components/DashSessionLogs';
 
 export default function Dashboard() {
   const location = useLocation();
@@ -44,6 +45,7 @@ export default function Dashboard() {
     task: <DashTask />,
     event: <DashEvent />,
     finance: <DashFinance />,
+    sessionLogs: <DashSessionLogs />,
     birthday: <DashBirthday />,
     dash: <DashboardComp />,
   };

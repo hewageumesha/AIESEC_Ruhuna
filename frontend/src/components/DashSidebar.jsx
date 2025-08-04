@@ -87,6 +87,24 @@ export default function DashSidebar({ tab, subtab }) {
     <Sidebar className='w-full md:w-64 bg-gray-50 dark:bg-gray-800'>
       <Sidebar.Items>
         <Sidebar.ItemGroup className='flex flex-col gap-1'>
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
+            <>
+              <Link to='/dashboard?tab=dash'>
+                <Sidebar.Item
+                  active={tab === 'dash' || !tab}
+                  icon={HiChartPie}
+                  as='div'
+                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  onClick={() => {
+                    setIsCommitteeExpanded(false);
+                    setIsProfileExpanded(false);
+                  }}
+                >
+                  <span className="font-medium">Dashboard</span>
+                </Sidebar.Item>
+              </Link>
+            </>
+          )}
 
           {/* Manage Committee with dropdown */}
           <div className="relative">
@@ -172,10 +190,32 @@ export default function DashSidebar({ tab, subtab }) {
                   <span className="font-medium">Finance</span>
                 </Sidebar.Item>
               </Link>
-              <Link to='/dashboard?tab=birthday'>
+            </>
+          )}
+
+          {currentUser.role === 'LCVP' && (
+          <Link to="/dashboard?tab=sessionLogs">
+            <Sidebar.Item
+              active={tab === 'sessionLogs'}
+              icon={HiLockClosed}  // or any icon you like
+              as="div"
+              className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              onClick={() => {
+                setIsCommitteeExpanded(false);
+                setIsProfileExpanded(false);
+              }}
+            >
+              <span className="font-medium">Session Logs</span>
+            </Sidebar.Item>
+          </Link>
+        )}
+          
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
+            <>
+              <Link to='/dashboard?tab=task'>
                 <Sidebar.Item
-                  active={tab === 'birthday'}
-                  icon={HiCreditCard}
+                  active={tab === 'task'}
+                  icon={HiNewspaper}
                   as='div'
                   className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
                   onClick={() => {
@@ -183,49 +223,10 @@ export default function DashSidebar({ tab, subtab }) {
                     setIsProfileExpanded(false);
                   }}
                 >
-                  <span className="font-medium">Birthday</span>
+                  <span className="font-medium">Tasks</span>
                 </Sidebar.Item>
               </Link>
             </>
-          )}
-
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' || currentUser.role === 'Member') && (
-              <>
-                  <Sidebar.Item
-                      active={location.pathname.includes('TaskDashboard')}
-                      icon={HiNewspaper}
-                      as='div'
-                      className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                      onClick={() => {
-                          if (currentUser && currentUser.id) {
-                              switch(currentUser.role) {
-                                  case "LCP":
-                                      navigate(`/user/${currentUser.id}/TaskDashboard`);
-                                      break;
-                                  case "LCVP":
-                                      navigate(`/user/${currentUser.id}/TaskDashboardLCVP`);
-                                      break;
-                                  case "Team_Leader":
-                                      navigate(`/user/${currentUser.id}/TaskDashboardTL`);
-                                      break;
-                                  case "Member":
-                                      navigate(`/user/${currentUser.id}/TaskDashboardMember`);
-                                      break;
-                                  default:
-                                      navigate("/login");
-                              }
-                          } else {
-                              console.error("No user found in state!");
-                              navigate("/login");
-                          }
-                      }}
-                  >
-                      <span className="font-medium">Tasks</span>
-                  </Sidebar.Item>
-
-
-
-              </>
           )}
               <Link to='/dashboard?tab=event'>
                 <Sidebar.Item
@@ -241,7 +242,24 @@ export default function DashSidebar({ tab, subtab }) {
                   <span className="font-medium">Events</span>
                 </Sidebar.Item>
               </Link>
-
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
+            <>
+              <Link to='/dashboard?tab=birthday'>
+                <Sidebar.Item
+                  active={tab === 'birthday'}
+                  icon={HiCake}
+                  as='div'
+                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  onClick={() => {
+                    setIsCommitteeExpanded(false);
+                    setIsProfileExpanded(false);
+                  }}
+                >
+                  <span className="font-medium">Birthday</span>
+                </Sidebar.Item>
+              </Link>
+            </>
+          )}
           
           {/* Profile with dropdown */}
           <div className="relative">
