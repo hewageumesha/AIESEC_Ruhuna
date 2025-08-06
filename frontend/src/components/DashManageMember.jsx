@@ -55,17 +55,17 @@ export default function DashManageMember() {
   };
 
   const fetchRoles = async () => {
-    const res = await axios.get("http://localhost:8080/api/roles/all");
+    const res = await axios.get("https://aiesecinruhuna-production.up.railway.app/api/roles/all");
     setRoleOptions(res.data);
   };
 
   const fetchFunctions = async () => {
-    const res = await axios.get("http://localhost:8080/api/functions/");
+    const res = await axios.get("https://aiesecinruhuna-production.up.railway.app/api/functions/");
     setFunctionOptions(res.data);
   };
 
   const fetchMembers = async () => {
-    const res = await axios.get("http://localhost:8080/api/users/getall");
+    const res = await axios.get("https://aiesecinruhuna-production.up.railway.app/api/users/getall");
     setMembers(res.data);
   };
 
@@ -101,14 +101,14 @@ export default function DashManageMember() {
       setLoading(true);
       if (editing) {
         await axios.put(
-          `http://localhost:8080/api/users/update/${formData.aiesecEmail}`,
+          `https://aiesecinruhuna-production.up.railway.app/api/users/update/${formData.aiesecEmail}`,
           formData,
           { withCredentials: true }
         );
         setSuccessMsg("Member updated successfully!");
       } else {
         await axios.post(
-          "http://localhost:8080/api/users/add",
+          "https://aiesecinruhuna-production.up.railway.app/api/users/add",
           formData,
           { withCredentials: true }
         );
@@ -225,7 +225,7 @@ export default function DashManageMember() {
     try {
       setLoading(true);
       await axios.delete(
-        `http://localhost:8080/api/users/delete/${deleteId}`,
+        `https://aiesecinruhuna-production.up.railway.app/api/users/delete/${deleteId}`,
         { withCredentials: true }
       );
       setSuccessMsg("Member deleted successfully!");

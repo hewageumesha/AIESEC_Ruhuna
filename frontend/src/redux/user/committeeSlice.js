@@ -3,22 +3,22 @@ import axios from 'axios';
 
 
 export const fetchCommittee = createAsyncThunk('committee/fetchCommittee', async () => {
-  const response = await axios.get('http://localhost:8080/api/committee');
+  const response = await axios.get('https://aiesecinruhuna-production.up.railway.app/api/committee');
   return response.data;
 });
 
 export const addMember = createAsyncThunk('committee/addMember', async (memberData) => {
-  const response = await axios.post('http://localhost:8080/api/committee', memberData);
+  const response = await axios.post('https://aiesecinruhuna-production.up.railway.app/api/committee', memberData);
   return response.data;
 });
 
 export const updateMember = createAsyncThunk('committee/updateMember', async ({ id, ...data }) => {
-  const response = await axios.put('http://localhost:8080/apicommittee/${id}', data);
+  const response = await axios.put('https://aiesecinruhuna-production.up.railway.app/apicommittee/${id}', data);
   return response.data;
 });
 
 export const deleteMember = createAsyncThunk('committee/deleteMember', async (id) => {
-  await axios.delete('http://localhost:8080/api/committee/${id}');
+  await axios.delete('https://aiesecinruhuna-production.up.railway.app/api/committee/${id}');
   return id;
 });
 

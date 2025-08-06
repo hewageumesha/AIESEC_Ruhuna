@@ -22,6 +22,8 @@ public interface UserRepository extends JpaRepository<User, Long>{
     List<User> findByRole(UserRole role);
     List<User> findByTeamLeaderAiesecEmail(String teamLeaderAiesecEmail);
     List<User> findByFunctionId(Long functionId);
+    List<User> findByFunctionIdAndRoleIn(Long functionId, List<UserRole> roles);
+    List<User> findByFunctionIdAndRoleAndTeamLeaderAiesecEmail(Long functionId, UserRole role, String teamLeaderAiesecEmail);
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.joinedDate BETWEEN :start AND :end")
     Long countUsersJoinedLastMonth(Date start, Date end);

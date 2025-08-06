@@ -36,7 +36,7 @@ export default function ChangePassword() {
 
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8080/api/auth/change-password', {
+      const response = await fetch('https://aiesecinruhuna-production.up.railway.app/api/auth/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

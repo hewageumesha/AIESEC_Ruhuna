@@ -1,9 +1,6 @@
 package com.aiesec.controller;
 
-import com.aiesec.dto.CommentDTO;
 import com.aiesec.dto.PasswordUpdateRequest;
-import com.aiesec.dto.UserDTO;
-import com.aiesec.dto.UserHierarchyDTO;
 import com.aiesec.dto.UserRequestDTO;
 import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.Gender;
@@ -11,15 +8,9 @@ import com.aiesec.enums.UserRole;
 import com.aiesec.model.User;
 
 import com.aiesec.repository.UserRepository;
-import com.aiesec.security.UserDetailsImpl;
-import com.aiesec.service.CommentService;
 import com.aiesec.service.UserService;
 
 import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,10 +19,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -171,5 +158,39 @@ public class UserController {
     @GetMapping("/totalaieseccount")
     public ResponseEntity<Map<String, Long>> getAiesecUserStats() {
         return ResponseEntity.ok(userService.getAiesecUserStats());
+    }
+
+    @GetMapping("/team-leader/{memberId}")
+    public ResponseEntity<?> getTeamLeaderByMemberId(@PathVariable Long memberId) {
+        try {
+            User member = userRepo.getUserById(memberId);
+
+            if (member == null) {
+                System.out.println("Member not found with ID: " + memberId);
+                return ResponseEntity.status(404).body("Member not found.");
+            }
+
+            System.out.println("member.getTeamLeaderId(): " + member.getTeamLeaderId());
+
+            if (member.getTeamLeaderId() == null || member.getTeamLeaderId().isBlank()) {
+                return ResponseEntity.status(404).body("Assigned person not found.");
+            }
+
+            Long teamLeaderId = Long.parseLong(member.getTeamLeaderId());
+            User assignedPerson = userRepo.getUserById(teamLeaderId);
+
+            if (assignedPerson == null) {
+                System.out.println("No user found with ID: " + teamLeaderId);
+                return ResponseEntity.status(404).body("Assigned user not found.");
+            }
+
+            return ResponseEntity.ok(assignedPerson);
+
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body("Invalid team leader ID format.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Internal server error.");
+        }
     }
 }

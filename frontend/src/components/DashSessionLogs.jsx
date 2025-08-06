@@ -28,7 +28,7 @@ export default function DashSessionLogs() {
 
   const fetchLogs = async () => {
     try {
-        const res = await axios.get(`http://localhost:8080/api/auth/sessions`, {
+        const res = await axios.get(`https://aiesecinruhuna-production.up.railway.app/api/auth/sessions`, {
         headers: { Authorization: `Bearer ${currentUser.token}` },
         });
         setLogs(res.data); // set to state

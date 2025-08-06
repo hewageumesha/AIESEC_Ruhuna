@@ -11,7 +11,7 @@ export default function SessionManager() {
     alert('You have been logged out due to inactivity.');
 
     // Optional: call signout API
-    fetch(`http://localhost:8080/api/auth/signout`, {
+    fetch(`https://aiesecinruhuna-production.up.railway.app/api/auth/signout`, {
       method: 'POST',
     });
 
@@ -28,7 +28,7 @@ export default function SessionManager() {
     // Log out on browser/tab close
     const handleUnload = () => {
       sessionStorage.removeItem('token');
-      fetch('http://localhost:8080/api/auth/signout', { method: 'POST' });
+      fetch('https://aiesecinruhuna-production.up.railway.app/api/auth/signout', { method: 'POST' });
     };
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);

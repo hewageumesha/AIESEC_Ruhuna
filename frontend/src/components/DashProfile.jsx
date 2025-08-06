@@ -36,7 +36,7 @@ export default function DashProfile() {
   const fetchProfileData = async () => {
     try {
       const profile = await axios.get(
-        `http://localhost:8080/api/users/profile/${currentUser.aiesecEmail}`,
+        `https://aiesecinruhuna-production.up.railway.app/api/users/profile/${currentUser.aiesecEmail}`,
         {
           headers: {
             Authorization: `Bearer ${currentUser.token}`,
@@ -45,17 +45,30 @@ export default function DashProfile() {
       );
       let fullProfile = profile.data;
 
-      if (fullProfile.role === 'Member') {
-        const teamLeader = await axios.get(
-          `http://localhost:8080/api/users/team-leader/${fullProfile.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${currentUser.token}`,
-            },
-          }
-        );
-        fullProfile = { ...fullProfile, teamLeader: teamLeader.data };
+if (['Member', 'Team_Leader'].includes(fullProfile.role)) {
+  try {
+    const teamLeaderRes = await axios.get(
+      `https://aiesecinruhuna-production.up.railway.app/api/users/team-leader/${fullProfile.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${currentUser.token}`,
+        },
       }
+    );
+    console.log('Team leader response:', teamLeaderRes.data);
+
+    const teamLeader = teamLeaderRes.data;
+
+    fullProfile = {
+      ...fullProfile,
+      teamLeaderAiesecEmail: teamLeader.aiesecEmail,
+    };
+  } catch (err) {
+    console.warn('No team leader found for this user:', err);
+    fullProfile = { ...fullProfile, teamLeaderAiesecEmail: 'Not Assigned' };
+  }
+}
+
 
       setProfileData(fullProfile);
       setFormData(fullProfile); 
@@ -156,7 +169,7 @@ export default function DashProfile() {
       }
 
       const res = await fetch(
-        `http://localhost:8080/api/users/profile/update/${currentUser.aiesecEmail}`,
+        `https://aiesecinruhuna-production.up.railway.app/api/users/profile/update/${currentUser.aiesecEmail}`,
         {
           method: 'PUT',
           headers: {
@@ -185,7 +198,7 @@ export default function DashProfile() {
 
   const refreshUserProfile = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/users/profile/${currentUser.aiesecEmail}`, {
+      const res = await axios.get(`https://aiesecinruhuna-production.up.railway.app/api/users/profile/${currentUser.aiesecEmail}`, {
         headers: { Authorization: `Bearer ${currentUser.token}` },
       });
       dispatch(updateSuccess(res.data)); // ✅ Redux is updated with new profilePicture

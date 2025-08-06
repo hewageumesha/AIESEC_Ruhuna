@@ -46,7 +46,7 @@ console.log("currentUser:", currentUser);
     setErrorMsg("");
     setSuccessMsg("");
 
-    const res = await fetch("http://localhost:8080/api/users/update-password", {
+    const res = await fetch("https://aiesecinruhuna-production.up.railway.app/api/users/update-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -16,7 +16,7 @@ const MemberRegistrationForm = ({ eventId, onSuccess }) => {
       if (!currentUser?.id || !eventId) return;
       try {
         const res = await axios.get(
-          `http://localhost:8080/api/member-event-registrations/user/${currentUser.id}/event/${eventId}`
+          `https://aiesecinruhuna-production.up.railway.app/api/member-event-registrations/user/${currentUser.id}/event/${eventId}`
         );
         if (res.data && res.data.length > 0) {
           setExistingRegistration(res.data[0]); // use the first registration
@@ -40,7 +40,7 @@ const MemberRegistrationForm = ({ eventId, onSuccess }) => {
     try {
       setLoading(true);
       const res = await axios.post(
-        "http://localhost:8080/api/member-event-registrations/register",
+        "https://aiesecinruhuna-production.up.railway.app/api/member-event-registrations/register",
         payload
       );
       message.success("Your response has been submitted.");
