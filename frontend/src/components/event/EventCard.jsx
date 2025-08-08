@@ -16,7 +16,7 @@ const EventCard = ({ event, onDeleteSuccess }) => {
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(`https://aiesecinruhuna-production.up.railway.app/api/events/${event.id}`, {
+      const response = await fetch(`https://aiesec-ruhuna.vercel.app/api/events/${event.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

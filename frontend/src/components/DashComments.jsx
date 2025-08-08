@@ -44,7 +44,7 @@ export default function DashComments() {
   const fetchMembersWithComments = async () => {
     try {
       setIsLoading(true);
-      const membersRes = await axios.get('https://aiesecinruhuna-production.up.railway.app/api/users/members', {
+      const membersRes = await axios.get('https://aiesec-ruhuna.vercel.app/api/users/members', {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
 
@@ -55,7 +55,7 @@ export default function DashComments() {
         membersRes.data.map(async member => {
           try {
             console.log(currentUser.role)
-            const commentsRes = await axios.get(`https://aiesecinruhuna-production.up.railway.app/api/comments/member/${member.id}/${currentUser.role}`, {
+            const commentsRes = await axios.get(`https://aiesec-ruhuna.vercel.app/api/comments/member/${member.id}/${currentUser.role}`, {
               headers: { Authorization: `Bearer ${currentUser.token}` }
             });
             
@@ -94,7 +94,7 @@ export default function DashComments() {
   const fetchComments = async (memberId) => {
     try {
       setIsLoading(true);
-      const res = await axios.get(`https://aiesecinruhuna-production.up.railway.app/api/comments/member/${memberId}/${currentUser.role}`, {
+      const res = await axios.get(`https://aiesec-ruhuna.vercel.app/api/comments/member/${memberId}/${currentUser.role}`, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
       
@@ -170,7 +170,7 @@ export default function DashComments() {
     console.log(currentUser);
 
     try {
-      const res = await axios.post('https://aiesecinruhuna-production.up.railway.app/api/comments/add', {
+      const res = await axios.post('https://aiesec-ruhuna.vercel.app/api/comments/add', {
         content: newComment,
         memberId: selectedMember.id,
         creatorEmail: currentUser.aiesecEmail
@@ -213,7 +213,7 @@ export default function DashComments() {
 
   const handleDeleteComment = async (id) => {
     try {
-      await axios.delete(`https://aiesecinruhuna-production.up.railway.app/api/comments/${id}`, {
+      await axios.delete(`https://aiesec-ruhuna.vercel.app/api/comments/${id}`, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
       

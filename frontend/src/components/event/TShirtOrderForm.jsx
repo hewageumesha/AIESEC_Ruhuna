@@ -56,7 +56,7 @@ const TShirtOrderForm = ({
     };
 
     try {
-      await axios.post("https://aiesecinruhuna-production.up.railway.app/api/tshirt-orders", orderPayload);
+      await axios.post("https://aiesec-ruhuna.vercel.app/api/tshirt-orders", orderPayload);
       message.success("T-Shirt order placed!");
       form.resetFields();
       setGuestName("");

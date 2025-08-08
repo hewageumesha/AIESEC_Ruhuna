@@ -18,7 +18,7 @@ const DashEvent = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get('https://aiesecinruhuna-production.up.railway.app/api/events');
+      const response = await axios.get('https://aiesec-ruhuna.vercel.app/api/events');
       setEvents(response.data);
     } catch (error) {
       console.error('Failed to fetch events:', error);
@@ -44,7 +44,7 @@ const DashEvent = () => {
   const handleDelete = async (eventId, e) => {
     e.stopPropagation();
     try {
-      await axios.delete(`https://aiesecinruhuna-production.up.railway.app/api/events/${eventId}`);
+      await axios.delete(`https://aiesec-ruhuna.vercel.app/api/events/${eventId}`);
       message.success('Event deleted successfully');
       setEvents((prev) => prev.filter((event) => event.eventId !== eventId));
     } catch (error) {

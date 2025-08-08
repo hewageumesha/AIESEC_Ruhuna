@@ -213,7 +213,7 @@ public class UserService {
         Files.write(path, profilePhoto.getBytes());
 
         // Update profile picture URL
-        String photoUrl = "https://aiesecinruhuna-production.up.railway.app/uploads/" + filename;
+        String photoUrl = "http://localhost:8080/ uploads/" + filename;
         user.setProfilePicture(photoUrl);
     }
 
