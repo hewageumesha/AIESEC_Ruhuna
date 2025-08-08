@@ -37,9 +37,9 @@ export default function SignIn() {
       newErrors.aiesecEmail = 'AIESEC Email is required';
       isValid = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.aiesecEmail) && email.endsWith("@aiesec.net")) {
-      newErrors.aiesecEmail = 'Please enter a valid email address';
-      isValid = false;
-    }
+  newErrors.aiesecEmail = 'Please enter a valid email address';
+  isValid = false;
+}
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
