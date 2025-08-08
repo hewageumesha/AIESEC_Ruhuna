@@ -25,7 +25,7 @@ export default function DashboardComp() {
   useEffect(() => {
     const fetchAiesecUsers = async () => {
       try {
-        const res = await fetch('https://aiesec-ruhuna.vercel.app/api/users/totalaieseccount');
+        const res = await fetch('https://aiesecruhuna-production.up.railway.app/api/users/totalaieseccount');
         const data = await res.json();
         if (res.ok) {
           setTotalAiesecUsers(data.totalAiesecUsers);
@@ -37,7 +37,7 @@ export default function DashboardComp() {
     };
     const fetchTasks = async () => {
       try {
-        const res = await fetch('https://aiesec-ruhuna.vercel.app/api/task/gettasks?limit=5');
+        const res = await fetch('https://aiesecruhuna-production.up.railway.app/api/task/gettasks?limit=5');
         const data = await res.json();
         if (res.ok) {
           setTasks(data.tasks);
@@ -50,7 +50,7 @@ export default function DashboardComp() {
     };
     const fetchEvents = async () => {
       try {
-        const res = await fetch('https://aiesec-ruhuna.vercel.app/api/event/geteventss?limit=5');
+        const res = await fetch('https://aiesecruhuna-production.up.railway.app/api/event/geteventss?limit=5');
         const data = await res.json();
         if (res.ok) {
           setEvents(data.events);

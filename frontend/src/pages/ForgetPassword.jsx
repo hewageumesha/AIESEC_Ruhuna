@@ -17,7 +17,7 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch(`https://aiesec-ruhuna.vercel.app/forgot-password/verifyMail/${email}`, {
+      const res = await fetch(`https://aiesecruhuna-production.up.railway.app/forgot-password/verifyMail/${email}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }), // Not required in this case but fine to include
@@ -41,7 +41,7 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch(`https://aiesec-ruhuna.vercel.app/forgot-password/verifyOtp/${code}/${email}`, {
+      const res = await fetch(`https://aiesecruhuna-production.up.railway.app/forgot-password/verifyOtp/${code}/${email}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code }),
@@ -68,7 +68,7 @@ export default function ForgotPassword() {
         return setMessage('Passwords do not match');
       }
 
-      const res = await fetch(`https://aiesec-ruhuna.vercel.app/forgot-password/changePassword/${email}`, {
+      const res = await fetch(`https://aiesecruhuna-production.up.railway.app/forgot-password/changePassword/${email}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password: newPassword, confirmPassword }),

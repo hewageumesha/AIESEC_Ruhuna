@@ -26,7 +26,7 @@ const OrgTable = () => {
 
   const fetchOrganizationData = async () => {
     try {
-      const data = await axios.get(`https://aiesec-ruhuna.vercel.app/api/users/hierarchy`, {
+      const data = await axios.get(`https://aiesecruhuna-production.up.railway.app/api/users/hierarchy`, {
         headers: { Authorization: `Bearer ${currentUser.token}` },
       });
       const main = data.data[0];

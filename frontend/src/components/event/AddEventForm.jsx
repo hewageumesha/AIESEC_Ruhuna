@@ -116,7 +116,7 @@ const AddEventForm = () => {
    
       };
 
-      const response = await axios.post('https://aiesec-ruhuna.vercel.app/api/events', payload);
+      const response = await axios.post('https://aiesecruhuna-production.up.railway.app/api/events', payload);
       const eventId = response.data.eventId;
 
       if (tshirtAvailable) {
@@ -126,7 +126,7 @@ const AddEventForm = () => {
           images: merchImages.map((img) => img.url),
           available: true,
         };
-        await axios.post('https://aiesec-ruhuna.vercel.app/api/merchandise', merchPayload);
+        await axios.post('https://aiesecruhuna-production.up.railway.app/api/merchandise', merchPayload);
       }
 
       message.success('Event published successfully!');

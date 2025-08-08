@@ -23,7 +23,7 @@ const EditEvent = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const { data } = await axios.get(`https://aiesec-ruhuna.vercel.app/api/events/${id}`);
+        const { data } = await axios.get(`https://aiesecruhuna-production.up.railway.app/api/events/${id}`);
         if (data) {
           setImageUrl(data.imageUrl);
           setEventType(data.isVirtual ? 'virtual' : 'in_person');
@@ -100,7 +100,7 @@ const EditEvent = () => {
         hasTshirtOrder: values.hasTshirtOrder,
       };
 
-      await axios.put(`https://aiesec-ruhuna.vercel.app/api/events/${id}`, payload);
+      await axios.put(`https://aiesecruhuna-production.up.railway.app/api/events/${id}`, payload);
       message.success('✅ Event updated successfully!');
       navigate(`/event/${id}`);
     } catch (error) {

@@ -36,7 +36,7 @@ export default function DashProfile() {
   const fetchProfileData = async () => {
     try {
       const profile = await axios.get(
-        `https://aiesec-ruhuna.vercel.app/api/users/profile/${currentUser.aiesecEmail}`,
+        `https://aiesecruhuna-production.up.railway.app/api/users/profile/${currentUser.aiesecEmail}`,
         {
           headers: {
             Authorization: `Bearer ${currentUser.token}`,
@@ -48,7 +48,7 @@ export default function DashProfile() {
 if (['Member', 'Team_Leader'].includes(fullProfile.role)) {
   try {
     const teamLeaderRes = await axios.get(
-      `https://aiesec-ruhuna.vercel.app/api/users/team-leader/${fullProfile.id}`,
+      `https://aiesecruhuna-production.up.railway.app/api/users/team-leader/${fullProfile.id}`,
       {
         headers: {
           Authorization: `Bearer ${currentUser.token}`,
@@ -169,7 +169,7 @@ if (['Member', 'Team_Leader'].includes(fullProfile.role)) {
       }
 
       const res = await fetch(
-        `https://aiesec-ruhuna.vercel.app/api/users/profile/update/${currentUser.aiesecEmail}`,
+        `https://aiesecruhuna-production.up.railway.app/api/users/profile/update/${currentUser.aiesecEmail}`,
         {
           method: 'PUT',
           headers: {
@@ -198,7 +198,7 @@ if (['Member', 'Team_Leader'].includes(fullProfile.role)) {
 
   const refreshUserProfile = async () => {
     try {
-      const res = await axios.get(`https://aiesec-ruhuna.vercel.app/api/users/profile/${currentUser.aiesecEmail}`, {
+      const res = await axios.get(`https://aiesecruhuna-production.up.railway.app/api/users/profile/${currentUser.aiesecEmail}`, {
         headers: { Authorization: `Bearer ${currentUser.token}` },
       });
       dispatch(updateSuccess(res.data)); // ✅ Redux is updated with new profilePicture

@@ -3,22 +3,22 @@ import axios from 'axios';
 
 
 export const fetchCommittee = createAsyncThunk('committee/fetchCommittee', async () => {
-  const response = await axios.get('https://aiesec-ruhuna.vercel.app/api/committee');
+  const response = await axios.get('https://aiesecruhuna-production.up.railway.app/api/committee');
   return response.data;
 });
 
 export const addMember = createAsyncThunk('committee/addMember', async (memberData) => {
-  const response = await axios.post('https://aiesec-ruhuna.vercel.app/api/committee', memberData);
+  const response = await axios.post('https://aiesecruhuna-production.up.railway.app/api/committee', memberData);
   return response.data;
 });
 
 export const updateMember = createAsyncThunk('committee/updateMember', async ({ id, ...data }) => {
-  const response = await axios.put('https://aiesec-ruhuna.vercel.app/apicommittee/${id}', data);
+  const response = await axios.put('https://aiesecruhuna-production.up.railway.app/apicommittee/${id}', data);
   return response.data;
 });
 
 export const deleteMember = createAsyncThunk('committee/deleteMember', async (id) => {
-  await axios.delete('https://aiesec-ruhuna.vercel.app/api/committee/${id}');
+  await axios.delete('https://aiesecruhuna-production.up.railway.app/api/committee/${id}');
   return id;
 });
 
