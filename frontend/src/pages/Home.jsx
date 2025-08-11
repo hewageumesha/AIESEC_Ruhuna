@@ -17,32 +17,6 @@ export default function Home() {
     { id: 4, url: '/image4.jpg', alt: 'Aiesec in Ruhuna' },
   ];
 
-  /*
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await fetch('/api/event/getEvents');
-        if (!res.ok) {
-          throw new Error('Failed to fetch events');
-        }
-        const data = await res.json();
-        const currentDate = new Date();
-        
-        const filteredEvents = data.events.filter(event => new Date(event.date) <= currentDate);
-        const filteredUpcomingEvents = data.events.filter(event => new Date(event.date) > currentDate);
-        
-        setEvents(filteredEvents);
-        setUpcomingEvents(filteredUpcomingEvents);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEvents();
-  }, []);
-  */
-
   const programs = [
     {
       title: "Explore teaching",
@@ -114,7 +88,9 @@ export default function Home() {
     hours: 0,
     minutes: 0,
     seconds: 0,
-    isOpen: false
+    isOpen: false,
+    periodLabel: '',
+    nextPeriodLabel: ''
   });
 
   useEffect(() => {
@@ -122,17 +98,25 @@ export default function Home() {
       const now = new Date();
       const currentYear = now.getFullYear();
 
-      // Define both intake periods this year
+      // Define intake periods with labels
       const intakePeriods = [
-        { start: new Date(currentYear, 0, 1), end: new Date(currentYear, 1, 1) },  // Jan 1 - Feb 1
-        { start: new Date(currentYear, 6, 1), end: new Date(currentYear, 7, 1) }   // Jul 1 - Aug 1
+        { 
+          start: new Date(currentYear, 0, 1),  // Jan 1
+          end: new Date(currentYear, 1, 1),    // Feb 1
+          label: "January 1st to February 1st"
+        },
+        {
+          start: new Date(currentYear, 6, 1),  // Jul 1
+          end: new Date(currentYear, 7, 1),    // Aug 1
+          label: "July 1st to August 1st"
+        }
       ];
 
-      // Check if now is inside any intake period
+      // Check if current date is within any intake period
       const currentIntake = intakePeriods.find(period => now >= period.start && now <= period.end);
 
       if (currentIntake) {
-        // Intake is open, countdown to closing date of this period
+        // Intake is open, countdown to closing date
         const diff = currentIntake.end - now;
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -144,26 +128,23 @@ export default function Home() {
           hours,
           minutes,
           seconds,
-          isOpen: true
+          isOpen: true,
+          periodLabel: currentIntake.label,
+          nextPeriodLabel: ''
         });
       } else {
-        // Intake is closed — find the next upcoming intake start date
-        // Calculate next intake start date among the two periods for now or next year
-        let nextIntakeStart = null;
+        // Find the next upcoming intake period
+        let nextIntake = intakePeriods.find(period => now < period.start);
 
-        for (const period of intakePeriods) {
-          if (now < period.start) {
-            nextIntakeStart = period.start;
-            break;
-          }
+        if (!nextIntake) {
+          // If no future intake in this year, set next intake to Jan 1 next year
+          nextIntake = {
+            start: new Date(currentYear + 1, 0, 1),
+            label: "January 1st to February 1st"
+          };
         }
 
-        // If no future intake this year, pick first intake of next year
-        if (!nextIntakeStart) {
-          nextIntakeStart = new Date(currentYear + 1, 0, 1); // Jan 1 next year
-        }
-
-        const diff = nextIntakeStart - now;
+        const diff = nextIntake.start - now;
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -174,13 +155,16 @@ export default function Home() {
           hours,
           minutes,
           seconds,
-          isOpen: false
+          isOpen: false,
+          periodLabel: '',
+          nextPeriodLabel: nextIntake.label
         });
       }
     };
 
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -281,37 +265,38 @@ export default function Home() {
                 <h3 className="text-xl font-bold text-center mb-4 text-gray-800 dark:text-white">
                   {countdown.isOpen ? '🎉 Membership Intake Open!' : '⏳ Next Intake Countdown'}
                 </h3>
-                
+
                 <div className="flex justify-center gap-2 mb-4">
                   {/* Days */}
                   <div className="flex flex-col items-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg min-w-[70px]">
                     <span className="text-2xl font-bold text-blue-600 dark:text-blue-200">{countdown.days}</span>
                     <span className="text-xs text-blue-500 dark:text-blue-300">DAYS</span>
                   </div>
-                  
+
                   {/* Hours */}
                   <div className="flex flex-col items-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg min-w-[70px]">
                     <span className="text-2xl font-bold text-blue-600 dark:text-blue-200">{countdown.hours}</span>
                     <span className="text-xs text-blue-500 dark:text-blue-300">HOURS</span>
                   </div>
-                  
+
                   {/* Minutes */}
                   <div className="flex flex-col items-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg min-w-[70px]">
                     <span className="text-2xl font-bold text-blue-600 dark:text-blue-200">{countdown.minutes}</span>
                     <span className="text-xs text-blue-500 dark:text-blue-300">MINUTES</span>
                   </div>
-                  
+
                   {/* Seconds */}
                   <div className="flex flex-col items-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg min-w-[70px]">
                     <span className="text-2xl font-bold text-blue-600 dark:text-blue-200">{countdown.seconds}</span>
                     <span className="text-xs text-blue-500 dark:text-blue-300">SECONDS</span>
                   </div>
                 </div>
-                
+
                 <p className="text-center text-sm text-gray-600 dark:text-gray-300">
-                  {countdown.isOpen 
-                    ? 'Applications close on August 1st - Apply now! If you want to be a part of the next intake, please contact us.'
-                    : 'Next application window opens July 1st'}
+                  {countdown.isOpen
+                    ? `Applications close on ${countdown.periodLabel.split(' to ')[1]} - Apply now! If you want to be a part of the next intake, please contact us.`
+                    : `Next application window opens ${countdown.nextPeriodLabel.split(' to ')[0]}`
+                  }
                 </p>
               </div>
             </div>
