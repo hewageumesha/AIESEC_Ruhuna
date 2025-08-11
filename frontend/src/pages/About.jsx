@@ -75,10 +75,10 @@ const TEAM_MEMBERS = [
   { name: "Dilma Salpadoru", role: "LCVP oGT B2C", img: "LCVP7.png" },
   { name: "Ranudi Uyangoda", role: "LCVP oGT PS", img: "LCVP8.png" },
   { name: "Gagana Tharupathi", role: "LCVP MKT", img: "LCVP9.png" },
-  { name: "Thisura Daksina", role: "LCVP TM", img: "LCVP10.png" },
+  { name: "Thisura Daksina", role: "LCVP FnL", img: "LCVP10.png" },
   { name: "Parami Sigera", role: "LCVP BD", img: "LCVP11.png" },
   { name: "Akila Nissanka", role: "LCVP ED", img: "LCVP12.png" },
-  { name: "Lakshitha Wijethunga", role: "LCVP FnL", img: "LCVP13.png" },
+  { name: "Lakshitha Wijethunga", role: "LCVP TM", img: "LCVP13.png" },
   { name: "Nethma Dewni", role: "LCVP PR", img: "LCVP14.png" },
 ];
 

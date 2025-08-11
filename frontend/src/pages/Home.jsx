@@ -121,27 +121,24 @@ export default function Home() {
     const updateCountdown = () => {
       const now = new Date();
       const currentYear = now.getFullYear();
-      
-      // Set intake period (July 1 to August 1)
-      let intakeStart = new Date(currentYear, 6, 1); // July is month 6 (0-indexed)
-      let intakeEnd = new Date(currentYear, 7, 1); // August is month 7
-      
-      // If we're past this year's intake, set for next year
-      if (now > intakeEnd) {
-        intakeStart = new Date(currentYear + 1, 6, 1);
-        intakeEnd = new Date(currentYear + 1, 7, 1);
-      }
 
-      const isIntakeOpen = now >= intakeStart && now <= intakeEnd;
-      
-      if (isIntakeOpen) {
-        // Calculate time until intake closes
-        const diff = intakeEnd - now;
+      // Define both intake periods this year
+      const intakePeriods = [
+        { start: new Date(currentYear, 0, 1), end: new Date(currentYear, 1, 1) },  // Jan 1 - Feb 1
+        { start: new Date(currentYear, 6, 1), end: new Date(currentYear, 7, 1) }   // Jul 1 - Aug 1
+      ];
+
+      // Check if now is inside any intake period
+      const currentIntake = intakePeriods.find(period => now >= period.start && now <= period.end);
+
+      if (currentIntake) {
+        // Intake is open, countdown to closing date of this period
+        const diff = currentIntake.end - now;
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        
+
         setCountdown({
           days,
           hours,
@@ -150,13 +147,28 @@ export default function Home() {
           isOpen: true
         });
       } else {
-        // Calculate time until next intake opens
-        const diff = intakeStart - now;
+        // Intake is closed — find the next upcoming intake start date
+        // Calculate next intake start date among the two periods for now or next year
+        let nextIntakeStart = null;
+
+        for (const period of intakePeriods) {
+          if (now < period.start) {
+            nextIntakeStart = period.start;
+            break;
+          }
+        }
+
+        // If no future intake this year, pick first intake of next year
+        if (!nextIntakeStart) {
+          nextIntakeStart = new Date(currentYear + 1, 0, 1); // Jan 1 next year
+        }
+
+        const diff = nextIntakeStart - now;
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        
+
         setCountdown({
           days,
           hours,
@@ -167,12 +179,8 @@ export default function Home() {
       }
     };
 
-    // Update immediately
     updateCountdown();
-    
-    // Update every second
     const interval = setInterval(updateCountdown, 1000);
-    
     return () => clearInterval(interval);
   }, []);
 
