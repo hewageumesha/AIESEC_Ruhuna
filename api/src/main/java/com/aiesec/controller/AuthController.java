@@ -70,10 +70,21 @@ public class AuthController {
     }
 
     @PostMapping("/signout")
-    public ResponseEntity<Map<String, String>> signOut(@RequestHeader("Authorization") String authorizationHeader) {
-        String token = authorizationHeader.substring(7); // Remove "Bearer "
-        String userEmail = jwtUtil.extractUsername(token);
+    public ResponseEntity<Map<String, String>> signOut(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
 
+        String userEmail = "Unknown";
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            try {
+                userEmail = jwtUtil.extractUsername(token);
+            } catch (Exception e) {
+                System.out.println("Token invalid or expired during signout: " + e.getMessage());
+            }
+        }
+
+        // Always log logout attempt, even if token is missing/invalid
         sessionService.logLogout(userEmail);
 
         Map<String, String> response = new HashMap<>();
