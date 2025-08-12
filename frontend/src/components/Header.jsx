@@ -15,24 +15,31 @@ export default function Header() {
     const navigate = useNavigate();
 
     const handleSignout = async () => {
-    try {
-        // 1. Remove the token from storage
-        sessionStorage.removeItem('token'); // or localStorage.removeItem('token')
+        try {
+            const token = sessionStorage.getItem('token');
+            
+            if (token) {
+                await fetch('https://aiesecruhuna-production.up.railway.app/api/auth/signout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
+            }
 
-        // 2. Optionally call backend to log sign-out (for logging/statistics)
-        await fetch('/api/auth/signout', {
-        method: 'POST',
-        credentials: 'include',
-        });
+            // Remove token from storage
+            sessionStorage.removeItem('token');
 
-        // 3. Update Redux state
-        dispatch(signoutSuccess());
+            // Update Redux state
+            dispatch(signoutSuccess());
 
-        // 4. Redirect to login or home page
-        navigate('/sign-in'); // or navigate('/')
-    } catch (error) {
-        console.log('Signout error:', error.message);
-    }
+            // Redirect
+            navigate('/');
+        } catch (error) {
+            console.error('Signout error:', error.message);
+        }
     };
     
     return (
