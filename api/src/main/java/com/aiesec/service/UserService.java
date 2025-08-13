@@ -376,4 +376,6 @@ public class UserService {
         result.put("lastMonthAiesecUsers", lastMonth);
         return result;
     }
+
+    
 }
