@@ -62,7 +62,6 @@ public class UserController {
         dto.setRole(role);
         dto.setFirstName(firstName);
         dto.setLastName(lastName);
-        dto.setTeamLeaderAiesecEmail(aiesecEmail);
         dto.setBirthday(birthday);
         dto.setJoinedDate(joinedDate);
         dto.setGender(gender);
