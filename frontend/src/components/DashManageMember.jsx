@@ -108,7 +108,7 @@ export default function DashManageMember() {
         setSuccessMsg("Member updated successfully!");
       } else {
         await axios.post(
-          "https://aiesecruhuna-production.up.railway.app/api/users/add",
+          `https://aiesecruhuna-production.up.railway.app/api/users/add`,
           formData,
           { withCredentials: true }
         );
