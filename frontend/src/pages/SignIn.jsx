@@ -65,6 +65,7 @@ export default function SignIn() {
       const res = await fetch('https://aiesecruhuna-production.up.railway.app/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
