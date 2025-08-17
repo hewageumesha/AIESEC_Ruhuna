@@ -12,8 +12,15 @@ export default function DashSessionLogs() {
 
   const [logs, setLogs] = useState([]);
   const [filteredLogs, setFilteredLogs] = useState([]);
+
+  // filters
   const [searchTerm, setSearchTerm] = useState("");
   const [letterFilter, setLetterFilter] = useState("All");
+  const [dateFilter, setDateFilter] = useState("all");
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
+
+  // pagination
   const [page, setPage] = useState(1);
   const perPage = 15;
 
@@ -33,7 +40,27 @@ export default function DashSessionLogs() {
           headers: { Authorization: `Bearer ${currentUser.token}` },
         }
       );
-      setLogs(res.data);
+
+      // 🔹 Auto-remove logs older than 2 months
+      const twoMonthsAgo = moment().subtract(2, "months");
+      const recentLogs = res.data.filter((log) =>
+        moment(log.loginTime).isAfter(twoMonthsAgo)
+      );
+
+      setLogs(recentLogs);
+
+      // OPTIONAL: delete from backend too
+      const oldLogs = res.data.filter((log) =>
+        moment(log.loginTime).isBefore(twoMonthsAgo)
+      );
+      if (oldLogs.length > 0) {
+        for (const old of oldLogs) {
+          await axios.delete(
+            `https://aiesecruhuna-production.up.railway.app/api/auth/sessions/${old.id}`,
+            { headers: { Authorization: `Bearer ${currentUser.token}` } }
+          );
+        }
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch session logs");
     }
@@ -42,11 +69,10 @@ export default function DashSessionLogs() {
   useEffect(() => {
     let filtered = [...logs];
 
-    // 🔹 Role-based access control
+    // 🔹 Role-based access
     if (currentUser.role === "LCVP") {
       filtered = filtered.filter(
-        (log) =>
-          log.role === "Team_Leader" || log.role === "Member"
+        (log) => log.role === "Team_Leader" || log.role === "Member"
       );
     } else if (currentUser.role === "Team_Leader" || currentUser.role === "Member") {
       filtered = filtered.filter((log) => log.userEmail === currentUser.email);
@@ -57,17 +83,38 @@ export default function DashSessionLogs() {
       log.userEmail.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // 🔹 First name alphabet filter
+    // 🔹 Alphabet filter
     if (letterFilter !== "All") {
       filtered = filtered.filter((log) =>
         log.userEmail[0]?.toUpperCase() === letterFilter
       );
     }
 
-    setFilteredLogs(filtered);
-  }, [logs, searchTerm, letterFilter, currentUser]);
+    // 🔹 Date filter
+    const now = moment();
+    filtered = filtered.filter((log) => {
+      const logDate = moment(log.loginTime);
+      switch (dateFilter) {
+        case "today":
+          return logDate.isSame(now, "day");
+        case "thisWeek":
+          return logDate.isAfter(moment().subtract(7, "days"));
+        case "thisMonth":
+          return logDate.isAfter(moment().subtract(30, "days"));
+        case "custom":
+          if (!customStartDate || !customEndDate) return true;
+          const start = moment(customStartDate);
+          const end = moment(customEndDate).endOf("day");
+          return logDate.isBetween(start, end, null, "[]");
+        default:
+          return true;
+      }
+    });
 
-  // Pagination
+    setFilteredLogs(filtered);
+  }, [logs, searchTerm, letterFilter, dateFilter, customStartDate, customEndDate, currentUser]);
+
+  // pagination
   const startIndex = (page - 1) * perPage;
   const paginated = filteredLogs.slice(startIndex, startIndex + perPage);
   const totalPages = Math.ceil(filteredLogs.length / perPage);
@@ -76,7 +123,7 @@ export default function DashSessionLogs() {
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Session Logs</h1>
 
-      {/* Filters */}
+      {/* Search + Date filter */}
       <div className="mb-4 flex flex-wrap items-center gap-4">
         <div className="flex items-center space-x-2">
           <FaSearch className="text-gray-500" />
@@ -88,9 +135,38 @@ export default function DashSessionLogs() {
             className="border px-3 py-1 rounded-lg dark:bg-gray-700 dark:text-white"
           />
         </div>
+
+        <select
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          className="border rounded-lg px-3 py-1 dark:bg-gray-700 dark:text-white"
+        >
+          <option value="all">All Time</option>
+          <option value="today">Today</option>
+          <option value="thisWeek">This Week</option>
+          <option value="thisMonth">This Month</option>
+          <option value="custom">Custom Range</option>
+        </select>
+
+        {dateFilter === "custom" && (
+          <>
+            <input
+              type="date"
+              value={customStartDate}
+              onChange={(e) => setCustomStartDate(e.target.value)}
+              className="border rounded px-2 py-1"
+            />
+            <input
+              type="date"
+              value={customEndDate}
+              onChange={(e) => setCustomEndDate(e.target.value)}
+              className="border rounded px-2 py-1"
+            />
+          </>
+        )}
       </div>
 
-      {/* Alphabet filter like screenshot */}
+      {/* Alphabet filter */}
       <div className="flex gap-2 flex-wrap mb-4">
         {["All", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"].map((char) => (
           <button
@@ -155,7 +231,7 @@ export default function DashSessionLogs() {
             key={i}
             onClick={() => setPage(i + 1)}
             className={`px-3 py-1 rounded ${
-              page === i + 1 ? "bg-teal-700 text-white" : "bg-gray-200"
+              page === i + 1 ? "bg-teal-700 text-white" : "bg-gray-200 dark:text-black"
             }`}
           >
             {i + 1}
