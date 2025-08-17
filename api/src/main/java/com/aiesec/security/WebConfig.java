@@ -16,6 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("https://aiesec-ruhuna.vercel.app")  // Allow requests from your client
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // Allow specific methods
                 .allowedHeaders("*");  // Allow all headers
+                .allowCredentials(true); // Important when using withCredentials
     }
 
     @Override
