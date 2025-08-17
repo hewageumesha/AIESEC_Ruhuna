@@ -190,25 +190,23 @@ export default function DashSidebar({ tab, subtab }) {
                   <span className="font-medium">Finance</span>
                 </Sidebar.Item>
               </Link>
+
+              <Link to="/dashboard?tab=sessionLogs">
+                <Sidebar.Item
+                  active={tab === 'sessionLogs'}
+                  icon={HiLockClosed}  // or any icon you like
+                  as="div"
+                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  onClick={() => {
+                    setIsCommitteeExpanded(false);
+                    setIsProfileExpanded(false);
+                  }}
+                >
+                  <span className="font-medium">Session Logs</span>
+                </Sidebar.Item>
+              </Link>
             </>
           )}
-
-          {currentUser.role === 'LCVP' && (
-          <Link to="/dashboard?tab=sessionLogs">
-            <Sidebar.Item
-              active={tab === 'sessionLogs'}
-              icon={HiLockClosed}  // or any icon you like
-              as="div"
-              className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              onClick={() => {
-                setIsCommitteeExpanded(false);
-                setIsProfileExpanded(false);
-              }}
-            >
-              <span className="font-medium">Session Logs</span>
-            </Sidebar.Item>
-          </Link>
-        )}
           
           {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
             <>
