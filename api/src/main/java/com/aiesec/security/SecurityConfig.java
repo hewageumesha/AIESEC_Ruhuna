@@ -48,7 +48,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true); // Important if you use cookies or Authorization header
-        config.setAllowedOrigins(List.of("https://aiesec-ruhuna.vercel.app")); // Your frontend domain
+        config.setAllowedOriginPatterns(List.of("https://aiesec-ruhuna.vercel.app")); // Your frontend domain
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*")); // Accept all headers
 
