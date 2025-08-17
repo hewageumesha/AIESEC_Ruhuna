@@ -15,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")  // Apply to all endpoints
                 .allowedOrigins("https://aiesec-ruhuna.vercel.app")  // Allow requests from your client
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // Allow specific methods
-                .allowedHeaders("*");  // Allow all headers
+                .allowedHeaders("*")  // Allow all headers
                 .allowCredentials(true); // Important when using withCredentials
     }
 
