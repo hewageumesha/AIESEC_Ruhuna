@@ -15,32 +15,31 @@ export default function Header() {
     const navigate = useNavigate();
 
     const handleSignout = async () => {
-        try {
-            const token = sessionStorage.getItem('token');
-            
-            if (token) {
-                await fetch('https://aiesecruhuna-production.up.railway.app/api/auth/signout', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include',
-                });
-            }
+    try {
+        const token = sessionStorage.getItem('token');
+        console.log('Token before signout:', token);
 
-            // Remove token from storage
-            sessionStorage.removeItem('token');
+        if (token) {
+            const response = await fetch('http://localhost:8080/api/auth/signout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token.trim()}`,
+                    'Content-Type': 'application/json',
+                },
+            });
 
-            // Update Redux state
-            dispatch(signoutSuccess());
-
-            // Redirect
-            navigate('/');
-        } catch (error) {
-            console.error('Signout error:', error.message);
+            const data = await response.json();
+            console.log('Signout response:', data);
         }
-    };
+
+        sessionStorage.removeItem('token');
+        dispatch(signoutSuccess());
+        navigate('/');
+    } catch (error) {
+        console.error('Signout error:', error.message);
+    }
+};
+
     
     return (
     <Navbar className='border-b-2'>
@@ -101,6 +100,11 @@ export default function Header() {
             <Navbar.Link active={path === '/funcion'} as={'div'}>
                 <Link to="/functional-area" className='font-semibold'>
                     Functional Area
+                </Link>
+            </Navbar.Link >
+            <Navbar.Link active={path === '/project'} as={'div'}>
+                <Link to="/project" className='font-semibold'>
+                    Project
                 </Link>
             </Navbar.Link >
             <Navbar.Link active={path === '/event'} as={'div'}>

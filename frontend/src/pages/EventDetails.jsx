@@ -25,7 +25,7 @@ const EventDetails = () => {
     const fetchEvent = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`https://aiesecruhuna-production.up.railway.app/api/events/${id}`);
+        const res = await axios.get(`http://localhost:8080/api/events/${id}`);
         setEvent(res.data);
       } catch (error) {
         console.error('❌ Error fetching event:', error);

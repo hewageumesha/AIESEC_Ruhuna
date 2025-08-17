@@ -3,6 +3,7 @@ package com.aiesec.controller;
 // Import required classes and annotations
 import com.aiesec.model.User;
 import com.aiesec.security.JwtUtil;
+import com.aiesec.service.JwtBlacklistService;
 import com.aiesec.service.SessionService;
 import com.aiesec.service.UserService;
 
@@ -34,6 +35,9 @@ public class AuthController {
 
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private JwtBlacklistService jwtBlacklistService;
 
     // Endpoint to sign in a user (Login)
     @PostMapping("/signin")
@@ -79,12 +83,14 @@ public class AuthController {
             String token = authorizationHeader.substring(7);
             try {
                 userEmail = jwtUtil.extractUsername(token);
+                // Optionally blacklist token to prevent reuse
+                jwtBlacklistService.blacklistToken(token);
             } catch (Exception e) {
                 System.out.println("Token invalid or expired during signout: " + e.getMessage());
             }
         }
 
-        // Always log logout attempt, even if token is missing/invalid
+        // Log the logout attempt
         sessionService.logLogout(userEmail);
 
         Map<String, String> response = new HashMap<>();

@@ -35,13 +35,13 @@ export default function DashSessionLogs() {
   const fetchLogs = async () => {
     try {
       const res = await axios.get(
-        `https://aiesecruhuna-production.up.railway.app/api/auth/sessions`,
+        `http://localhost:8080/api/auth/sessions`,
         {
           headers: { Authorization: `Bearer ${currentUser.token}` },
         }
       );
 
-      // 🔹 Auto-remove logs older than 2 months
+      // Auto-remove logs older than 2 months
       const twoMonthsAgo = moment().subtract(2, "months");
       const recentLogs = res.data.filter((log) =>
         moment(log.loginTime).isAfter(twoMonthsAgo)
@@ -56,7 +56,7 @@ export default function DashSessionLogs() {
       if (oldLogs.length > 0) {
         for (const old of oldLogs) {
           await axios.delete(
-            `https://aiesecruhuna-production.up.railway.app/api/auth/sessions/${old.id}`,
+            `http://localhost:8080/api/auth/sessions/${old.id}`,
             { headers: { Authorization: `Bearer ${currentUser.token}` } }
           );
         }
@@ -69,28 +69,33 @@ export default function DashSessionLogs() {
   useEffect(() => {
     let filtered = [...logs];
 
-    // 🔹 Role-based access
+    // Role-based access
     if (currentUser.role === "LCVP") {
-      filtered = filtered.filter(
-        (log) => log.role === "Team_Leader" || log.role === "Member"
-      );
+      filtered = filtered.filter((log) => {
+        // Only show Team Leaders and Members from the same function
+        return (
+          (log.role === "Team_Leader" || log.role === "Member") &&
+          log.function?.id === currentUser.function?.id
+        );
+      });
+      console.log( currentUser.function?.id);
     } else if (currentUser.role === "Team_Leader" || currentUser.role === "Member") {
       filtered = filtered.filter((log) => log.userEmail === currentUser.email);
     }
 
-    // 🔹 Search filter
+    // Search filter
     filtered = filtered.filter((log) =>
       log.userEmail.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // 🔹 Alphabet filter
+    // Alphabet filter
     if (letterFilter !== "All") {
       filtered = filtered.filter((log) =>
         log.userEmail[0]?.toUpperCase() === letterFilter
       );
     }
 
-    // 🔹 Date filter
+    // Date filter
     const now = moment();
     filtered = filtered.filter((log) => {
       const logDate = moment(log.loginTime);
