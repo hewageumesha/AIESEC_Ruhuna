@@ -8,7 +8,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -18,6 +23,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ enable CORS
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/api/auth/**").permitAll()
@@ -26,16 +32,10 @@ public class SecurityConfig {
                                 .requestMatchers("/api/events/**").permitAll()
                                 .requestMatchers("/api/tshirts/**").permitAll()
                                 .requestMatchers("/api/**").permitAll()
-                                .requestMatchers("/**").permitAll() // TEMP: allow all for debugging
-
+                                .requestMatchers("/**").permitAll()
                                 .requestMatchers("/uploads/**").permitAll()
                                 .requestMatchers("/api/comments/**").permitAll()
                                 .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session
-                    .invalidSessionUrl("/api/auth/session-expired")
-                    .maximumSessions(1)
-                    .maxSessionsPreventsLogin(false) // Optional: allow new login to replace old one
                 );
         return http.build();
     }
@@ -43,5 +43,22 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    // ✅ CORS configuration
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // Allow only your frontend origin
+        configuration.setAllowedOrigins(List.of("https://aiesec-ruhuna.vercel.app"));
+        
+        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization","Content-Type"));
+        configuration.setAllowCredentials(true); // If using cookies/auth headers
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
