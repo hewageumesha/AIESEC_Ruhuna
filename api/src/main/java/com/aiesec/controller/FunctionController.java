@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*") // Allow requests from all origins (CORS configuration)
 @RestController // Marks this class as a REST controller
 @RequestMapping("/api/functions") // Base path for all function-related endpoints
 public class FunctionController {

@@ -10,12 +10,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 import java.util.Collections;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final String secretKey = "Z7k8J9mI23NwS6mD3QwWmO7Pz0d9Xz1d2Z7k8J9mI23NwS"; // Move to env variable
+    private final String secretKey = "your_secret_key_here"; // Use env variable in production
     private final JwtBlacklistService jwtBlacklistService;
 
     public JwtAuthenticationFilter(JwtBlacklistService jwtBlacklistService) {
@@ -23,18 +24,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7); // Remove "Bearer "
+        String bearer = request.getHeader("Authorization");
+        if (bearer != null && bearer.startsWith("Bearer ")) {
+            return bearer.substring(7);
         }
         return null;
     }
 
     private boolean validateToken(String token) {
         try {
-            Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token);
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
@@ -42,28 +41,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String extractUserEmail(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
                 .getBody()
                 .getSubject();
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
         String token = getTokenFromRequest(request);
 
-        // Check token exists, is valid, and not blacklisted
         if (token != null && validateToken(token) && !jwtBlacklistService.isTokenBlacklisted(token)) {
-            String userEmail = extractUserEmail(token);
-            UsernamePasswordAuthenticationToken authentication = 
-                    new UsernamePasswordAuthenticationToken(userEmail, null, Collections.emptyList());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String email = extractUserEmail(token);
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
-        filterChain.doFilter(request, response);
+        chain.doFilter(request, response);
     }
 }

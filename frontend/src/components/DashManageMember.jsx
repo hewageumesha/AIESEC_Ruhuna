@@ -66,7 +66,7 @@ export default function DashManageMember() {
 
   const fetchMembers = async () => {
     const res = await axios.get("http://localhost:8080/api/users/getall");
-    setMembers(res.data);
+    setMembers(Array.isArray(res.data) ? res.data : []);
   };
 
   const handleChange = (e) => {

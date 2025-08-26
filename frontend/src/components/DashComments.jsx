@@ -44,7 +44,7 @@ export default function DashComments() {
   const fetchMembersWithComments = async () => {
     try {
       setIsLoading(true);
-      const membersRes = await axios.get('http://localhost:8080/api/users/members', {
+      const membersRes = await axios.get(`http://localhost:8080/api/users/members`, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
 
@@ -170,7 +170,7 @@ export default function DashComments() {
     console.log(currentUser);
 
     try {
-      const res = await axios.post('http://localhost:8080/api/comments/add', {
+      const res = await axios.post(`http://localhost:8080/api/comments/add`, {
         content: newComment,
         memberId: selectedMember.id,
         creatorEmail: currentUser.aiesecEmail
@@ -195,7 +195,7 @@ export default function DashComments() {
 
   const handleUpdateComment = async () => {
     try {
-      await axios.put(`/api/comments/${editingCommentId}`, {
+      await axios.put(`http://localhost:8080/api/comments/${editingCommentId}`, {
         content: editingContent
       }, {
         headers: { Authorization: `Bearer ${currentUser.token}` }

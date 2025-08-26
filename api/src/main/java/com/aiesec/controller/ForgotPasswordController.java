@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/forgot-password")
-@CrossOrigin(origins = "*")
 public class ForgotPasswordController {
 
     @Autowired

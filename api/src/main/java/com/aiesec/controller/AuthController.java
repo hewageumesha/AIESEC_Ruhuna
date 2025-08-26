@@ -19,8 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-@CrossOrigin(origins = "*") // Allows requests from any origin (CORS policy)
 @RestController // Marks this class as a REST controller
 @RequestMapping("/api/auth") // Base URL for all endpoints in this controller
 public class AuthController {
@@ -41,26 +39,34 @@ public class AuthController {
 
     // Endpoint to sign in a user (Login)
     @PostMapping("/signin")
-    public ResponseEntity<Object> signIn(@RequestBody User user, HttpServletRequest request) {
+public ResponseEntity<Object> signIn(@RequestBody User user, HttpServletRequest request) {
+    try {
+        System.out.println("Incoming request: " + user);
+
         if (user.getAiesecEmail() == null || user.getPassword() == null) {
             return ResponseEntity.badRequest().body("Email and password must be provided");
         }
 
         Optional<User> existingUser = userService.getUserByAiesecEmail(user.getAiesecEmail());
+        System.out.println("User from DB: " + existingUser);
 
         if (!existingUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with email: " + user.getAiesecEmail());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("User not found with email: " + user.getAiesecEmail());
         }
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        System.out.println("Raw Password: " + user.getPassword());
+        System.out.println("Encoded Password in DB: " + existingUser.get().getPassword());
 
         if (!passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
         }
 
-        // Log login event
         String ipAddress = request.getRemoteAddr();
         String userAgent = request.getHeader("User-Agent");
+        System.out.println("IP: " + ipAddress + ", User-Agent: " + userAgent);
+
         sessionService.logLogin(existingUser.get().getAiesecEmail(), ipAddress, userAgent);
 
         String token = jwtUtil.generateToken(existingUser.get().getAiesecEmail());
@@ -71,7 +77,13 @@ public class AuthController {
         json.put("token", token);
 
         return ResponseEntity.ok().body(json.toString());
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error: " + e.getMessage());
     }
+}
+
 
     @PostMapping("/signout")
     public ResponseEntity<Map<String, String>> signOut(

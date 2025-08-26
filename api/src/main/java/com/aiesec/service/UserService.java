@@ -55,47 +55,45 @@ public class UserService {
 
     // Method to add a new user
     public User addUser(UserRequestDTO dto) {
-    User user = new User();
-    user.setAiesecEmail(dto.getAiesecEmail());
-    user.setEmail(dto.getEmail());
-    user.setFirstName(dto.getFirstName());
-    user.setLastName(dto.getLastName());
-    user.setRole(dto.getRole());
-    user.setBirthday(dto.getBirthday());
-    user.setJoinedDate(dto.getJoinedDate());
+        User user = new User();
+        user.setAiesecEmail(dto.getAiesecEmail());
+        user.setEmail(dto.getEmail());
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setRole(dto.getRole());
+        user.setBirthday(dto.getBirthday());
+        user.setJoinedDate(dto.getJoinedDate());
 
-    Function function = functionRepository.findById(dto.getFunctionId())
-            .orElseThrow(() -> new RuntimeException("Function not found"));
-    user.setFunction(function);
+        Function function = functionRepository.findById(dto.getFunctionId())
+                .orElseThrow(() -> new RuntimeException("Function not found"));
+        user.setFunction(function);
 
-    // Check team leader if role == Member
-    if (dto.getRole() != UserRole.LCP) {
-        if (dto.getTeamLeaderAiesecEmail() == null || dto.getTeamLeaderAiesecEmail().isEmpty()) {
-            throw new RuntimeException("teamLeaderAiesecEmail is required for MEMBER role");
+        if (dto.getRole() != UserRole.LCP) {
+            if (dto.getTeamLeaderAiesecEmail() == null || dto.getTeamLeaderAiesecEmail().isEmpty()) {
+                throw new RuntimeException("teamLeaderAiesecEmail is required for MEMBER role");
+            }
+
+            User teamLeader = userRepository.findByAiesecEmail(dto.getTeamLeaderAiesecEmail())
+                    .orElseThrow(() -> new RuntimeException("Team leader not found"));
+
+            if (teamLeader.getRole() == UserRole.Member) {
+                throw new RuntimeException("Provided team leader email does not belong to a TEAM_LEADER");
+            }
+
+            user.setTeamLeaderAiesecEmail(dto.getTeamLeaderAiesecEmail());
+            user.setTeamLeaderId(String.valueOf(teamLeader.getId()));
         }
 
-        User teamLeader = userRepository.findByAiesecEmail(dto.getTeamLeaderAiesecEmail())
-                .orElseThrow(() -> new RuntimeException("Team leader not found"));
+        // 🔑 FIXED: Encode before saving
+        String tempPassword = generateTempPassword();
+        user.setPassword(passwordEncoder.encode(tempPassword));
 
-        if (teamLeader.getRole() == UserRole.Member) {
-            throw new RuntimeException("Provided team leader email does not belong to a TEAM_LEADER");
-        }
+        userRepository.save(user);
 
-        user.setTeamLeaderAiesecEmail(dto.getTeamLeaderAiesecEmail());
-        user.setTeamLeaderId(String.valueOf(teamLeader.getId())); // Optional, if you want
+        sendTempPasswordEmail(user.getEmail(), tempPassword, user.getAiesecEmail());
+
+        return user;
     }
-
-    String tempPassword = generateTempPassword();
-    user.setPassword(tempPassword);
-    
-
-    userRepository.save(user);
-
-    sendTempPasswordEmail(user.getEmail(), tempPassword, user.getAiesecEmail());
-
-    return user;
-}
-
 
     // Method to update user details
     @Transactional

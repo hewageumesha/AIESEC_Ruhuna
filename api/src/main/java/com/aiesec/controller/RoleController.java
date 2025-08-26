@@ -13,7 +13,6 @@ import com.aiesec.enums.UserRole;
 
 @RestController
 @RequestMapping("/api/roles")
-@CrossOrigin(origins = "*")
 public class RoleController {
 
     @GetMapping("/all")
