@@ -5,14 +5,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class FunctionDTO {
+public class DepartmentDTO {
     private Long id;
     private String name;
 
-    public FunctionDTO() {
+    public DepartmentDTO() {
     }
 
-    public FunctionDTO(Long id, String name) {
+    public DepartmentDTO(Long id, String name) {
         this.id = id;
         this.name = name;
     }

@@ -1,6 +1,5 @@
 package com.aiesec.controller;
 
-// Import required classes and annotations
 import com.aiesec.model.User;
 import com.aiesec.security.JwtUtil;
 import com.aiesec.service.JwtBlacklistService;
@@ -19,15 +18,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-@RestController // Marks this class as a REST controller
-@RequestMapping("/api/auth") // Base URL for all endpoints in this controller
+@RestController 
+@RequestMapping("/api/auth") 
 public class AuthController {
 
-     // Injecting the JWT utility class to generate tokens
     @Autowired
     private JwtUtil jwtUtil;
 
-    // Injecting the UserService to handle user-related operations
     @Autowired
     private UserService userService;
 

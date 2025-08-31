@@ -19,6 +19,7 @@ import EventDetails from "./pages/EventDetails";
 import EditEvent from "./components/event/EditEvent";
 import Function from "./pages/FunctionalArea";
 import SessionManager from "./components/SessionManager"; 
+import Project from "./pages/Project";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/edit-event/:id" element={<EditEvent />} />
         <Route path="/functional-area" element={<Function />} />
+        <Route path="/project" element={<Project />} />
       </Routes>
       <Footer/>
     </BrowserRouter>

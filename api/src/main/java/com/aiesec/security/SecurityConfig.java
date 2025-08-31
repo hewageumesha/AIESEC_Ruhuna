@@ -28,10 +28,13 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/functions/**").permitAll()
+                .requestMatchers("/api/departments/**").permitAll()
+                .requestMatchers("/api/roles/**").permitAll()
                 .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/api/events/**").permitAll()
                 .requestMatchers("/api/tshirts/**").permitAll()
                 .requestMatchers("/api/comments/**").permitAll()
+                .requestMatchers("/api/projects/**").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
                 .anyRequest().authenticated()
             );
@@ -47,7 +50,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true); // Important if you use cookies or Authorization header
-        config.setAllowedOriginPatterns(List.of("https://aiesec-ruhuna.vercel.app")); // Your frontend domain
+        config.setAllowedOriginPatterns(List.of("http://localhost:5173", "https://aiesec-ruhuna.vercel.app")); // Your frontend domain
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*")); // Accept all headers
 

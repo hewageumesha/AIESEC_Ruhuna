@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DashManageMember from './DashManageMember';
 import DashManageFunction from './DashManageFunction';
+import DashManageDepartment from './DashManageDepartment';
 
 const OrgTable = () => {
   const [organization, setOrganization] = useState({});
@@ -93,6 +94,9 @@ const OrgTable = () => {
   }
   if (subtab === 'function') {
     return <DashManageFunction />;
+  }
+  if (subtab === 'department') {
+    return <DashManageDepartment />;
   }
 
   return (

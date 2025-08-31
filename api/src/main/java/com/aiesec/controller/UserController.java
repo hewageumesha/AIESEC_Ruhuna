@@ -47,6 +47,7 @@ public class UserController {
         String email = (String) body.get("email");
         Date birthday = body.get("birthday") != null ? java.sql.Date.valueOf(body.get("birthday").toString()) : null;
         Long function = body.get("function") != null ? Long.parseLong(body.get("function").toString()) : null;
+        Long department = body.get("department") != null ? Long.parseLong(body.get("department").toString()) : null;
         String firstName = (String) body.get("firstName");
         String lastName = (String) body.get("lastName");
         Date joinedDate = body.get("joinedDate") != null ? java.sql.Date.valueOf(body.get("joinedDate").toString()) : null;
@@ -58,6 +59,7 @@ public class UserController {
         dto.setAiesecEmail(aiesecEmail);
         dto.setEmail(email);
         dto.setFunctionId(function);
+        dto.setDepartmentId(department);
         dto.setRole(role);
         dto.setFirstName(firstName);
         dto.setLastName(lastName);

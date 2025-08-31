@@ -18,6 +18,7 @@ export default function DashManageMember() {
     role: "",
     teamLeaderAiesecEmail: "",
     function: "",
+    department: "",
   });
   const [editing, setEditing] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
@@ -27,6 +28,7 @@ export default function DashManageMember() {
   const [deleteId, setDeleteId] = useState(null);
   const [roleOptions, setRoleOptions] = useState([]);
   const [functionOptions, setFunctionOptions] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const getTodayDateString = () => {
@@ -38,15 +40,15 @@ export default function DashManageMember() {
   };
 
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && members.length === 0) {
       fetchData();
     }
-  }, [currentUser]);
+  }, [currentUser, members.length]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      await Promise.all([fetchMembers(), fetchRoles(), fetchFunctions()]);
+      await Promise.all([fetchMembers(), fetchRoles(), fetchFunctions(), fetchDepartment()]);
     } catch (error) {
       setErrorMsg("Failed to fetch initial data");
     } finally {
@@ -64,9 +66,19 @@ export default function DashManageMember() {
     setFunctionOptions(res.data);
   };
 
+  const fetchDepartment = async () => {
+    const res = await axios.get("http://localhost:8080/api/departments/");
+    setDepartmentOptions(res.data);
+  };
+
   const fetchMembers = async () => {
-    const res = await axios.get("http://localhost:8080/api/users/getall");
-    setMembers(Array.isArray(res.data) ? res.data : []);
+    try {
+      const res = await axios.get("http://localhost:8080/api/users/getall");
+      console.log("Fetched members:", res.data);
+      setMembers(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error("Error fetching members:", err);
+    }
   };
 
   const handleChange = (e) => {
@@ -88,6 +100,10 @@ export default function DashManageMember() {
     }
     if (!formData.function) {
       setErrorMsg("Function is required");
+      return false;
+    }
+    if (!formData.department) {
+      setErrorMsg("Department is required");
       return false;
     }
     return true;
@@ -135,6 +151,7 @@ export default function DashManageMember() {
       role: "",
       teamLeaderAiesecEmail: getDefaultTeamLeader(),
       function: getDefaultFunction(),
+      department: getDefaultDepartment(),
     });
     setEditing(false);
     setShowForm(false);
@@ -154,6 +171,7 @@ export default function DashManageMember() {
       role: currentUser.role === "Team_Leader" ? "Member" : "",
       teamLeaderAiesecEmail: getDefaultTeamLeader(),
       function: getDefaultFunction(),
+      department: getDefaultDepartment(),
     });
     setEditing(false);
     setSuccessMsg("");
@@ -173,12 +191,21 @@ export default function DashManageMember() {
     return currentUser.function?.id?.toString() || "";
   };
 
+  const getDefaultDepartment = () => {
+    if (!currentUser) return "";
+    return currentUser.department?.id?.toString() || "";
+  };
+
   const handleEdit = (member) => {
     if (!hasEditPermission(member)) {
       setErrorMsg("You don't have permission to edit this member");
       return;
     }
-    setFormData(member);
+    setFormData({
+      ...member,
+      function: member.function?.id?.toString() || "",
+      department: member.department?.id?.toString() || "",
+    });
     setEditing(true);
     setShowForm(true);
     setSuccessMsg("");
@@ -283,6 +310,14 @@ export default function DashManageMember() {
     if (currentUser.role === "LCP") return functionOptions;
     
     return functionOptions.filter(func => func.id === currentUser.function?.id);
+  };
+
+  const getAvailableDepartment = () => {
+    if (!currentUser) return [];
+    
+    if (currentUser.role === "LCP") return departmentOptions;
+    
+    return departmentOptions.filter(dep => dep.id === currentUser.department?.id);
   };
 
   if (loading && !showForm) {
@@ -422,21 +457,39 @@ export default function DashManageMember() {
             </div>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium dark:text-gray-200">Function *</label>
-            <select
-              name="function"
-              value={formData.function}
-              onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              required
-              disabled={currentUser.role !== "LCP"}
-            >
-              <option value="">Select Function</option>
-              {getAvailableFunctions().map((f) => (
-                <option key={f.id} value={f.id}>{f.name}</option>
-              ))}
-            </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium dark:text-gray-200">Function *</label>
+              <select
+                name="function"
+                value={formData.function}
+                onChange={handleChange}
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                required
+                disabled={currentUser.role !== "LCP"}
+              >
+                <option value="">Select Function</option>
+                {getAvailableFunctions().map((f) => (
+                  <option key={f.id} value={f.id}>{f.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium dark:text-gray-200">Department *</label>
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                required
+                disabled={currentUser.role !== "LCP"}
+              >
+                <option value="">Department</option>
+                {getAvailableDepartment().map((d) => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {formData.role && formData.function && (

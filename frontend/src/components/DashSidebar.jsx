@@ -153,6 +153,16 @@ export default function DashSidebar({ tab, subtab }) {
                       Functions
                     </Sidebar.Item>
                   </Link>
+                  <Link to='/dashboard?tab=manageCommittee&subtab=department'>
+                    <Sidebar.Item
+                      active={tab === 'manageCommittee' && location.search.includes('subtab=department')}
+                      as='div'
+                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=department') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
+                      onClick={() => isMobile && setIsCommitteeExpanded(false)}
+                    >
+                      Departments
+                    </Sidebar.Item>
+                  </Link>
                 </>
                 )}
               </div>
@@ -161,6 +171,16 @@ export default function DashSidebar({ tab, subtab }) {
           
           {(currentUser.role === 'LCP' || currentUser.role === 'LCVP') && (
             <>
+              <Link to='/dashboard?tab=project'>
+                <Sidebar.Item
+                  active={tab === 'project'}
+                  icon={HiRectangleStack} // any icon for project
+                  as='div'
+                  className={`flex justify-between items-center hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors ${tab === 'project' ? 'bg-blue-50 dark:bg-gray-700' : ''}`}
+                >
+                  <span className="font-medium">Project</span>
+                </Sidebar.Item>
+              </Link>
               <Link to='/dashboard?tab=comments'>
                 <Sidebar.Item
                   active={tab === 'comments'}
