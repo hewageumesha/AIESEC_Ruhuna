@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
-import AddBirthday from '../pages/AddBirthday';
-import Home from '../pages/HomeB';
+import AddBirthday from '../pages/birthday/AddBirthday';
+import Home from '../pages/birthday/HomeB';
 
 export default function DashBirthday() {
   return (

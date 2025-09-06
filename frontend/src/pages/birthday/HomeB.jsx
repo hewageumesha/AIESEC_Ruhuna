@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import BirthdayCard from '../components/BirthdayCard';
-import { getDaysUntilBirthday } from '../utils/dateUtils';
+import BirthdayCard from '../../components/birthday/BirthdayCard';
+import { getAgeAndDisplayDate, getDaysUntilBirthday, getColorCode } from '../../utils/dateUtils';
+
 
 const HomeB = ({ setTodayCount }) => {
   const [birthdays, setBirthdays] = useState([]);

@@ -20,8 +20,8 @@ import EditEvent from "./components/event/EditEvent";
 import Function from "./pages/FunctionalArea";
 import SessionManager from "./components/SessionManager"; 
 import Project from "./pages/Project";
-import HomeB from './pages/HomeB';
-import AddBirthday from './pages/AddBirthday';
+import HomeB from './pages/birthday/HomeB';
+import AddBirthday from './pages/birthday/AddBirthday';
 import DashBirthday from './components/DashBirthday';
 
 function App() {

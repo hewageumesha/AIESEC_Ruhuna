@@ -1,5 +1,5 @@
 import React from 'react';
-import { getAgeAndDisplayDate, getDaysUntilBirthday, getColorCode } from '../utils/dateUtils';
+import { getAgeAndDisplayDate, getDaysUntilBirthday, getColorCode } from "../../utils/dateUtils";
 
 const BirthdayCard = ({ birthday }) => {
   const birthDate = new Date(birthday.birthday); // <-- updated field
