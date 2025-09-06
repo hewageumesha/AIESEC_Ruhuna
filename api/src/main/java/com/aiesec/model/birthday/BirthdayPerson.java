@@ -1,5 +1,5 @@
 
-package com.aiesec.model;
+package com.aiesec.model.birthday;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

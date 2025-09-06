@@ -1,4 +1,4 @@
-package com.aiesec.model;
+package com.aiesec.model.birthday;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;

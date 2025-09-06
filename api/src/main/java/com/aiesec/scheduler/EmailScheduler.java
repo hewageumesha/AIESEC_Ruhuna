@@ -1,7 +1,7 @@
 package com.aiesec.scheduler;
 
-import com.aiesec.model.Birthday;
-import com.aiesec.repository.BirthdayRepository;
+import com.aiesec.model.birthday.Birthday;
+import com.aiesec.repository.birthday.BirthdayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

@@ -20,6 +20,9 @@ import EditEvent from "./components/event/EditEvent";
 import Function from "./pages/FunctionalArea";
 import SessionManager from "./components/SessionManager"; 
 import Project from "./pages/Project";
+import HomeB from './pages/HomeB';
+import AddBirthday from './pages/AddBirthday';
+import DashBirthday from './components/DashBirthday';
 
 function App() {
   return (
@@ -44,6 +47,9 @@ function App() {
         <Route path="/edit-event/:id" element={<EditEvent />} />
         <Route path="/functional-area" element={<Function />} />
         <Route path="/project" element={<Project />} />
+        <Route path="/add-birthday" element={<AddBirthday />} />
+        <Route path="/homeB-birthday" element={<HomeB />} />
+        <Route path="/dashboard/birthday/*" element={<DashBirthday />} />
       </Routes>
       <Footer/>
     </BrowserRouter>

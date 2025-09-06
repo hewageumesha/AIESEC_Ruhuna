@@ -1,4 +1,4 @@
-package com.aiesec.service;
+package com.aiesec.service.birthday;
 
 import com.aiesec.dto.BirthdayDTO;
 //import com.aiesec.repository.BirthdayRepository;
@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 @Service
 public class BirthdayReminderService {
 
-    private final EmailService emailService;
+    private final B_EmailService emailService;
     private final UserRepository userRepository;
 
-    public BirthdayReminderService(EmailService emailService, UserRepository userRepository) {
+    public BirthdayReminderService(B_EmailService emailService, UserRepository userRepository) {
         this.emailService = emailService;
         this.userRepository = userRepository;
     }
@@ -51,19 +51,23 @@ public class BirthdayReminderService {
         return userRepository.findAllBirthdays();
     }
 
-    // Save or update a birthday for a user
-    public BirthdayDTO saveBirthday(Long userId, Date birthday) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+   // Save or update a birthday for a user
+public BirthdayDTO saveBirthday(Long userId, Date birthday) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        user.setBirthday(birthday);
-        User saved = userRepository.save(user);
+    
+    java.sql.Date sqlDate = new java.sql.Date(birthday.getTime());
+    user.setBirthday(sqlDate);
 
-        return new BirthdayDTO(
-                saved.getId(),
-                saved.getFirstName() + " " + saved.getLastName(),
-                saved.getBirthday(),
-                saved.getProfilePicture()
-        );
-    }
+    User saved = userRepository.save(user);
+
+    return new BirthdayDTO(
+            saved.getId(),
+            saved.getFirstName() + " " + saved.getLastName(),
+            saved.getBirthday(),
+            saved.getProfilePicture()
+    );
+}
+
 }

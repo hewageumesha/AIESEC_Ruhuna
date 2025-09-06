@@ -1,4 +1,4 @@
-package com.aiesec.service;
+package com.aiesec.service.birthday;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,7 +14,7 @@ import com.aiesec.Record.MailBody;
 import com.aiesec.dto.BirthdayDTO;
 
 @Service
-public class EmailService {
+public class B_EmailService {
 
     @Autowired
     private JavaMailSender mailSender;
@@ -57,7 +57,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public EmailService(JavaMailSender mailSender) {
+    public B_EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 

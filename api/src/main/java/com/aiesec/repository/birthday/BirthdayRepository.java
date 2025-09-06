@@ -1,6 +1,6 @@
-package com.aiesec.repository;
+package com.aiesec.repository.birthday;
 
-import com.aiesec.model.Birthday;
+import com.aiesec.model.birthday.Birthday;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.util.List;

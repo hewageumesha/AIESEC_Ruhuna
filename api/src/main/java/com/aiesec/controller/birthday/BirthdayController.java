@@ -1,7 +1,7 @@
-package com.aiesec.controller;
+package com.aiesec.controller.birthday;
 
 import com.aiesec.dto.BirthdayDTO;
-import com.aiesec.service.BirthdayReminderService;
+import com.aiesec.service.birthday.BirthdayReminderService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

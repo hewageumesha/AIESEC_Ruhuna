@@ -5,8 +5,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 // import com.aiesec.service.Google;
 import com.aiesec.service.EmailService;
-import com.aiesec.model.BirthdayPerson;
-import com.aiesec.service.BirthdayReminderService;
+import com.aiesec.model.birthday.BirthdayPerson;
+import com.aiesec.service.birthday.BirthdayReminderService;
 
 
 
