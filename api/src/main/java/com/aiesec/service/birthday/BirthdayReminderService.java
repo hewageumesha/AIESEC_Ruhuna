@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 @Service
 public class BirthdayReminderService {
 
-    private final B_EmailService emailService;
+    private final BirthdayEmailService emailService;
     private final UserRepository userRepository;
 
-    public BirthdayReminderService(B_EmailService emailService, UserRepository userRepository) {
+    public BirthdayReminderService(BirthdayEmailService emailService, UserRepository userRepository) {
         this.emailService = emailService;
         this.userRepository = userRepository;
     }

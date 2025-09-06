@@ -14,7 +14,7 @@ import com.aiesec.Record.MailBody;
 import com.aiesec.dto.BirthdayDTO;
 
 @Service
-public class B_EmailService {
+public class BirthdayEmailService {
 
     @Autowired
     private JavaMailSender mailSender;
@@ -57,7 +57,7 @@ public class B_EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public B_EmailService(JavaMailSender mailSender) {
+    public BirthdayEmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
