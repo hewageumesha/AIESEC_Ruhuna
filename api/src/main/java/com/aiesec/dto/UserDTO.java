@@ -9,6 +9,7 @@ import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
 import com.aiesec.model.Department;
 import com.aiesec.model.Function;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -35,12 +36,13 @@ public class UserDTO {
     private String profilePicture;
     private UserRole role;
     private UserStatus status;
-    private Function functionId;  
+    private FunctionDTO functionId;  
     private String functionName; 
-    private Department departmentId;  
+    private DepartmentDTO departmentId;  
     private String departmentName;    
     private String teamLeaderAiesecEmail;
     private String teamLeaderName;
+    @JsonIgnore
     private List<UserDTO> teamMembers;
     private List<String> commentsForUser; 
     private List<String> commentsCreated; 

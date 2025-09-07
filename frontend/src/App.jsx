@@ -20,6 +20,8 @@ import EditEvent from "./components/event/EditEvent";
 import Function from "./pages/FunctionalArea";
 import SessionManager from "./components/SessionManager"; 
 import Project from "./pages/Project";
+import ProjectDetail from "./pages/ProjectDetail";
+import { Navigate } from "react-router-dom";
 
 function App() {
   return (
@@ -43,7 +45,11 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/edit-event/:id" element={<EditEvent />} />
         <Route path="/functional-area" element={<Function />} />
-        <Route path="/project" element={<Project />} />
+        <Route path="/projects/igv" element={<Project mainType="iGV" />} />
+        <Route path="/projects/igta" element={<Project mainType="iGTa" />} />
+        <Route path="/projects" element={<Project />} />
+        <Route path="/projects/:type" element={<Project />} />
+        <Route path="/projects/:type/:projectName" element={<ProjectDetail />} />
       </Routes>
       <Footer/>
     </BrowserRouter>
