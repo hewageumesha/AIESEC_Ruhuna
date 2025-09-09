@@ -11,15 +11,11 @@ import { Button, Table } from 'flowbite-react';
 import { Link } from 'react-router-dom';
 
 export default function DashboardComp() {
-  const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [events, setEvents] = useState([]);
   const [totalAiesecUsers, setTotalAiesecUsers] = useState(0);
   const [totalTasks, setTotalTasks] = useState(0);
   const [totalEvents, setTotalEvents] = useState(0);
-  const [lastMonthAiesecUsers, setLastMonthAiesecUsers] = useState(0);
-  const [lastMonthTasks, setLastMonthTasks] = useState(0);
-  const [lastMonthEvents, setLastMonthEvents] = useState(0);
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -29,7 +25,6 @@ export default function DashboardComp() {
         const data = await res.json();
         if (res.ok) {
           setTotalAiesecUsers(data.totalAiesecUsers);
-          setLastMonthAiesecUsers(data.lastMonthAiesecUsers);
         }
       } catch (error) {
         console.log('Error fetching AIESEC users count:', error.message);
@@ -42,7 +37,6 @@ export default function DashboardComp() {
         if (res.ok) {
           setTasks(data.tasks);
           setTotalTasks(data.totalTasks);
-          setLastMonthTasks(data.lastMonthTasks);
         }
       } catch (error) {
         console.log(error.message);
@@ -55,7 +49,6 @@ export default function DashboardComp() {
         if (res.ok) {
           setEvents(data.events);
           setTotalEvents(data.totalEvents);
-          setLastMonthEvents(data.lastMonthEvents);
         }
       } catch (error) {
         console.log(error.message);
@@ -80,13 +73,6 @@ export default function DashboardComp() {
                     </div>
                     <HiOutlineUserGroup className='bg-blue-600  text-white rounded-full text-5xl p-3 shadow-lg' />
                 </div>
-                <div className='flex  gap-2 text-sm'>
-                    <span className='text-red-400 flex items-center'>
-                    <HiArrowNarrowUp />
-                    {lastMonthAiesecUsers}
-                    </span>
-                    <div className='text-gray-500'>Last month</div>
-                </div>
             </div>
             <div className='flex flex-col p-3 dark:bg-slate-800 gap-4 md:w-72 w-full rounded-md shadow-md'>
                 <div className='flex justify-between'>
@@ -98,13 +84,6 @@ export default function DashboardComp() {
                     </div>
                     <HiNewspaper className='bg-blue-600  text-white rounded-full text-5xl p-3 shadow-lg' />
                 </div>
-                <div className='flex  gap-2 text-sm'>
-                    <span className='text-red-400 flex items-center'>
-                    <HiArrowNarrowUp />
-                    {/* {lastMonthTasks} */}
-                    </span>
-                    <div className='text-gray-500'>Last month</div>
-                </div>
             </div>
             <div className='flex flex-col p-3 dark:bg-slate-800 gap-4 md:w-72 w-full rounded-md shadow-md'>
                 <div className='flex justify-between'>
@@ -113,13 +92,6 @@ export default function DashboardComp() {
                     <p className='text-2xl'>{totalEvents}</p>
                     </div>
                     <HiRectangleStack className='bg-blue-600  text-white rounded-full text-5xl p-3 shadow-lg' />
-                </div>
-                <div className='flex  gap-2 text-sm'>
-                    <span className='text-red-400 flex items-center'>
-                    <HiArrowNarrowUp />
-                    {/* {lastMonthEvent} */}
-                    </span>
-                    <div className='text-gray-500'>Last month</div>
                 </div>
             </div>
         </div>

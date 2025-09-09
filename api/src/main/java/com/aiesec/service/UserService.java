@@ -1,8 +1,6 @@
 package com.aiesec.service;
 
 import com.aiesec.dto.PasswordUpdateRequest;
-import com.aiesec.dto.UserDTO;
-import com.aiesec.dto.UserHierarchyDTO;
 import com.aiesec.dto.UserRequestDTO;
 import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.UserRole;
@@ -11,7 +9,6 @@ import com.aiesec.model.User;
 import com.aiesec.repository.UserRepository;
 import com.aiesec.repository.FunctionRepo;
 
-import io.jsonwebtoken.lang.Collections;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +50,6 @@ public class UserService {
     @Autowired
     private JavaMailSender mailSender;
 
-    // Method to add a new user
     public User addUser(UserRequestDTO dto) {
         User user = new User();
         user.setAiesecEmail(dto.getAiesecEmail());
@@ -84,7 +80,6 @@ public class UserService {
             user.setTeamLeaderId(String.valueOf(teamLeader.getId()));
         }
 
-        // 🔑 FIXED: Encode before saving
         String tempPassword = generateTempPassword();
         user.setPassword(passwordEncoder.encode(tempPassword));
 
@@ -95,7 +90,6 @@ public class UserService {
         return user;
     }
 
-    // Method to update user details
     @Transactional
     public User updateUser(String aiesecEmail, UserUpdateDTO dto) {
         User user = userRepository.findByAiesecEmail(aiesecEmail)
@@ -114,7 +108,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // Method to delete a user
     public void deleteUser(String aiesecEmail) {
         User user = userRepository.findByAiesecEmail(aiesecEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -122,12 +115,10 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    // Method to retrieve a user by AIESEC email
     public Optional<User> getUserByAiesecEmail(String aiesecEmail) {
         try {
             return userRepository.findByAiesecEmail(aiesecEmail);
         } catch (Exception e) {
-            // Log the exception
             logger.error("Error retrieving user by email: " + aiesecEmail, e);
             throw new RuntimeException("Error retrieving user by email");
         }
@@ -136,26 +127,22 @@ public class UserService {
     public Map<String, Object> getUserStats(int limit) {
         Map<String, Object> response = new HashMap<>();
 
-        // Get total users
         long totalUsers = userRepository.count();
         response.put("totalUsers", totalUsers);
 
-        // Get 5 most recent users
         List<User> recentUsers = userRepository.findTop5ByOrderByJoinedDateDesc();
         response.put("users", recentUsers);
 
-        // Calculate last month's date range
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, 1); // 1st of current month
+        calendar.set(Calendar.DAY_OF_MONTH, 1); 
         Date startOfThisMonth = calendar.getTime();
 
-        calendar.add(Calendar.MONTH, -1); // go to last month
+        calendar.add(Calendar.MONTH, -1); 
         Date startOfLastMonth = calendar.getTime();
 
         calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
         Date endOfLastMonth = calendar.getTime();
 
-        // Get users joined last month
         long lastMonthUsers = userRepository.countUsersJoinedLastMonth(startOfLastMonth, endOfLastMonth);
         response.put("lastMonthUsers", lastMonthUsers);
 
@@ -203,14 +190,12 @@ public class UserService {
         user.setTeamLeaderAiesecEmail(userDetails.getTeamLeaderAiesecEmail());
     }
 
-    // ✅ HANDLE PROFILE PHOTO
     if (profilePhoto != null && !profilePhoto.isEmpty()) {
         String filename = UUID.randomUUID().toString() + "_" + profilePhoto.getOriginalFilename();
         Path path = Paths.get("uploads", filename);
-        Files.createDirectories(path.getParent()); // Ensure /uploads exists
+        Files.createDirectories(path.getParent()); 
         Files.write(path, profilePhoto.getBytes());
 
-        // Update profile picture URL
         String photoUrl = "http://localhost:8080/uploads/" + filename;
         user.setProfilePicture(photoUrl);
     }
@@ -232,7 +217,6 @@ public class UserService {
         Map<String, User> userById = userList.stream()
                 .collect(Collectors.toMap(u -> u.getId().toString(), u -> u));
 
-        // Find all LCPs (top-level users)
         List<User> lcps = userList.stream()
                 .filter(u -> u.getRole().equals(UserRole.LCP) && u.getTeamLeaderId() == null)
                 .toList();
@@ -242,7 +226,6 @@ public class UserService {
         for (User lcp : lcps) {
             Map<String, Object> lcpMap = new LinkedHashMap<>();
 
-            // LCP section
             Map<String, Object> lcpDetails = new LinkedHashMap<>();
             lcpDetails.put("id", lcp.getId().toString());
             lcpDetails.put("name", lcp.getFirstName() + " " + lcp.getLastName());
@@ -253,7 +236,6 @@ public class UserService {
             lcpDetails.put("tenure", getTenureString(lcp.getJoinedDate()));
             lcpMap.put("lcp", lcpDetails);
 
-            // LCVPs
             List<Map<String, Object>> lcvpList = new ArrayList<>();
             for (User lcvp : findChildren(userList, lcp.getId(), UserRole.LCVP)) {
                 Map<String, Object> lcvpMap = new LinkedHashMap<>();
@@ -265,7 +247,6 @@ public class UserService {
                 lcvpMap.put("phoneNumber", lcvp.getPhoneNumber());
                 lcvpMap.put("tenure", getTenureString(lcvp.getJoinedDate()));
 
-                // Team Leaders
                 List<Map<String, Object>> teamLeaders = new ArrayList<>();
                 for (User tl : findChildren(userList, lcvp.getId(), UserRole.Team_Leader)) {
                     Map<String, Object> tlMap = new LinkedHashMap<>();
@@ -276,7 +257,6 @@ public class UserService {
                     tlMap.put("email", tl.getAiesecEmail());
                     tlMap.put("phoneNumber", tl.getPhoneNumber());
 
-                    // Members
                     List<Map<String, Object>> memberList = new ArrayList<>();
                     for (User member : findChildren(userList, tl.getId(), UserRole.Member)) {
                         Map<String, Object> memberMap = new LinkedHashMap<>();
@@ -375,5 +355,22 @@ public class UserService {
         return result;
     }
 
-    
+    public List<User> getAllUsers(UserRole roleFilter) {
+        if (roleFilter != null) {
+            return userRepository.findByRole(roleFilter);
+        }
+        return userRepository.findAll();
+    }
+
+    public List<User> getUsersByFunction(Function function, UserRole roleFilter) {
+        if (roleFilter != null) {
+            return userRepository.findByFunctionIdAndRole(function, roleFilter);
+        }
+        return userRepository.findByFunctionId(function);
+    }
+
+    public List<User> getMembersByFunction(Function function) {
+        return userRepository.findByFunctionIdAndRole(function, UserRole.Member);
+    }
+
 }

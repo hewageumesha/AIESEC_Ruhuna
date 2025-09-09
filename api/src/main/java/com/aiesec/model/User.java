@@ -16,7 +16,6 @@ import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Getter
 @Setter
@@ -95,12 +94,11 @@ public class User {
     @PrePersist
     public void prePersist() {
         if (this.password != null) {
-            this.password = encodePassword(this.password);  // Automatically encode password before persisting
+            this.password = encodePassword(this.password);  
         }
     }
 
     private String encodePassword(String rawPassword) {
-        // Assuming you have access to a password encoder here, you could inject it or use it statically
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.encode(rawPassword);
     }

@@ -30,6 +30,7 @@ export default function DashManageMember() {
   const [functionOptions, setFunctionOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [filterRole, setFilterRole] = useState("");
 
   const getTodayDateString = () => {
     const today = new Date();
@@ -294,25 +295,31 @@ export default function DashManageMember() {
 
   const getFilteredMembers = () => {
     if (!currentUser) return [];
-    
-    if (currentUser.role === "LCP") return members;
-    
-    if (currentUser.role === "LCVP") {
-      return members.filter(member => 
-        (member.role === "Team_Leader" || member.role === "Member") && 
-        member.function?.id === currentUser.function?.id
+
+    let visibleMembers = [];
+
+    if (currentUser.role === "LCP") {
+      visibleMembers = members;
+    } else if (currentUser.role === "LCVP") {
+      if (!currentUser.function) return [];
+      visibleMembers = members.filter(member => 
+        (member.role === "Team_Leader" || member.role === "Member") &&
+        parseInt(member.function?.id) === parseInt(currentUser.function?.id)
+      );
+    } else if (currentUser.role === "Team_Leader") {
+      visibleMembers = members.filter(member => 
+        member.role === "Member" &&
+        parseInt(member.function?.id) === parseInt(currentUser.function?.id) &&
+        member.teamLeaderAiesecEmail?.trim() === currentUser.aiesecEmail?.trim()
       );
     }
-    
-    if (currentUser.role === "Team_Leader") {
-      return members.filter(member => 
-        member.role === "Member" && 
-        member.function?.id === currentUser.function?.id &&
-        member.teamLeaderAiesecEmail === currentUser.aiesecEmail
-      );
+
+    // Apply filter if selected
+    if (filterRole) {
+      visibleMembers = visibleMembers.filter(m => m.role === filterRole);
     }
-    
-    return [];
+
+    return visibleMembers;
   };
 
   const getAvailableRoles = () => {
@@ -566,7 +573,32 @@ export default function DashManageMember() {
       )}
 
       <div className="bg-white rounded-lg shadow-md p-6 mt-6 dark:bg-[rgb(26,35,58)]">
-        <h2 className="text-lg font-medium mb-4 dark:text-gray-50">Members List</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-medium dark:text-gray-50">Members List</h2>
+
+          {(currentUser.role === "LCP" || currentUser.role === "LCVP") && (
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className="rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2"
+            >
+              <option value="">All</option>
+              {currentUser.role === "LCP" && (
+                <>
+                  <option value="LCVP">LCVP</option>
+                  <option value="Team_Leader">Team Leader</option>
+                  <option value="Member">Member</option>
+                </>
+              )}
+              {currentUser.role === "LCVP" && (
+                <>
+                  <option value="Team_Leader">Team Leader</option>
+                  <option value="Member">Member</option>
+                </>
+              )}
+            </select>
+          )}
+        </div>  
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-700">
@@ -574,6 +606,7 @@ export default function DashManageMember() {
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Name</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">AIESEC Email</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Role</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Function</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th>
               </tr>
             </thead>
@@ -588,6 +621,9 @@ export default function DashManageMember() {
                   </td>
                   <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
                     {member.role}
+                  </td>
+                  <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
+                    {member.function?.name || "-"}
                   </td>
                   <td className="px-4 py-2">
                     <div className="flex space-x-2">

@@ -13,5 +13,4 @@ public class TshirtOrderDTO {
     private Integer quantity;
     private String size;
     private Long userId;
-    // private Long guestUserId;
 }

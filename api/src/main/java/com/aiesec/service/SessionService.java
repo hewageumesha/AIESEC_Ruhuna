@@ -19,7 +19,7 @@ public class SessionService {
     private SessionLogRepository sessionLogRepo;
 
     @Autowired
-    private UserService userService;  // Inject UserService
+    private UserService userService;  
 
     public void logLogin(String userEmail, String ipAddress, String userAgent) {
         SessionLog log = new SessionLog();
@@ -44,7 +44,6 @@ public class SessionService {
         return sessionLogRepo.findAll();
     }
 
-    // DTO class combining session log + user role
     public static class SessionLogWithRole {
         private Long id;
         private String userEmail;
@@ -66,7 +65,6 @@ public class SessionService {
             this.userAgent = log.getUserAgent();
         }
 
-        // Getters and setters (or use Lombok @Getter/@Setter if preferred)
         public Long getId() { return id; }
         public String getUserEmail() { return userEmail; }
         public String getRole() { return role; }
@@ -86,7 +84,6 @@ public class SessionService {
         public void setUserAgent(String userAgent) { this.userAgent = userAgent; }
     }
 
-    // New method to return session logs with user roles
     public List<SessionLogWithRole> getAllSessionsWithRoles() {
         List<SessionLog> sessions = sessionLogRepo.findAll();
         return sessions.stream().map(log -> {

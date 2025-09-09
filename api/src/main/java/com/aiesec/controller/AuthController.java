@@ -36,50 +36,48 @@ public class AuthController {
 
     // Endpoint to sign in a user (Login)
     @PostMapping("/signin")
-public ResponseEntity<Object> signIn(@RequestBody User user, HttpServletRequest request) {
-    try {
-        System.out.println("Incoming request: " + user);
+    public ResponseEntity<Object> signIn(@RequestBody User user, HttpServletRequest request) {
+        try {
+            System.out.println("Incoming request: " + user);
 
-        if (user.getAiesecEmail() == null || user.getPassword() == null) {
-            return ResponseEntity.badRequest().body("Email and password must be provided");
+            if (user.getAiesecEmail() == null || user.getPassword() == null) {
+                return ResponseEntity.badRequest().body("Email and password must be provided");
+            }
+
+            Optional<User> existingUser = userService.getUserByAiesecEmail(user.getAiesecEmail());
+            System.out.println("User from DB: " + existingUser);
+
+            if (!existingUser.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("User not found with email: " + user.getAiesecEmail());
+            }
+
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+            if (!passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
+            }
+
+            String ipAddress = request.getRemoteAddr();
+            String userAgent = request.getHeader("User-Agent");
+            System.out.println("IP: " + ipAddress + ", User-Agent: " + userAgent);
+
+            sessionService.logLogin(existingUser.get().getAiesecEmail(), ipAddress, userAgent);
+
+            String token = jwtUtil.generateToken(existingUser.get().getAiesecEmail());
+
+            JSONObject json = new JSONObject();
+            json.put("role", existingUser.get().getRole());
+            json.put("aiesecEmail", existingUser.get().getAiesecEmail());
+            json.put("token", token);
+
+            return ResponseEntity.ok().body(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error: " + e.getMessage());
         }
-
-        Optional<User> existingUser = userService.getUserByAiesecEmail(user.getAiesecEmail());
-        System.out.println("User from DB: " + existingUser);
-
-        if (!existingUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("User not found with email: " + user.getAiesecEmail());
-        }
-
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        System.out.println("Raw Password: " + user.getPassword());
-        System.out.println("Encoded Password in DB: " + existingUser.get().getPassword());
-
-        if (!passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
-        }
-
-        String ipAddress = request.getRemoteAddr();
-        String userAgent = request.getHeader("User-Agent");
-        System.out.println("IP: " + ipAddress + ", User-Agent: " + userAgent);
-
-        sessionService.logLogin(existingUser.get().getAiesecEmail(), ipAddress, userAgent);
-
-        String token = jwtUtil.generateToken(existingUser.get().getAiesecEmail());
-
-        JSONObject json = new JSONObject();
-        json.put("role", existingUser.get().getRole());
-        json.put("aiesecEmail", existingUser.get().getAiesecEmail());
-        json.put("token", token);
-
-        return ResponseEntity.ok().body(json.toString());
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + e.getMessage());
     }
-}
 
 
     @PostMapping("/signout")
@@ -92,14 +90,12 @@ public ResponseEntity<Object> signIn(@RequestBody User user, HttpServletRequest 
             String token = authorizationHeader.substring(7);
             try {
                 userEmail = jwtUtil.extractUsername(token);
-                // Optionally blacklist token to prevent reuse
                 jwtBlacklistService.blacklistToken(token);
             } catch (Exception e) {
                 System.out.println("Token invalid or expired during signout: " + e.getMessage());
             }
         }
 
-        // Log the logout attempt
         sessionService.logLogout(userEmail);
 
         Map<String, String> response = new HashMap<>();
