@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Getter
@@ -105,5 +106,6 @@ public class User {
     }
 
     @OneToOne(mappedBy = "user")
+    @JsonIgnore
     private ForgotPassword forgotPassword;
 }

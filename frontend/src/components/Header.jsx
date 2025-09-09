@@ -102,8 +102,8 @@ export default function Header() {
                     Functional Area
                 </Link>
             </Navbar.Link >
-            <Navbar.Link active={path === '/project'} as={'div'}>
-                <Link to="/project" className='font-semibold'>
+            <Navbar.Link active={path === '/projects'} as={'div'}>
+                <Link to="/projects" className='font-semibold'>
                     Project
                 </Link>
             </Navbar.Link >

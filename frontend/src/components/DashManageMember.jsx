@@ -40,10 +40,10 @@ export default function DashManageMember() {
   };
 
   useEffect(() => {
-    if (currentUser && members.length === 0) {
+    if (currentUser) {
       fetchData();
     }
-  }, [currentUser, members.length]);
+  }, [currentUser]);
 
   const fetchData = async () => {
     try {
@@ -72,14 +72,41 @@ export default function DashManageMember() {
   };
 
   const fetchMembers = async () => {
-    try {
-      const res = await axios.get("http://localhost:8080/api/users/getall");
-      console.log("Fetched members:", res.data);
-      setMembers(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      console.error("Error fetching members:", err);
+  try {
+    const res = await axios.get("http://localhost:8080/api/users/getall");
+    if (!Array.isArray(res.data)) {
+      console.error("Members data is not an array:", res.data);
+      setMembers([]);
+      return;
     }
-  };
+
+    // Remove fields that may cause circular references
+    const cleaned = res.data.map(m => ({
+      id: m.id,
+      firstName: m.firstName,
+      lastName: m.lastName,
+      email: m.email,
+      aiesecEmail: m.aiesecEmail,
+      birthday: m.birthday,
+      gender: m.gender,
+      joinedDate: m.joinedDate,
+      profilePicture: m.profilePicture,
+      phoneNumber: m.phoneNumber,
+      role: m.role,
+      function: m.function ? { id: m.function.id, name: m.function.name } : null,
+      department: m.department ? { id: m.department.id, name: m.department.name } : null,
+      teamLeaderAiesecEmail: m.teamLeaderAiesecEmail,
+      teamMembers: undefined, // REMOVE circular references
+    }));
+
+    setMembers(cleaned);
+  } catch (err) {
+    console.error("Error fetching members:", err);
+    setMembers([]);
+  }
+};
+
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
