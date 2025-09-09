@@ -19,7 +19,7 @@ const AddBirthday = () => {
     try {
 
       // Send POST request
-      await axios.post("http://localhost:8080/api/birthdays", formData);
+      await axios.post("http://localhost:8080/api/users/birthdays", formData);
 
      
       setSuccessMsg("🎉 Birthday added successfully!");
