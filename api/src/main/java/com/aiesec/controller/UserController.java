@@ -232,4 +232,17 @@ public class UserController {
             return ResponseEntity.status(500).body("Internal server error.");
         }
     }
+
+    @GetMapping("/birthdays")
+public ResponseEntity<List<UserDTO>> getAllBirthdays() {
+    List<User> users = userRepo.findAll();
+
+    List<UserDTO> birthdays = users.stream()
+        .filter(user -> user.getBirthday() != null) // only users with a birthday
+        .map(this::mapToDTO)
+        .collect(Collectors.toList());
+
+    return ResponseEntity.ok(birthdays);
+}
+
 }

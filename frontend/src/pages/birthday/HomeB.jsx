@@ -7,7 +7,7 @@ const HomeB = ({ setTodayCount }) => {
   const [birthdays, setBirthdays] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/birthdays')
+    fetch("http://localhost:8080/api/users/birthdays")
       .then((response) => response.json())
       .then((data) => {
         const today = new Date();
