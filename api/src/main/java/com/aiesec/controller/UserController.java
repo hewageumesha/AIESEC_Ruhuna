@@ -1,6 +1,9 @@
 package com.aiesec.controller;
 
+import com.aiesec.dto.DepartmentDTO;
+import com.aiesec.dto.FunctionDTO;
 import com.aiesec.dto.PasswordUpdateRequest;
+import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserRequestDTO;
 import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.Gender;
@@ -9,6 +12,8 @@ import com.aiesec.model.User;
 
 import com.aiesec.repository.UserRepository;
 import com.aiesec.service.UserService;
+
+import io.jsonwebtoken.lang.Collections;
 
 import java.sql.Date;
 import java.util.List;
@@ -106,12 +111,46 @@ public class UserController {
         return userService.getUserStats(limit);
     }
 
+    public UserDTO mapToDTO(User user) {
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setEmail(user.getEmail());
+        dto.setAiesecEmail(user.getAiesecEmail());
+        dto.setPhone(user.getPhoneNumber());
+        dto.setStreetAddress(user.getStreetAddress());
+        dto.setCity(user.getCity());
+        dto.setStateORProvince(user.getStateORProvince());
+        dto.setS_department(user.getS_department());
+        dto.setFaculty(user.getFaculty());
+        dto.setBirthday(user.getBirthday());
+        dto.setGender(user.getGender());
+        dto.setJoinedDate(user.getJoinedDate());
+        dto.setProfilePicture(user.getProfilePicture());
+        dto.setRole(user.getRole());
+        dto.setStatus(user.getStatus());
+        dto.setTeamLeaderAiesecEmail(user.getTeamLeaderAiesecEmail());
+
+        // Map department safely
+        if (user.getDepartment() != null) {
+            dto.setDepartmentId(new DepartmentDTO(user.getDepartment().getId(), user.getDepartment().getName()));
+            dto.setDepartmentName(user.getDepartment().getName());
+        }
+
+        // Map function safely
+        if (user.getFunction() != null) {
+            dto.setFunctionId(new FunctionDTO(user.getFunction().getId(), user.getFunction().getName()));
+            dto.setFunctionName(user.getFunction().getName());
+        }
+        return dto;
+    }
+
 
     @GetMapping("/members")
-    public List<User> getAllMembers() {
-       List<User> members =  userRepo.findByRole(UserRole.Member);
-       System.out.println(members.size());
-        return members;
+    public List<UserDTO> getAllMembers() {
+        List<User> members = userRepo.findByRole(UserRole.Member);
+        return members.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @GetMapping("/getall")
