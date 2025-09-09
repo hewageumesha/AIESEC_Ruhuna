@@ -231,17 +231,27 @@ public class UserController {
     }
 
     @GetMapping("/list")
-public List<User> getUsersList(@AuthenticationPrincipal User currentUser,
+    public List<User> getUsersList(@AuthenticationPrincipal User currentUser,
                                @RequestParam(required = false) UserRole roleFilter) {
-    if (currentUser.getRole() == UserRole.LCP) {
-        return userService.getAllUsers(roleFilter);
-    } else if (currentUser.getRole() == UserRole.LCVP) {
-        return userService.getUsersByFunction(currentUser.getFunction(), roleFilter);
-    } else if (currentUser.getRole() == UserRole.Team_Leader) {
-        return userService.getMembersByFunction(currentUser.getFunction());
-    } else {
-        return List.of(currentUser);
+      if (currentUser.getRole() == UserRole.LCP) {
+          return userService.getAllUsers(roleFilter);
+      } else if (currentUser.getRole() == UserRole.LCVP) {
+          return userService.getUsersByFunction(currentUser.getFunction(), roleFilter);
+      } else if (currentUser.getRole() == UserRole.Team_Leader) {
+          return userService.getMembersByFunction(currentUser.getFunction());
+      } else {
+          return List.of(currentUser);
     }
-}
+  
+    @GetMapping("/birthdays")
+    public ResponseEntity<List<UserDTO>> getAllBirthdays() {
+        List<User> users = userRepo.findAll();
 
+        List<UserDTO> birthdays = users.stream()
+            .filter(user -> user.getBirthday() != null) // only users with a birthday
+            .map(this::mapToDTO)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(birthdays);
+    }
 }
