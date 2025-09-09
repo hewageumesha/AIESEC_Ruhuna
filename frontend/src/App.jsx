@@ -20,6 +20,9 @@ import EditEvent from "./components/event/EditEvent";
 import Function from "./pages/FunctionalArea";
 import SessionManager from "./components/SessionManager"; 
 import Project from "./pages/Project";
+import HomeB from './pages/birthday/HomeB';
+import AddBirthday from './pages/birthday/AddBirthday';
+import DashBirthday from './components/DashBirthday';
 import ProjectDetail from "./pages/ProjectDetail";
 import { Navigate } from "react-router-dom";
 
@@ -45,6 +48,10 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/edit-event/:id" element={<EditEvent />} />
         <Route path="/functional-area" element={<Function />} />
+        <Route path="/project" element={<Project />} />
+        <Route path="/add-birthday" element={<AddBirthday />} />
+        <Route path="/homeB-birthday" element={<HomeB />} />
+        <Route path="/dashboard/birthday/*" element={<DashBirthday />} />
         <Route path="/projects/igv" element={<Project mainType="iGV" />} />
         <Route path="/projects/igta" element={<Project mainType="iGTa" />} />
         <Route path="/projects" element={<Project />} />

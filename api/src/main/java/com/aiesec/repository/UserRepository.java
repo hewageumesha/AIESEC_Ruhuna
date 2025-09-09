@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.aiesec.dto.BirthdayDTO;
 import com.aiesec.enums.UserRole;
 import com.aiesec.model.User;
 
@@ -43,4 +44,8 @@ public interface UserRepository extends JpaRepository<User, Long>{
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.aiesecEmail IS NOT NULL AND u.joinedDate BETWEEN :startDate AND :endDate")
     long countUsersWithAiesecEmailJoinedLastMonth(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+     @Query("SELECT new com.aiesec.dto.BirthdayDTO(u.id, CONCAT(u.firstName, ' ', u.lastName), u.birthday, u.profilePicture) " +
+       "FROM User u WHERE u.birthday IS NOT NULL")
+List<BirthdayDTO> findAllBirthdays();
 }
