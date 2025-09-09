@@ -2,9 +2,7 @@ import { Sidebar } from 'flowbite-react';
 import React from 'react';
 import {
     HiUser,
-    HiArrowSmRight,
     HiNewspaper,
-    HiCreditCard,
     HiCake,
     HiChartPie,
     HiUserGroup,
@@ -15,18 +13,14 @@ import {
 import { HiRectangleStack, HiChatBubbleLeftEllipsis } from "react-icons/hi2";
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { signoutSuccess } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 
 export default function DashSidebar({ tab, subtab }) {
   const location = useLocation();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user)
   const [isCommitteeExpanded, setIsCommitteeExpanded] = useState(false);
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
 
@@ -193,21 +187,6 @@ export default function DashSidebar({ tab, subtab }) {
                   }}
                 >
                   <span className="font-medium">Comments</span>
-                </Sidebar.Item>
-              </Link>
-
-              <Link to='/dashboard?tab=finance'>
-                <Sidebar.Item
-                  active={tab === 'finance'}
-                  icon={HiCreditCard}
-                  as='div'
-                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  onClick={() => {
-                    setIsCommitteeExpanded(false);
-                    setIsProfileExpanded(false);
-                  }}
-                >
-                  <span className="font-medium">Finance</span>
                 </Sidebar.Item>
               </Link>
 

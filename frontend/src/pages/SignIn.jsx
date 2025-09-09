@@ -55,7 +55,7 @@ export default function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -65,30 +65,24 @@ export default function SignIn() {
       const res = await fetch(`http://localhost:8080/api/auth/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
-      
-
       const data = await res.json();
+
       if (!res.ok) {
         return dispatch(signInFailure(data.message));
       }
 
-      dispatch(signInSuccess(data));
-
-      console.log('User signed in successfully:', data.role);
-      // Role-based redirection
-      if (data.role === 'LCP') {
-        navigate('/dashboard');
-      } else if (data.role === 'LCVP') {
-        navigate('/dashboard');
-      } else if (data.role === 'Team_Leader') {
-        navigate('/dashboard');
-      } else if(data.role === 'Member'){
-        navigate('/dashboard');
+      if (data.token) {
+        sessionStorage.setItem("token", data.token);
       }
+
+      dispatch(signInSuccess(data));
+      console.log('User signed in successfully:', data.role);
+
+      navigate('/dashboard');
+
     } catch (error) {
       dispatch(signInFailure(error.message));
     }

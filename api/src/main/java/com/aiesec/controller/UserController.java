@@ -13,8 +13,6 @@ import com.aiesec.model.User;
 import com.aiesec.repository.UserRepository;
 import com.aiesec.service.UserService;
 
-import io.jsonwebtoken.lang.Collections;
-
 import java.sql.Date;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +22,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -132,13 +131,11 @@ public class UserController {
         dto.setStatus(user.getStatus());
         dto.setTeamLeaderAiesecEmail(user.getTeamLeaderAiesecEmail());
 
-        // Map department safely
         if (user.getDepartment() != null) {
             dto.setDepartmentId(new DepartmentDTO(user.getDepartment().getId(), user.getDepartment().getName()));
             dto.setDepartmentName(user.getDepartment().getName());
         }
 
-        // Map function safely
         if (user.getFunction() != null) {
             dto.setFunctionId(new FunctionDTO(user.getFunction().getId(), user.getFunction().getName()));
             dto.setFunctionName(user.getFunction().getName());
@@ -232,4 +229,19 @@ public class UserController {
             return ResponseEntity.status(500).body("Internal server error.");
         }
     }
+
+    @GetMapping("/list")
+public List<User> getUsersList(@AuthenticationPrincipal User currentUser,
+                               @RequestParam(required = false) UserRole roleFilter) {
+    if (currentUser.getRole() == UserRole.LCP) {
+        return userService.getAllUsers(roleFilter);
+    } else if (currentUser.getRole() == UserRole.LCVP) {
+        return userService.getUsersByFunction(currentUser.getFunction(), roleFilter);
+    } else if (currentUser.getRole() == UserRole.Team_Leader) {
+        return userService.getMembersByFunction(currentUser.getFunction());
+    } else {
+        return List.of(currentUser);
+    }
+}
+
 }

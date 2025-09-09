@@ -14,5 +14,5 @@ public class MerchandiseDTO {
     private boolean available;
     private String description;
     private List<String> imageUrls;
-    private Long eventId; // Link to the event
+    private Long eventId; 
 }

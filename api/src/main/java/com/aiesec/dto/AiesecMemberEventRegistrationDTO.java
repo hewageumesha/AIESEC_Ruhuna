@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
-
 public class AiesecMemberEventRegistrationDTO {
     private Long id;
     private Long userId;

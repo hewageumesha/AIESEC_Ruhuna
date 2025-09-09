@@ -22,18 +22,17 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Return authorities if needed
-        return Collections.emptyList(); // or map roles if you use them
+        return Collections.emptyList(); 
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword(); // or null if not used
+        return user.getPassword(); 
     }
 
     @Override
     public String getUsername() {
-        return user.getAiesecEmail(); // or whatever unique field you use
+        return user.getAiesecEmail();
     }
 
     @Override

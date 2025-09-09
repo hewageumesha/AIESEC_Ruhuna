@@ -1,19 +1,15 @@
 package com.aiesec.dto;
 
-
 import java.sql.Date;
 import java.util.List;
 
 import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
-import com.aiesec.model.Department;
-import com.aiesec.model.Function;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.Setter;
-
 
 @Getter
 @Setter
@@ -21,7 +17,7 @@ public class UserDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    private String aiesecEmail;  // Add this field
+    private String aiesecEmail;  
     private String email;
     private String phone;
     private String streetAddress;

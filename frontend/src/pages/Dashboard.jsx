@@ -5,7 +5,6 @@ import DashProfile from '../components/DashProfile';
 import DashManageCommitee from '../components/DashManageCommitee';
 import DashTask from '../components/DashTask';
 import DashEvent from '../components/DashEvent';
-import DashFinance from '../components/DashFinance';
 import DashBirthday from '../components/DashBirthday';
 import DashboardComp from '../components/DashboardComp';
 import DashComments from '../components/DashComments';
@@ -47,7 +46,6 @@ export default function Dashboard() {
     project: <DashProject />,
     task: <DashTask />,
     event: <DashEvent />,
-    finance: <DashFinance />,
     birthday: <DashBirthday />,
     comments: <DashComments />,
     sessionLogs: <DashSessionLogs />,

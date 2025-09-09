@@ -14,8 +14,8 @@ import java.time.LocalDate;
 public class EventExperienceDTO {
     private Long experienceId;
     private Long eventId;
-    private Long userId; //AIESEC Member
-    private Long guestUserId;  //Guest
+    private Long userId;
+    private Long guestUserId; 
     private Integer rating;
     private String testimonial;
     private LocalDate dateCreated;

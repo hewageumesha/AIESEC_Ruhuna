@@ -16,7 +16,7 @@ import java.util.Collections;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final String secretKey = "your_secret_key_here"; // Use env variable in production
+    private final String secretKey = "your_secret_key_here"; 
     private final JwtBlacklistService jwtBlacklistService;
 
     public JwtAuthenticationFilter(JwtBlacklistService jwtBlacklistService) {
@@ -50,7 +50,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
     
-        // Skip JWT check for preflight requests
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
             filterChain.doFilter(request, response);

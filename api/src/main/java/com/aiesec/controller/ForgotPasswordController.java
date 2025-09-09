@@ -48,7 +48,6 @@ public class ForgotPasswordController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        // Simulate password update
         System.out.println("Password reset for: " + email);
         response.put("message", "Password reset successful");
         return ResponseEntity.ok(response);

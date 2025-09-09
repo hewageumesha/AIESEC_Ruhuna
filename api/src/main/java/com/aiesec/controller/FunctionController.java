@@ -10,51 +10,28 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController // Marks this class as a REST controller
-@RequestMapping("/api/functions") // Base path for all function-related endpoints
+@RestController 
+@RequestMapping("/api/functions")
 public class FunctionController {
 
     @Autowired
-    private FunctionService functionService;  // Inject FunctionService to handle business logic
+    private FunctionService functionService;
 
-    /**
-     * Endpoint to add a new function
-     * URL: POST /api/functions/add
-     * Request Body: JSON representation of Function
-     * Response: Created Function object
-     */
     @PostMapping("/add")
     public FunctionDTO addFunction(@RequestBody FunctionDTO dto) {
         return functionService.addFunction(dto);
     }
 
-    /**
-     * Endpoint to retrieve all functions
-     * URL: GET /api/functions/
-     * Response: List of all functions
-     */
     @GetMapping("/")
     public List<FunctionDTO> getAllFunctions() {
         return functionService.getAllFunctions();
     }
 
-    /**
-     * Endpoint to retrieve a function by its ID
-     * URL: GET /api/functsion/{id}
-     * Path Variable: id - ID of the function to retrieve
-     * Response: Function object with the given ID
-     */
     @GetMapping("/{id}")
     public FunctionDTO getFunctionById(@PathVariable Long id) {
         return functionService.getFunctionById(id);
     }
 
-    /**
-     * Endpoint to delete a function by its ID
-     * URL: DELETE /api/functions/delete/{id}
-     * Path Variable: id - ID of the function to delete
-     * Response: Success message
-     */
     @DeleteMapping("/delete/{id}")
     public String deleteFunction(@PathVariable Long id) {
         functionService.deleteFunction(id);
