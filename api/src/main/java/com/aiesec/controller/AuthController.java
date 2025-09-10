@@ -70,6 +70,8 @@ public class AuthController {
             json.put("role", existingUser.get().getRole());
             json.put("aiesecEmail", existingUser.get().getAiesecEmail());
             json.put("token", token);
+            json.put("id",existingUser.get().getId());
+            json.put("noOfTask", existingUser.get().getNoOfTask());
 
             return ResponseEntity.ok().body(json.toString());
         } catch (Exception e) {

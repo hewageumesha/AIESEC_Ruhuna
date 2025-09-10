@@ -54,39 +54,49 @@ export default function SignIn() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validateForm()) {
-      return;
+  if (!validateForm()) {
+    return;
+  }
+
+  try {
+    dispatch(signInStart());
+    const res = await fetch(`http://localhost:8080/api/auth/signin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return dispatch(signInFailure(data.message));
     }
 
-    try {
-      dispatch(signInStart());
-      const res = await fetch(`http://localhost:8080/api/auth/signin`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+    if (data.token) {
+      // Save token in sessionStorage
+      sessionStorage.setItem("token", data.token);
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        return dispatch(signInFailure(data.message));
-      }
-
-      if (data.token) {
-        sessionStorage.setItem("token", data.token);
-      }
-
-      dispatch(signInSuccess(data));
-      console.log('User signed in successfully:', data.role);
-
-      navigate('/dashboard');
-
-    } catch (error) {
-      dispatch(signInFailure(error.message));
+      // Save full user in localStorage
+      localStorage.setItem("user", JSON.stringify({
+        id: data.id,              // adjust based on backend field (_id, userId, etc.)
+        email: data.aiesecEmail,
+        role: data.role,
+        token: data.token
+      }));
     }
-  };
+
+    dispatch(signInSuccess(data));
+    console.log('User signed in successfully:', data.role);
+
+    navigate('/dashboard');
+
+  } catch (error) {
+    dispatch(signInFailure(error.message));
+  }
+};
+
 
   return (
     <div className='min-h-screen mt-20'>

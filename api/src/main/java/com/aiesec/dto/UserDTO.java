@@ -42,6 +42,7 @@ public class UserDTO {
     private List<UserDTO> teamMembers;
     private List<String> commentsForUser; 
     private List<String> commentsCreated; 
+    private int noOfTask;
 
 }
 
