@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -67,6 +68,8 @@ public class User {
 
     private String teamLeaderId;
 
+    private int noOfTask=0;
+
     private String s_department;
 
     private String faculty;
@@ -90,6 +93,10 @@ public class User {
 
     @OneToMany(mappedBy = "createdBy")
     private List<Comment> commentsCreated;
+
+     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Task> tasks=new ArrayList<>();
 
     @PrePersist
     public void prePersist() {

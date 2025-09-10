@@ -32,6 +32,7 @@ public interface UserRepository extends JpaRepository<User, Long>{
 
     List<User> findTop5ByOrderByJoinedDateDesc();
     User getUserById(Long id);
+    
 
     @Transactional
     @Modifying
