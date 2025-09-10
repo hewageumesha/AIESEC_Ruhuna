@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import AssignedTasks from "./AssignedTasks";
 import UserProgressPage from "./UserProgressPage";
-import TaskList from "./TaskList.JSX";
+import TaskList from "./TaskList";
 
 const TaskDashboardTL = () => {
     const { id } = useParams();

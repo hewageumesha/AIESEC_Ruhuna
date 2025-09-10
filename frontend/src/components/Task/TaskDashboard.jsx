@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import UserProgressPage from "./UserProgressPage";
-import TaskList from "./TaskList.JSX";
+import TaskList from "./TaskList";
 
 
 const TaskDashboard = () => {
