@@ -31,12 +31,13 @@ export default function DashManageMember() {
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filterRole, setFilterRole] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
 
   const getTodayDateString = () => {
     const today = new Date();
     const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); // months are 0-indexed
-    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
   };
 
@@ -49,7 +50,12 @@ export default function DashManageMember() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      await Promise.all([fetchMembers(), fetchRoles(), fetchFunctions(), fetchDepartment()]);
+      await Promise.all([
+        fetchMembers(),
+        fetchRoles(),
+        fetchFunctions(),
+        fetchDepartment(),
+      ]);
     } catch (error) {
       setErrorMsg("Failed to fetch initial data");
     } finally {
@@ -73,41 +79,45 @@ export default function DashManageMember() {
   };
 
   const fetchMembers = async () => {
-  try {
-    const res = await axios.get("http://localhost:8080/api/users/getall");
-    if (!Array.isArray(res.data)) {
-      console.error("Members data is not an array:", res.data);
+    try {
+      const res = await axios.get("http://localhost:8080/api/users/getall");
+      if (!Array.isArray(res.data)) {
+        console.error("Members data is not an array:", res.data);
+        setMembers([]);
+        return;
+      }
+      const cleaned = res.data.map((m) => ({
+        id: m.id,
+        firstName: m.firstName,
+        lastName: m.lastName,
+        email: m.email,
+        aiesecEmail: m.aiesecEmail,
+        birthday: m.birthday,
+        gender: m.gender,
+        joinedDate: m.joinedDate,
+        profilePicture: m.profilePicture,
+        phoneNumber: m.phoneNumber,
+        role: m.role,
+        function: m.function ? { id: m.function.id, name: m.function.name } : null,
+        department: m.department
+          ? { id: m.department.id, name: m.department.name }
+          : null,
+        teamLeaderAiesecEmail: m.teamLeaderAiesecEmail,
+      }));
+      setMembers(cleaned);
+    } catch (err) {
+      console.error("Error fetching members:", err);
       setMembers([]);
-      return;
     }
+  };
 
-    // Remove fields that may cause circular references
-    const cleaned = res.data.map(m => ({
-      id: m.id,
-      firstName: m.firstName,
-      lastName: m.lastName,
-      email: m.email,
-      aiesecEmail: m.aiesecEmail,
-      birthday: m.birthday,
-      gender: m.gender,
-      joinedDate: m.joinedDate,
-      profilePicture: m.profilePicture,
-      phoneNumber: m.phoneNumber,
-      role: m.role,
-      function: m.function ? { id: m.function.id, name: m.function.name } : null,
-      department: m.department ? { id: m.department.id, name: m.department.name } : null,
-      teamLeaderAiesecEmail: m.teamLeaderAiesecEmail,
-      teamMembers: undefined, // REMOVE circular references
-    }));
-
-    setMembers(cleaned);
-  } catch (err) {
-    console.error("Error fetching members:", err);
-    setMembers([]);
-  }
-};
-
-
+  const getUserRecord = () => {
+    return members.find(
+      (m) =>
+        m.aiesecEmail?.toLowerCase().trim() ===
+        currentUser?.aiesecEmail?.toLowerCase().trim()
+    );
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -151,11 +161,9 @@ export default function DashManageMember() {
         );
         setSuccessMsg("Member updated successfully!");
       } else {
-        await axios.post(
-          "http://localhost:8080/api/users/add",
-          formData,
-          { withCredentials: true }
-        );
+        await axios.post("http://localhost:8080/api/users/add", formData, {
+          withCredentials: true,
+        });
         setSuccessMsg("Member added successfully!");
       }
       resetForm();
@@ -215,13 +223,13 @@ export default function DashManageMember() {
   };
 
   const getDefaultFunction = () => {
-    if (!currentUser) return "";
-    return currentUser.function?.id?.toString() || "";
+    const userRecord = getUserRecord();
+    return userRecord?.function?.id?.toString() || "";
   };
 
   const getDefaultDepartment = () => {
-    if (!currentUser) return "";
-    return currentUser.department?.id?.toString() || "";
+    const userRecord = getUserRecord();
+    return userRecord?.department?.id?.toString() || "";
   };
 
   const handleEdit = (member) => {
@@ -242,30 +250,31 @@ export default function DashManageMember() {
 
   const hasEditPermission = (member) => {
     if (!currentUser) return false;
-    
+    const userRecord = getUserRecord();
+    const currFuncId = userRecord?.function?.id;
+
     if (currentUser.role === "LCP") return true;
-    
+
     if (currentUser.role === "LCVP") {
       return (
-        (member.role === "Team_Leader" || member.role === "Member") && 
-        member.function?.id === currentUser.function?.id
+        (member.role === "Team_Leader" || member.role === "Member") &&
+        member.function?.id === currFuncId
       );
     }
-    
+
     if (currentUser.role === "Team_Leader") {
       return (
-        member.role === "Member" && 
-        member.function?.id === currentUser.function?.id &&
-        member.teamLeaderAiesecEmail === currentUser.aiesecEmail
+        member.role === "Member" &&
+        member.function?.id === currFuncId &&
+        member.teamLeaderAiesecEmail?.toLowerCase().trim() ===
+          currentUser.aiesecEmail?.toLowerCase().trim()
       );
     }
-    
+
     return false;
   };
 
-  const hasDeletePermission = (member) => {
-    return hasEditPermission(member);
-  };
+  const hasDeletePermission = (member) => hasEditPermission(member);
 
   const openDeleteModal = (member) => {
     if (!hasDeletePermission(member)) {
@@ -294,70 +303,75 @@ export default function DashManageMember() {
   };
 
   const getFilteredMembers = () => {
-    if (!currentUser) return [];
+    if (!currentUser ) return [];
+    const userRecord = getUserRecord();
+    const currFuncId = userRecord?.function?.id;
 
-    let visibleMembers = [];
+    let filteredMembers = [];
 
-    if (currentUser.role === "LCP") {
-      visibleMembers = members;
-    } else if (currentUser.role === "LCVP") {
-      if (!currentUser.function) return [];
-      visibleMembers = members.filter(member => 
-        (member.role === "Team_Leader" || member.role === "Member") &&
-        parseInt(member.function?.id) === parseInt(currentUser.function?.id)
+    if (currentUser .role === "LCP") {
+      filteredMembers = members;
+    } else if (currentUser .role === "LCVP") {
+      filteredMembers = members.filter(
+        (m) =>
+          (m.role === "Team_Leader" || m.role === "Member") &&
+          m.function?.id === currFuncId
       );
-    } else if (currentUser.role === "Team_Leader") {
-      visibleMembers = members.filter(member => 
-        member.role === "Member" &&
-        parseInt(member.function?.id) === parseInt(currentUser.function?.id) &&
-        member.teamLeaderAiesecEmail?.trim() === currentUser.aiesecEmail?.trim()
+    } else if (currentUser .role === "Team_Leader") {
+      filteredMembers = members.filter(
+        (m) =>
+          m.role === "Member" &&
+          m.function?.id === currFuncId &&
+          m.teamLeaderAiesecEmail?.toLowerCase().trim() ===
+            currentUser .aiesecEmail?.toLowerCase().trim()
       );
+    } else {
+      return [];
     }
 
-    // Apply filter if selected
+    // Apply role filter if selected
     if (filterRole) {
-      visibleMembers = visibleMembers.filter(m => m.role === filterRole);
+      filteredMembers = filteredMembers.filter((m) => m.role === filterRole);
     }
 
-    return visibleMembers;
+    // Apply status filter if selected
+    if (filterStatus) {
+      filteredMembers = filteredMembers.filter((m) => m.status === filterStatus);
+    }
+
+    return filteredMembers;
   };
 
   const getAvailableRoles = () => {
     if (!currentUser) return [];
-    
     if (currentUser.role === "LCP") return roleOptions;
-    
-    if (currentUser.role === "LCVP") {
-      return roleOptions.filter(role => role === "Team_Leader" || role === "Member");
-    }
-    
-    if (currentUser.role === "Team_Leader") {
-      return roleOptions.filter(role => role === "Member");
-    }
-    
+    if (currentUser.role === "LCVP")
+      return roleOptions.filter((r) => r === "Team_Leader" || r === "Member");
+    if (currentUser.role === "Team_Leader")
+      return roleOptions.filter((r) => r === "Member");
     return [];
   };
 
   const getAvailableFunctions = () => {
     if (!currentUser) return [];
-    
     if (currentUser.role === "LCP") return functionOptions;
-    
-    return functionOptions.filter(func => func.id === currentUser.function?.id);
+    const userRecord = getUserRecord();
+    return functionOptions.filter((f) => f.id === userRecord?.function?.id);
   };
 
   const getAvailableDepartment = () => {
     if (!currentUser) return [];
-    
     if (currentUser.role === "LCP") return departmentOptions;
-    
-    return departmentOptions.filter(dep => dep.id === currentUser.department?.id);
+    const userRecord = getUserRecord();
+    return departmentOptions.filter((d) => d.id === userRecord?.department?.id);
   };
 
   if (loading && !showForm) {
-    return <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>;
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   return (
@@ -574,8 +588,9 @@ export default function DashManageMember() {
 
       <div className="bg-white rounded-lg shadow-md p-6 mt-6 dark:bg-[rgb(26,35,58)]">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium dark:text-gray-50">Members List</h2>
-
+          <h2 className="text-lg font-medium dark:text-gray-50">
+            Members List
+          </h2>
           {(currentUser.role === "LCP" || currentUser.role === "LCVP") && (
             <select
               value={filterRole}
@@ -598,16 +613,27 @@ export default function DashManageMember() {
               )}
             </select>
           )}
-        </div>  
+        </div>
+
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Name</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">AIESEC Email</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Role</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Function</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                  Name
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                  AIESEC Email
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                  Role
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                  Function
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:bg-[rgb(26,35,58)] dark:divide-gray-700">
@@ -628,12 +654,18 @@ export default function DashManageMember() {
                   <td className="px-4 py-2">
                     <div className="flex space-x-2">
                       {hasEditPermission(member) && (
-                        <Button color="warning" onClick={() => handleEdit(member)}>
+                        <Button
+                          color="warning"
+                          onClick={() => handleEdit(member)}
+                        >
                           Edit
                         </Button>
                       )}
                       {hasDeletePermission(member) && (
-                        <Button color="failure" onClick={() => openDeleteModal(member)}>
+                        <Button
+                          color="failure"
+                          onClick={() => openDeleteModal(member)}
+                        >
                           Delete
                         </Button>
                       )}
@@ -646,7 +678,12 @@ export default function DashManageMember() {
         </div>
       </div>
 
-      <Modal show={showModal} size="md" onClose={() => setShowModal(false)} popup>
+      <Modal
+        show={showModal}
+        size="md"
+        onClose={() => setShowModal(false)}
+        popup
+      >
         <Modal.Header />
         <Modal.Body>
           <div className="text-center">
@@ -655,10 +692,18 @@ export default function DashManageMember() {
               Are you sure you want to delete this member?
             </h3>
             <div className="flex justify-center gap-4">
-              <Button color="failure" onClick={confirmDelete} disabled={loading}>
+              <Button
+                color="failure"
+                onClick={confirmDelete}
+                disabled={loading}
+              >
                 {loading ? "Deleting..." : "Yes, I'm sure"}
               </Button>
-              <Button color="gray" onClick={() => setShowModal(false)} disabled={loading}>
+              <Button
+                color="gray"
+                onClick={() => setShowModal(false)}
+                disabled={loading}
+              >
                 No, cancel
               </Button>
             </div>

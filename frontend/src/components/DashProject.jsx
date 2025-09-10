@@ -609,7 +609,7 @@ export default function DashProject() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
         Project Management
       </h1>

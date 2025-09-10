@@ -233,14 +233,15 @@ public class UserController {
     @GetMapping("/list")
     public List<User> getUsersList(@AuthenticationPrincipal User currentUser,
                                @RequestParam(required = false) UserRole roleFilter) {
-      if (currentUser.getRole() == UserRole.LCP) {
-          return userService.getAllUsers(roleFilter);
-      } else if (currentUser.getRole() == UserRole.LCVP) {
-          return userService.getUsersByFunction(currentUser.getFunction(), roleFilter);
-      } else if (currentUser.getRole() == UserRole.Team_Leader) {
-          return userService.getMembersByFunction(currentUser.getFunction());
-      } else {
-          return List.of(currentUser);
+        if (currentUser.getRole() == UserRole.LCP) {
+            return userService.getAllUsers(roleFilter);
+        } else if (currentUser.getRole() == UserRole.LCVP) {
+            return userService.getUsersByFunction(currentUser.getFunction(), roleFilter);
+        } else if (currentUser.getRole() == UserRole.Team_Leader) {
+            return userService.getMembersByFunction(currentUser.getFunction());
+        } else {
+            return List.of(currentUser);
+        }
     }
   
     @GetMapping("/birthdays")
