@@ -14,7 +14,7 @@ const BirthdayCard = ({ birthday }) => {
       : 'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png';
 
   return (
-    <div className={`bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-4 ${color}`}>
+    <div className={`bg-white dark:bg-gray-800 p-4 mb-4 ${color}`}>
       <div className="flex items-center mb-4">
         <img
           src={imageUrl}
