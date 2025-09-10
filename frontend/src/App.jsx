@@ -24,12 +24,11 @@ import HomeB from './pages/birthday/HomeB';
 import AddBirthday from './pages/birthday/AddBirthday';
 import DashBirthday from './components/DashBirthday';
 import ProjectDetail from "./pages/ProjectDetail";
-import { Navigate } from "react-router-dom";
 import TaskDashboard from "./components/Task/TaskDashboard";
 import TaskDashboardLCVP from "./components/Task/TaskDashboardLCVP";
-import TaskDashboardTL from "./components/Task/TaskDashboardTL.JSX";
-import TaskDashboardMember from "./components/Task/TaskDashboardMember.JSX";
-import TaskList from "./components/Task/TaskList.JSX";
+import TaskDashboardTL from "./components/Task/TaskDashboardTL";
+import TaskDashboardMember from "./components/Task/TaskDashboardMember";
+import TaskList from "./components/Task/TaskList";
 import AssignedTasks from "./components/Task/AssignedTasks";
 import UserProgressPage from "./components/Task/UserProgressPage";
 import CreateTask from "./components/Task/CreateTask";
@@ -86,10 +85,7 @@ function App() {
         <Route path="/users/:id/tasks/:taskId/edit" element={<TaskUpdate/>}/>
         <Route path="/user/:id/notifications" element={<NotificationsWrapper />} />
         
-        
 
-
-        
       </Routes>
       <Footer/>
     </BrowserRouter>
