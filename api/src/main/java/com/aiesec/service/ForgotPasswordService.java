@@ -21,7 +21,6 @@ public class ForgotPasswordService {
         String otp = String.valueOf(new Random().nextInt(900000) + 100000);
         otpStore.put(email, otp);
 
-        // Send email
         String subject = "AIESEC OTP Code";
         String body = "Your OTP code is: " + otp + "\n\nThis code is valid for 5 minutes.";
         MailBody mail = new MailBody(email, subject, body);

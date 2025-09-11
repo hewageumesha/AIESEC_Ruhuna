@@ -16,31 +16,29 @@ export default function Header() {
 
     const handleSignout = async () => {
     try {
-        const token = sessionStorage.getItem('token');
-        console.log('Token before signout:', token);
+        const token = sessionStorage.getItem("token");
 
         if (token) {
-            const response = await fetch('http://localhost:8080/api/auth/signout', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token.trim()}`,
-                    'Content-Type': 'application/json',
-                },
-            });
+        const response = await fetch("http://localhost:8080/api/auth/signout", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}` },
+        });
 
-            const data = await response.json();
-            console.log('Signout response:', data);
+        if (!response.ok) {
+            console.error("Signout failed:", response.status);
+        } else {
+            console.log("Signout success, session should be logged out.");
+        }
         }
 
-        sessionStorage.removeItem('token');
+        sessionStorage.removeItem("token");
         dispatch(signoutSuccess());
-        navigate('/');
+        navigate("/");
     } catch (error) {
-        console.error('Signout error:', error.message);
+        console.error("Signout error:", error.message);
     }
-};
+    };
 
-    
     return (
     <Navbar className='border-b-2'>
         <Link to="/" className="flex items-center">
@@ -102,8 +100,8 @@ export default function Header() {
                     Functional Area
                 </Link>
             </Navbar.Link >
-            <Navbar.Link active={path === '/project'} as={'div'}>
-                <Link to="/project" className='font-semibold'>
+            <Navbar.Link active={path === '/projects'} as={'div'}>
+                <Link to="/projects" className='font-semibold'>
                     Project
                 </Link>
             </Navbar.Link >

@@ -19,7 +19,7 @@ public class EventDTO {
     private String description;
     private LocalDate startDate;
 
-    @JsonFormat(pattern = "hh:mm a") // Accepts format like "03:30 PM"
+    @JsonFormat(pattern = "hh:mm a") 
     private LocalTime eventTime;
 
     @JsonFormat(pattern = "hh:mm a")

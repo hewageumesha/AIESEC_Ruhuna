@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.aiesec.dto.BirthdayDTO;
 import com.aiesec.enums.UserRole;
+import com.aiesec.model.Function;
 import com.aiesec.model.User;
 
 import jakarta.transaction.Transactional;
@@ -21,14 +23,13 @@ public interface UserRepository extends JpaRepository<User, Long>{
     void deleteByAiesecEmail(String aieseEmail);
     List<User> findByRole(UserRole role);
     List<User> findByTeamLeaderAiesecEmail(String teamLeaderAiesecEmail);
-    List<User> findByFunctionId(Long functionId);
-    List<User> findByFunctionIdAndRoleIn(Long functionId, List<UserRole> roles);
+    List<User> findByFunctionId(Function function);
+    List<User> findByFunctionIdAndRole(Function function, UserRole roleFilter);
     List<User> findByFunctionIdAndRoleAndTeamLeaderAiesecEmail(Long functionId, UserRole role, String teamLeaderAiesecEmail);
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.joinedDate BETWEEN :start AND :end")
     Long countUsersJoinedLastMonth(Date start, Date end);
 
-    // Get latest 5 users
     List<User> findTop5ByOrderByJoinedDateDesc();
     User getUserById(Long id);
     
@@ -43,4 +44,8 @@ public interface UserRepository extends JpaRepository<User, Long>{
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.aiesecEmail IS NOT NULL AND u.joinedDate BETWEEN :startDate AND :endDate")
     long countUsersWithAiesecEmailJoinedLastMonth(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+     @Query("SELECT new com.aiesec.dto.BirthdayDTO(u.id, CONCAT(u.firstName, ' ', u.lastName), u.birthday, u.profilePicture) " +
+       "FROM User u WHERE u.birthday IS NOT NULL")
+List<BirthdayDTO> findAllBirthdays();
 }

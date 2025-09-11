@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.aiesec.enums.Gender;
 import com.aiesec.enums.UserRole;
 import com.aiesec.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Getter
 @Setter
@@ -66,6 +68,8 @@ public class User {
 
     private String teamLeaderId;
 
+    private int noOfTask=0;
+
     private String s_department;
 
     private String faculty;
@@ -80,6 +84,9 @@ public class User {
     @JoinColumn(name = "function_id")
     private Function function;
 
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department department;
 
     @OneToMany(mappedBy = "member")
     private List<Comment> commentsForUser;
@@ -87,19 +94,23 @@ public class User {
     @OneToMany(mappedBy = "createdBy")
     private List<Comment> commentsCreated;
 
+     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Task> tasks=new ArrayList<>();
+
     @PrePersist
     public void prePersist() {
         if (this.password != null) {
-            this.password = encodePassword(this.password);  // Automatically encode password before persisting
+            this.password = encodePassword(this.password);  
         }
     }
 
     private String encodePassword(String rawPassword) {
-        // Assuming you have access to a password encoder here, you could inject it or use it statically
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.encode(rawPassword);
     }
 
     @OneToOne(mappedBy = "user")
+    @JsonIgnore
     private ForgotPassword forgotPassword;
 }

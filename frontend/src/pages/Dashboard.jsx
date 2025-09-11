@@ -5,7 +5,6 @@ import DashProfile from '../components/DashProfile';
 import DashManageCommitee from '../components/DashManageCommitee';
 import DashTask from '../components/DashTask';
 import DashEvent from '../components/DashEvent';
-import DashFinance from '../components/DashFinance';
 import DashBirthday from '../components/DashBirthday';
 import DashboardComp from '../components/DashboardComp';
 import DashComments from '../components/DashComments';
@@ -14,6 +13,8 @@ import UpdatePassword from '../components/UpdatePassword';
 import DashManageFunction from '../components/DashManageFunction';
 import React from 'react';
 import DashSessionLogs from '../components/DashSessionLogs';
+import DashManageDepartment from '../components/DashManageDepartment';
+import DashProject from '../components/DashProject';
 
 export default function Dashboard() {
   const location = useLocation();
@@ -37,17 +38,18 @@ export default function Dashboard() {
     ),
     manageCommittee: (
       <DashManageCommitee>
-        {subtab === 'members' && <DashManageMember />}
+        {subtab === 'member' && <DashManageMember />}
         {subtab === 'function' && <DashManageFunction />}
+        {subtab === 'department' && <DashManageDepartment />}
       </DashManageCommitee>
     ),
-    comments: <DashComments />,
+    project: <DashProject />,
     task: <DashTask />,
     event: <DashEvent />,
-    finance: <DashFinance />,
-    sessionLogs: <DashSessionLogs />,
     birthday: <DashBirthday />,
-    dash: <DashboardComp />,
+    comments: <DashComments />,
+    sessionLogs: <DashSessionLogs />,
+    dash: <DashboardComp />
   };
 
   return (

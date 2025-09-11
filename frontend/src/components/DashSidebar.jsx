@@ -2,9 +2,7 @@ import { Sidebar } from 'flowbite-react';
 import React from 'react';
 import {
     HiUser,
-    HiArrowSmRight,
     HiNewspaper,
-    HiCreditCard,
     HiCake,
     HiChartPie,
     HiUserGroup,
@@ -15,19 +13,16 @@ import {
 import { HiRectangleStack, HiChatBubbleLeftEllipsis } from "react-icons/hi2";
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { signoutSuccess } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 
 export default function DashSidebar({ tab, subtab }) {
   const location = useLocation();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user)
   const [isCommitteeExpanded, setIsCommitteeExpanded] = useState(false);
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const navigate = useNavigate();
   
 
   useEffect(() => {
@@ -153,6 +148,16 @@ export default function DashSidebar({ tab, subtab }) {
                       Functions
                     </Sidebar.Item>
                   </Link>
+                  <Link to='/dashboard?tab=manageCommittee&subtab=department'>
+                    <Sidebar.Item
+                      active={tab === 'manageCommittee' && location.search.includes('subtab=department')}
+                      as='div'
+                      className={`pl-8 md:pl-4 text-sm py-2 rounded-lg transition-colors ${tab === 'manageCommittee' && location.search.includes('subtab=department') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-white' : 'hover:bg-blue-50 dark:hover:bg-gray-700'}`}
+                      onClick={() => isMobile && setIsCommitteeExpanded(false)}
+                    >
+                      Departments
+                    </Sidebar.Item>
+                  </Link>
                 </>
                 )}
               </div>
@@ -161,6 +166,16 @@ export default function DashSidebar({ tab, subtab }) {
           
           {(currentUser.role === 'LCP' || currentUser.role === 'LCVP') && (
             <>
+              <Link to='/dashboard?tab=project'>
+                <Sidebar.Item
+                  active={tab === 'project'}
+                  icon={HiRectangleStack} // any icon for project
+                  as='div'
+                  className={`flex justify-between items-center hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors ${tab === 'project' ? 'bg-blue-50 dark:bg-gray-700' : ''}`}
+                >
+                  <span className="font-medium">Project</span>
+                </Sidebar.Item>
+              </Link>
               <Link to='/dashboard?tab=comments'>
                 <Sidebar.Item
                   active={tab === 'comments'}
@@ -173,21 +188,6 @@ export default function DashSidebar({ tab, subtab }) {
                   }}
                 >
                   <span className="font-medium">Comments</span>
-                </Sidebar.Item>
-              </Link>
-
-              <Link to='/dashboard?tab=finance'>
-                <Sidebar.Item
-                  active={tab === 'finance'}
-                  icon={HiCreditCard}
-                  as='div'
-                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  onClick={() => {
-                    setIsCommitteeExpanded(false);
-                    setIsProfileExpanded(false);
-                  }}
-                >
-                  <span className="font-medium">Finance</span>
                 </Sidebar.Item>
               </Link>
 
@@ -208,24 +208,49 @@ export default function DashSidebar({ tab, subtab }) {
             </>
           )}
           
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' || currentUser.role === 'Member') && (
             <>
-              <Link to='/dashboard?tab=task'>
+             
                 <Sidebar.Item
-                  active={tab === 'task'}
-                  icon={HiNewspaper}
-                  as='div'
-                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  onClick={() => {
-                    setIsCommitteeExpanded(false);
-                    setIsProfileExpanded(false);
-                  }}
+                    active={tab === 'task'}
+                    icon={HiNewspaper}
+                    as='div'
+                    className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    onClick={() => {
+                      console.log("🧭 Navigating for user from Redux:", currentUser);
+                      if (currentUser && currentUser.id) {
+                        switch(currentUser.role) {
+                          case "LCP":
+                            navigate(`/user/${currentUser.id}/TaskDashboard`);
+                            break;
+                          case "LCVP":
+                            navigate(`/user/${currentUser.id}/TaskDashboardLCVP`);
+                            break;
+                          case "Team_Leader":
+                            navigate(`/user/${currentUser.id}/TaskDashboardTL`);
+                            break;
+                          case "Member":
+                            navigate(`/user/${currentUser.id}/TaskDashboardMember`);
+                            break;
+                          default:
+                            navigate("/login");
+                        }
+                      } else {
+                        console.error("User not found in Redux state!");
+                        navigate("/login");
+                      }
+                    }}
+
+
                 >
                   <span className="font-medium">Tasks</span>
                 </Sidebar.Item>
-              </Link>
+              
             </>
           )}
+
+
+
               <Link to='/dashboard?tab=event'>
                 <Sidebar.Item
                   active={tab === 'event'}

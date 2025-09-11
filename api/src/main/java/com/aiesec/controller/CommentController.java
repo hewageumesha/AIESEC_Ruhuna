@@ -25,10 +25,6 @@ public class CommentController {
     @Autowired
     private UserRepository userRepo;
 
-     /**
-     * Endpoint to add a new comment to a member profile
-     * Expects a JSON request body with: content, memberId, and creatorEmail
-     */
     @PostMapping("/add")
     public Comment addComment(@RequestBody Map<String, Object> requestBody) {
 
@@ -43,10 +39,6 @@ public class CommentController {
         return commentService.addComment(content, memberId, creatorEmail);
     }
 
-    /**
-     * Endpoint to fetch comments for a specific member, based on requester's role
-     * Example: /api/comments/member/5/Manager
-     */
     @GetMapping("/member/{memberId}/{requesterRole}")
     public ResponseEntity<List<CommentDTO>> getCommentsForMember(
             @PathVariable Long memberId,
@@ -56,10 +48,6 @@ public class CommentController {
         return ResponseEntity.ok(comments);
     }
 
-    /**
-     * Endpoint to retrieve all users with the role "Member"
-     * This can be used to list all members who may have comments
-     */
     @GetMapping("/members")
     public ResponseEntity<List<User>> getAllMembersWithComments() {
         List<User> members = userRepo.findByRole(UserRole.Member);
