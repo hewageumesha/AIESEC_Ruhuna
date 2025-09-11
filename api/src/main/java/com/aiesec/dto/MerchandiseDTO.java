@@ -15,5 +15,5 @@ public class MerchandiseDTO {
     private String type;
     private String description;
     private List<String> images;
-    private boolean available;
+    private boolean available;
 }

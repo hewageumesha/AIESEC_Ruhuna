@@ -1,42 +1,22 @@
 package com.aiesec.dto;
 
+
 import com.aiesec.enums.InterestStatus;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class AiesecMemberEventRegistrationDTO {
-    private Long id;
-    @JsonProperty("userId")
-    private Long userId;
-    @JsonProperty("eventId")
+public class RegistrationDTO {
     private Long eventId;
+    private Long userId;
     private InterestStatus interestStatus;
     private String comment;
     private LocalDateTime registeredAt;
-    private UserDTO user;
-
-    public UserDTO getUser() {
-        return user;
-    }
-
-    public void setUser(UserDTO user) {
-        this.user = user;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getEventId() {
         return eventId;
