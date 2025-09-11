@@ -7,7 +7,6 @@ import axios from 'axios';
 import  LightGallery from 'lightgallery/react';
 import lgThumbnail from 'lightgallery/plugins/thumbnail';
 import lgZoom from 'lightgallery/plugins/zoom';
-import lgVideo from 'lightgallery/plugins/video';
 import lgFullscreen from 'lightgallery/plugins/fullscreen';
 
 
