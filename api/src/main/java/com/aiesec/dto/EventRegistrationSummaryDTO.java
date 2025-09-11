@@ -7,7 +7,7 @@ public class EventRegistrationSummaryDTO {
     private Long eventId;
     private String eventName;
 
-   private Long goingCount;
+    private Long goingCount;
 
 
 

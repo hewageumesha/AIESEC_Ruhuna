@@ -19,15 +19,28 @@ public class AiesecMemberEventRegistrationMapper {
         dto.setComment(entity.getComment());
         dto.setRegisteredAt(entity.getRegisteredAt());
 
-        // Minimal user mapping (only what's needed in the table)
+        // CRITICAL FIX: Properly map user with phone number
         User user = entity.getUser();
         if (user != null) {
             UserDTO userDTO = new UserDTO();
+            userDTO.setId(user.getId());
             userDTO.setFirstName(user.getFirstName());
             userDTO.setLastName(user.getLastName());
+            userDTO.setEmail(user.getEmail());
             userDTO.setAiesecEmail(user.getAiesecEmail());
-            userDTO.setPhone(user.getPhoneNumber());
+
+            // FIXED: Only use phoneNumber field since phone field doesn't exist in User entity
+            String phoneNumber = user.getPhoneNumber();
+
+            // userDTO.setPhoneNumber(phoneNumber);
+            userDTO.setPhone(phoneNumber); // Set both fields to the same value for compatibility
+
+            // Debug logging to check if phone is being mapped
+            System.out.println("Mapping phone for user " + user.getId() + ": phoneNumber=" + phoneNumber);
+
             dto.setUser(userDTO);
+        } else {
+            System.out.println("WARNING: User is null for registration " + entity.getId());
         }
 
         return dto;

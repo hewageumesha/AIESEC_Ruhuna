@@ -1,106 +1,97 @@
 package com.aiesec.controller.event;
 
-
-import com.aiesec.dto.EventDTO;
-import com.aiesec.service.interfaces.EventService;
+import com.aiesec.dto.EventCategoryDTO;
+import com.aiesec.dto.EventVersionDTO;
+import com.aiesec.service.interfaces.EventCategoryService;
+import com.aiesec.service.interfaces.EventVersionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/events")
-public class EventController {
-
-    private final EventService eventService;
+@RequestMapping("/api")
+@CrossOrigin(origins = "*")
+public class EventManagementController {
 
     @Autowired
-    public EventController(EventService eventService) {
-        this.eventService = eventService;
+    private EventCategoryService categoryService;
+
+    @Autowired
+    private EventVersionService versionService;
+
+    // Category endpoints
+    @PostMapping("/categories")
+    public ResponseEntity<EventCategoryDTO> createCategory(@RequestBody EventCategoryDTO categoryDTO) {
+        EventCategoryDTO created = categoryService.createCategory(categoryDTO);
+        return ResponseEntity.ok(created);
     }
 
-    // Create Event
-    @PostMapping
-    public ResponseEntity<EventDTO> createEvent(@RequestBody EventDTO eventDTO) {
-        EventDTO createdEvent = eventService.createEvent(eventDTO);
-        return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
+    @GetMapping("/categories")
+    public ResponseEntity<List<EventCategoryDTO>> getAllCategories() {
+        List<EventCategoryDTO> categories = categoryService.getAllCategories();
+        return ResponseEntity.ok(categories);
     }
 
-    // Update Event
-    @PutMapping("/{eventId}")
-    public ResponseEntity<EventDTO> updateEvent(@PathVariable Long eventId, @RequestBody EventDTO updatedEvent) {
-        EventDTO event = eventService.updateEvent(eventId, updatedEvent);
-        return (event != null) ? new ResponseEntity<>(event, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @GetMapping("/categories/with-gallery")
+    public ResponseEntity<List<EventCategoryDTO>> getCategoriesWithGalleryImages() {
+        List<EventCategoryDTO> categories = categoryService.getCategoriesWithGalleryImages();
+        return ResponseEntity.ok(categories);
     }
 
-    // Get All Events
-    @GetMapping
-    public ResponseEntity<List<EventDTO>> getAllEvents() {
-        List<EventDTO> events = eventService.getAllEvents();
-        return new ResponseEntity<>(events, HttpStatus.OK);
+    @GetMapping("/categories/{id}")
+    public ResponseEntity<EventCategoryDTO> getCategoryById(@PathVariable Long id) {
+        EventCategoryDTO category = categoryService.getCategoryById(id);
+        return ResponseEntity.ok(category);
     }
 
-    // Get Event by ID
-    @GetMapping("/{eventId}")
-    public ResponseEntity<EventDTO> getEventById(@PathVariable String eventId) {
-        try {
-            Long id = Long.valueOf(eventId);
-            EventDTO event = eventService.getEventById(id);
-            return (event != null) ? new ResponseEntity<>(event, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (NumberFormatException e) {
-            System.err.println("Invalid eventId: " + eventId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    @PutMapping("/categories/{id}")
+    public ResponseEntity<EventCategoryDTO> updateCategory(@PathVariable Long id, @RequestBody EventCategoryDTO categoryDTO) {
+        EventCategoryDTO updated = categoryService.updateCategory(id, categoryDTO);
+        return ResponseEntity.ok(updated);
     }
 
-    // Delete Event
-    @DeleteMapping("/{eventId}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable Long eventId) {
-        eventService.deleteEvent(eventId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @DeleteMapping("/categories/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 
-    // Search filter
-    @GetMapping("/filter")
-    public ResponseEntity<Page<EventDTO>> filterEvents(
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String date,
-            Pageable pageable) {
-        Page<EventDTO> results = eventService.filterEvents(search, status, date, pageable);
-        return ResponseEntity.ok(results);
+    // Version endpoints
+    @PostMapping("/versions")
+    public ResponseEntity<EventVersionDTO> createVersion(@RequestBody EventVersionDTO versionDTO) {
+        EventVersionDTO created = versionService.createVersion(versionDTO);
+        return ResponseEntity.ok(created);
     }
 
-    // Get Public Events (for public event page)
-    @GetMapping("/public")
-    public ResponseEntity<List<EventDTO>> getPublicUpcomingEvents() {
-        List<EventDTO> publicEvents = eventService.getPublicUpcomingEvents();
-        return new ResponseEntity<>(publicEvents, HttpStatus.OK);
+    @GetMapping("/categories/{categoryId}/versions")
+    public ResponseEntity<List<EventVersionDTO>> getVersionsByCategoryId(@PathVariable Long categoryId) {
+        List<EventVersionDTO> versions = versionService.getVersionsByCategoryId(categoryId);
+        return ResponseEntity.ok(versions);
     }
 
-    // Get Private Events (for members dashboard)
-    @GetMapping("/private")
-    public ResponseEntity<List<EventDTO>> getPrivateUpcomingEvents() {
-        List<EventDTO> privateEvents = eventService.getPrivateUpcomingEvents();
-        return new ResponseEntity<>(privateEvents, HttpStatus.OK);
+    @GetMapping("/categories/{categoryId}/versions/with-gallery")
+    public ResponseEntity<List<EventVersionDTO>> getVersionsWithGalleryImagesByCategoryId(@PathVariable Long categoryId) {
+        List<EventVersionDTO> versions = versionService.getVersionsWithGalleryImagesByCategoryId(categoryId);
+        return ResponseEntity.ok(versions);
     }
 
-    // Get All Public Events
-    @GetMapping("/public/all")
-    public ResponseEntity<List<EventDTO>> getAllPublicEvents() {
-        List<EventDTO> publicEvents = eventService.getAllPublicEvents();
-        return new ResponseEntity<>(publicEvents, HttpStatus.OK);
+    @GetMapping("/versions/{id}")
+    public ResponseEntity<EventVersionDTO> getVersionById(@PathVariable Long id) {
+        EventVersionDTO version = versionService.getVersionById(id);
+        return ResponseEntity.ok(version);
     }
 
-    // Get All Private Events
-    @GetMapping("/private/all")
-    public ResponseEntity<List<EventDTO>> getAllPrivateEvents() {
-        List<EventDTO> privateEvents = eventService.getAllPrivateEvents();
-        return new ResponseEntity<>(privateEvents, HttpStatus.OK);
+    @PutMapping("/versions/{id}")
+    public ResponseEntity<EventVersionDTO> updateVersion(@PathVariable Long id, @RequestBody EventVersionDTO versionDTO) {
+        EventVersionDTO updated = versionService.updateVersion(id, versionDTO);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/versions/{id}")
+    public ResponseEntity<Void> deleteVersion(@PathVariable Long id) {
+        versionService.deleteVersion(id);
+        return ResponseEntity.noContent().build();
     }
 }
