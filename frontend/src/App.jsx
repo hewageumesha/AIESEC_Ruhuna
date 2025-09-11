@@ -33,6 +33,9 @@ import AssignedTasks from "./components/Task/AssignedTasks";
 import UserProgressPage from "./components/Task/UserProgressPage";
 import CreateTask from "./components/Task/CreateTask";
 import TaskUpdate from "./components/Task/TaskUpdate";
+import PublicEventsPage from "./pages/PublicEvents.jsx";
+import EventAnalytics from "./pages/EventAnalytics";
+
 
 const NotificationsWrapper = () => {
     const { id } = useParams();
@@ -85,6 +88,10 @@ function App() {
         <Route path="/users/:id/tasks/:taskId/edit" element={<TaskUpdate/>}/>
         <Route path="/user/:id/notifications" element={<NotificationsWrapper />} />
         
+        {/* Event Routes */}
+        <Route path="/public-event" element={<PublicEventsPage />} />
+        <Route path="/public-event/:id" element={<EventDetails />} />
+        <Route path="/event-analytics" element={<EventAnalytics />} />
 
       </Routes>
       <Footer/>
