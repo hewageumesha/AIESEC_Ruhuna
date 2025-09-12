@@ -54,4 +54,15 @@ public class ProjectService {
                 .orElseThrow(() -> new ProjectNotFoundException("Project not found with id: " + id));
         projectRepository.delete(project);
     }
+
+    public List<Project> getPublishedProjects() {
+        return projectRepository.findByPublishedTrue();
+    }
+
+    public Project togglePublishStatus(Long id, Boolean published) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new ProjectNotFoundException("Project not found"));
+        project.setPublished(published);
+        return projectRepository.save(project);
+    }
 }

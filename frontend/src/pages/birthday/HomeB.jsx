@@ -13,7 +13,7 @@ export default function HomeB({ setTodayCount }) {
 
   const fetchBirthdays = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/users/birthdays");
+      const res = await axios.get("https://aiesecruhuna-production.up.railway.app/api/users/birthdays");
       const today = new Date();
 
       const upcoming = res.data
