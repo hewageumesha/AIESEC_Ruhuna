@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/departments/**").permitAll()
                 .requestMatchers("/api/roles/**").permitAll()
                 .requestMatchers("/api/users/**").permitAll()
+                .requestMatchers("/api/user/**").permitAll()
                 .requestMatchers("/api/events/**").permitAll()
                 .requestMatchers("/api/tshirts/**").permitAll()
                 .requestMatchers("/api/comments/**").permitAll()

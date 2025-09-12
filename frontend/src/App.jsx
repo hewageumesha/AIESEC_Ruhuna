@@ -24,8 +24,25 @@ import HomeB from './pages/birthday/HomeB';
 import AddBirthday from './pages/birthday/AddBirthday';
 import DashBirthday from './components/DashBirthday';
 import ProjectDetail from "./pages/ProjectDetail";
-import { Navigate } from "react-router-dom";
-import Developers from "./pages/developers";
+import TaskDashboard from "./components/Task/TaskDashboard";
+import TaskDashboardLCVP from "./components/Task/TaskDashboardLCVP";
+import TaskDashboardTL from "./components/Task/TaskDashboardTL";
+import TaskDashboardMember from "./components/Task/TaskDashboardMember";
+import TaskList from "./components/Task/TaskList";
+import AssignedTasks from "./components/Task/AssignedTasks";
+import UserProgressPage from "./components/Task/UserProgressPage";
+import CreateTask from "./components/Task/CreateTask";
+import TaskUpdate from "./components/Task/TaskUpdate";
+import PublicEventsPage from "./pages/PublicEvents.jsx";
+import EventAnalytics from "./pages/EventAnalytics";
+
+
+const NotificationsWrapper = () => {
+    const { id } = useParams();
+    console.log("🚀 Extracted ID from URL:", id);
+    if (!id) return <div>User ID missing</div>;
+    return <Notifications id={id}></Notifications>;
+};
 
 function App() {
   return (
@@ -58,7 +75,24 @@ function App() {
         <Route path="/projects" element={<Project />} />
         <Route path="/projects/:type" element={<Project />} />
         <Route path="/projects/:type/:projectName" element={<ProjectDetail />} />
-        <Route path="/developers" element={<Developers />} />
+
+        <Route path="/user/:id/TaskDashboard" element={<TaskDashboard />} />
+        <Route path="/user/:id/TaskDashboardLCVP" element={<TaskDashboardLCVP />} />
+        <Route path="/user/:id/TaskDashboardTL" element={<TaskDashboardTL />} />
+        <Route path="/user/:id/TaskDashboardMember" element={<TaskDashboardMember />} />
+
+        <Route path="/user/:id/TaskList" element={<TaskList />}/>
+        <Route path="/assigned-tasks" element={<AssignedTasks/>}/>
+        <Route path="/user/:id/progress" element={<UserProgressPage />} />
+        <Route path="/user/:id/CreateTask" element={<CreateTask/>}/>
+        <Route path="/users/:id/tasks/:taskId/edit" element={<TaskUpdate/>}/>
+        <Route path="/user/:id/notifications" element={<NotificationsWrapper />} />
+        
+        {/* Event Routes */}
+        <Route path="/public-event" element={<PublicEventsPage />} />
+        <Route path="/public-event/:id" element={<EventDetails />} />
+        <Route path="/event-analytics" element={<EventAnalytics />} />
+
       </Routes>
       <Footer/>
     </BrowserRouter>

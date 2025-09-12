@@ -1,9 +1,11 @@
 package com.aiesec.service;
 
 import com.aiesec.dto.PasswordUpdateRequest;
+import com.aiesec.dto.UserDTO;
 import com.aiesec.dto.UserRequestDTO;
 import com.aiesec.dto.UserUpdateDTO;
 import com.aiesec.enums.UserRole;
+import com.aiesec.exception.ResourcesNotFoundException;
 import com.aiesec.model.Function;
 import com.aiesec.model.User;
 import com.aiesec.repository.UserRepository;
@@ -371,6 +373,45 @@ public class UserService {
 
     public List<User> getMembersByFunction(Function function) {
         return userRepository.findByFunctionIdAndRole(function, UserRole.Member);
+    }
+
+     public List<UserDTO> getAllUsers() {
+        List<User> users = this.userRepository.findAll();
+        if (users == null || users.isEmpty()) {
+            return Collections.emptyList(); // or return a new ArrayList<UserDto>()
+        }
+        return users.stream().map(this::userToDto).toList();
+    }
+
+     public UserDTO userToDto(User user){
+        UserDTO userDto = new UserDTO();
+        userDto.setId(Long.valueOf(user.getId()));
+        userDto.setFirstName(user.getFirstName());
+        userDto.setNoOfTask(0);
+        userDto.setRole(user.getRole());
+
+        // Department
+        if (user.getDepartment() != null) {
+            userDto.setDepartmentId(null);
+            userDto.setDepartmentName(user.getDepartment().getName());
+        }
+
+        // ✅ Function
+        if (user.getFunction() != null) {
+            Function func = new Function();
+            func.setId(user.getFunction().getId());
+            func.setName(user.getFunction().getName());
+            userDto.setFunctionId(null);
+            userDto.setFunctionName(user.getFunction().getName());
+        }
+
+        return userDto;
+    }
+
+     public UserDTO getUserById(Integer id) {
+
+        User user=this.userRepository.findById(Long.valueOf(id)).orElseThrow(()-> new ResourcesNotFoundException("User","User Id",(long)id));
+        return this.userToDto(user);
     }
 
 }

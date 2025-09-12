@@ -22,6 +22,7 @@ export default function DashSidebar({ tab, subtab }) {
   const [isCommitteeExpanded, setIsCommitteeExpanded] = useState(false);
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const navigate = useNavigate();
   
 
   useEffect(() => {
@@ -208,24 +209,49 @@ export default function DashSidebar({ tab, subtab }) {
             </>
           )}
           
-          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader') && (
+          {(currentUser.role === 'LCP' || currentUser.role === 'LCVP' || currentUser.role === 'Team_Leader' || currentUser.role === 'Member') && (
             <>
-              <Link to='/dashboard?tab=task'>
+             
                 <Sidebar.Item
-                  active={tab === 'task'}
-                  icon={HiNewspaper}
-                  as='div'
-                  className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  onClick={() => {
-                    setIsCommitteeExpanded(false);
-                    setIsProfileExpanded(false);
-                  }}
+                    active={tab === 'task'}
+                    icon={HiNewspaper}
+                    as='div'
+                    className="hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    onClick={() => {
+                      console.log("🧭 Navigating for user from Redux:", currentUser);
+                      if (currentUser && currentUser.id) {
+                        switch(currentUser.role) {
+                          case "LCP":
+                            navigate(`/user/${currentUser.id}/TaskDashboard`);
+                            break;
+                          case "LCVP":
+                            navigate(`/user/${currentUser.id}/TaskDashboardLCVP`);
+                            break;
+                          case "Team_Leader":
+                            navigate(`/user/${currentUser.id}/TaskDashboardTL`);
+                            break;
+                          case "Member":
+                            navigate(`/user/${currentUser.id}/TaskDashboardMember`);
+                            break;
+                          default:
+                            navigate("/login");
+                        }
+                      } else {
+                        console.error("User not found in Redux state!");
+                        navigate("/login");
+                      }
+                    }}
+
+
                 >
                   <span className="font-medium">Tasks</span>
                 </Sidebar.Item>
-              </Link>
+              
             </>
           )}
+
+
+
               <Link to='/dashboard?tab=event'>
                 <Sidebar.Item
                   active={tab === 'event'}

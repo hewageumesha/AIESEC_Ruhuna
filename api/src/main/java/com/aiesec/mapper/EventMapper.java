@@ -19,8 +19,13 @@ public class EventMapper {
                 .isPublic(event.getIsPublic())
                 .isVirtual(event.getIsVirtual())
                 .virtualLink(event.getVirtualLink())
-                .hasTshirtOrder(event.isHasTshirtOrder())
-                .visibility(event.getVisibility())
+                .hasMerchandise(event.getHasMerchandise())
+                .registrationCloseBeforeDays(event.getRegistrationCloseBeforeDays())
+                .merchandise(event.getMerchandiseList() != null
+                        ? event.getMerchandiseList().stream()
+                        .map(MerchandiseMapper::toDTO)
+                        .collect(java.util.stream.Collectors.toList())
+                        : null)
                 .build();
     }
 
@@ -38,8 +43,8 @@ public class EventMapper {
                 .isPublic(dto.getIsPublic())
                 .isVirtual(dto.getIsVirtual())
                 .virtualLink(dto.getVirtualLink())
-                .hasTshirtOrder(dto.getHasTshirtOrder())
-                .visibility(dto.getVisibility())
+                .hasMerchandise(false) // default false, actual list handled in service
+                .registrationCloseBeforeDays(dto.getRegistrationCloseBeforeDays())
                 .build();
     }
 }

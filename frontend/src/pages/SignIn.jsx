@@ -54,12 +54,19 @@ export default function SignIn() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+  if (!validateForm()) {
+    return;
+  }
 
+  try {
+    dispatch(signInStart());
+    const res = await fetch(`http://localhost:8080/api/auth/signin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
     try {
       dispatch(signInStart());
       const res = await fetch(`https://aiesecruhuna-production.up.railway.app/api/auth/signin`, {
@@ -68,7 +75,7 @@ export default function SignIn() {
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
+    const data = await res.json();
 
       if (!res.ok) {
         return dispatch(signInFailure(data.message));
@@ -79,15 +86,16 @@ export default function SignIn() {
         localStorage.setItem("userRole", data.role);
       }
 
-      dispatch(signInSuccess(data));
-      console.log('User signed in successfully:', data.role);
+    dispatch(signInSuccess(data));
+    console.log('User signed in successfully:', data.role);
 
-      navigate('/dashboard');
+    navigate('/dashboard');
 
-    } catch (error) {
-      dispatch(signInFailure(error.message));
-    }
-  };
+  } catch (error) {
+    dispatch(signInFailure(error.message));
+  }
+};
+
 
   return (
     <div className='min-h-screen mt-20'>
