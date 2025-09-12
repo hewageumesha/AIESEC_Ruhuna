@@ -1,127 +1,294 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Spin, message, Button } from 'antd';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Spin, message, Modal } from 'antd';
+import { TeamOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import { motion as Motion } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useSelector } from 'react-redux';
 
-import EventHeader from '../components/event/EventHeader';
-import EventInfo from '../components/event/EventInfo';
-import EventMeta from '../components/event/EventMeta';
+// Import refactored components
+import {
+  EventHeader,
+  EventDateBadge,
+  EventNavigation,
+  EventDetails,
+  EventSidebar,
+  MerchandiseDisplay,
+  DynamicOrderForm
+} from '../components/event';
+
+// Import existing modals (assuming they're already created)
 import MemberRegistrationModal from '../components/event/MemberRegistrationModal';
 import GuestRegistrationModal from '../components/event/GuestRegistrationModal';
 
-const EventDetails = () => {
+// Import utilities
+import { deduplicateMerchandise, isMember } from '../utils/eventUtils';
+
+/**
+ * Main Event Details Page Component
+ * Displays comprehensive event information with registration and merchandise ordering
+ */
+const EventDetailsPage = () => {
+  // Router hooks
   const { id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isPublicPage = location.pathname.includes("/public");
+
+  // Redux state
   const { currentUser, loading: userLoading } = useSelector((state) => state.user);
 
+  // Local state
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('about');
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isOrderModalVisible, setIsOrderModalVisible] = useState(false);
+  const [merchandise, setMerchandise] = useState([]);
+  const [selectedMerchandise, setSelectedMerchandise] = useState(null);
 
-  const isMember = currentUser && ['LCP', 'LCVP', 'Team_Leader', 'Member'].includes(currentUser.role);
+  // Computed values
+  const isUserMember = isMember(currentUser);
 
+  /**
+   * Fetch event data and merchandise
+   */
   useEffect(() => {
     const fetchEvent = async () => {
+      if (!id) return;
+
       setLoading(true);
       try {
         const res = await axios.get(`http://localhost:8080/api/events/${id}`);
-        setEvent(res.data);
+        const eventData = res.data;
+
+        // Check access permissions
+        if (!eventData.isPublic && !currentUser) {
+          message.error("This is a private event. Please log in as an AIESEC member.");
+          navigate('/login');
+          return;
+        }
+
+        setEvent(eventData);
+
+        // Fetch merchandise if available
+        if (eventData.hasMerchandise) {
+          await fetchMerchandise(id);
+        }
       } catch (error) {
-        console.error('❌ Error fetching event:', error);
+        console.error('Error fetching event:', error);
         message.error('Failed to fetch event details.');
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) fetchEvent();
-  }, [id]);
+    fetchEvent();
+  }, [id, currentUser, navigate]);
 
-  const openRegistrationModal = () => {
-    if (!event) return;
-
-    // Guest trying to register for private event
-    if (!event.isPublic && !currentUser) {
-      message.error("This is a private event. Please log in to register.");
-      return;
+  /**
+   * Fetch merchandise data
+   */
+  const fetchMerchandise = async (eventId) => {
+    try {
+      const merchRes = await axios.get(`http://localhost:8080/api/merchandise/event/${eventId}`);
+      
+      // Ensure array format
+      let merchData = merchRes.data;
+      if (!Array.isArray(merchData)) {
+        merchData = [merchData];
+      }
+      
+      // Deduplicate and set merchandise
+      const uniqueMerchandise = deduplicateMerchandise(merchData);
+      setMerchandise(uniqueMerchandise);
+      
+      console.log('Merchandise loaded:', uniqueMerchandise);
+    } catch (merchError) {
+      console.error('Error fetching merchandise:', merchError);
+      setMerchandise([]);
     }
-
-    setIsModalVisible(true);
   };
 
+  /**
+   * Handle merchandise order click
+   */
+  const handleOrderClick = (merchandiseItem) => {
+    setSelectedMerchandise(merchandiseItem);
+    setIsOrderModalVisible(true);
+  };
+
+  /**
+   * Handle successful order submission
+   */
+  const handleOrderSuccess = () => {
+    setIsOrderModalVisible(false);
+    setSelectedMerchandise(null);
+    message.success('Order placed successfully!');
+  };
+
+  /**
+   * Handle registration modal close
+   */
+  const handleRegistrationSuccess = (isGuest = false) => {
+    setIsModalVisible(false);
+    const successMessage = isGuest ? "Guest registration successful!" : "Registration successful!";
+    message.success(successMessage);
+  };
+
+  // Loading state
   if (loading || userLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Spin size="large" />
+      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <Spin size="large" />
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading event details...</p>
+        </div>
       </div>
     );
   }
 
+  // Error state
   if (!event) {
     return (
-      <div className="text-center mt-20 text-red-600 font-semibold text-lg">
+      <div className="text-center mt-20 text-red-600 dark:text-red-400 font-semibold text-lg px-4">
         Event not found or unable to load event details.
       </div>
     );
   }
 
   return (
-    <Motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-5xl mx-auto p-6 bg-white shadow-xl rounded-xl"
-    >
-      <EventHeader
-        imageUrl={event.imageUrl}
-        eventName={event.eventName}
-        startDate={event.startDate}
-        location={event.location}
-      />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto">
+        {/* Event Header Section */}
+        <div className="relative">
+          <EventHeader
+            imageUrl={event.imageUrl}
+            eventName={event.eventName}
+            startDate={event.startDate}
+            location={event.location}
+          />
+          <EventDateBadge startDate={event.startDate} />
+        </div>
 
-      <EventInfo
-        eventName={event.eventName}
-        description={event.description}
-      />
+        {/* Navigation Section */}
+        <div className="px-4 sm:px-6">
+          <EventNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+        </div>
 
-      <EventMeta
-        startDate={event.startDate}
-        endDate={event.endDate}
-        eventTime={event.eventTime}
-        endTime={event.endTime}
-      />
+        {/* Main Content Section */}
+        <div className="px-4 sm:px-6 pb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content Column */}
+            <div className="lg:col-span-2">
+              {activeTab === 'about' && (
+                <>
+                  <EventDetails
+                    event={event}
+                    onRegister={() => setIsModalVisible(true)}
+                  />
+                  
+                  {/* Merchandise Section */}
+                  {event.hasMerchandise && merchandise?.length > 0 && (
+                    <MerchandiseDisplay 
+                      merchandise={merchandise} 
+                      onOrderClick={handleOrderClick} 
+                    />
+                  )}
+                </>
+              )}
+              
+              {activeTab === 'comments' && (
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="bg-gray-100 dark:bg-gray-700 p-2 rounded-lg">
+                      <TeamOutlined className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                      Comments & Discussion
+                    </h2>
+                  </div>
+                  <div className="text-center py-12">
+                    <TeamOutlined className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                    <p className="text-gray-500 dark:text-gray-400 text-lg">
+                      Discussion features coming soon...
+                    </p>
+                    <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
+                      Connect with other attendees and share your thoughts
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
 
-      <div className="mt-6 text-center">
-        <Button type="primary" size="large" onClick={openRegistrationModal}>
-          Register Now
-        </Button>
+            {/* Sidebar Column */}
+            <div className="lg:col-span-1">
+              <EventSidebar event={event} />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Registration Modals */}
-      {isMember ? (
-        <MemberRegistrationModal
-          visible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
-          eventId={event.eventId || id}
-          onRegister={() => {
-            message.success("Registration successful!");
-            setIsModalVisible(false);
-          }}
-        />
-      ) : (
-        <GuestRegistrationModal
-          visible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
-          eventId={event.eventId || id}
-          onRegister={() => {
-            message.success("Guest registration successful!");
-            setIsModalVisible(false);
-          }}
-        />
-      )}
-    </Motion.div>
+      {/* Registration Modal */}
+      <AnimatePresence>
+        {isModalVisible && (
+          <Motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+          >
+            {isPublicPage && event?.isPublic ? (
+              <GuestRegistrationModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                eventId={event?.Id || id}
+                onRegister={() => handleRegistrationSuccess(true)}
+              />
+            ) : isUserMember ? (
+              <MemberRegistrationModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                eventId={event.Id || id}
+                onRegister={() => handleRegistrationSuccess(false)}
+              />
+            ) : null}
+          </Motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Order Modal */}
+      <Modal
+        title={null}
+        open={isOrderModalVisible && selectedMerchandise}
+        onCancel={() => {
+          setIsOrderModalVisible(false);
+          setSelectedMerchandise(null);
+        }}
+        footer={null}
+        width={600}
+        className="order-modal"
+        styles={{
+          content: {
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+            padding: 0,
+          }
+        }}
+      >
+        {selectedMerchandise && (
+          <DynamicOrderForm
+            merchandise={selectedMerchandise}
+            onCancel={() => {
+              setIsOrderModalVisible(false);
+              setSelectedMerchandise(null);
+            }}
+            onOrderSuccess={handleOrderSuccess}
+          />
+        )}
+      </Modal>
+    </div>
   );
 };
 
-export default EventDetails;
+export default EventDetailsPage;
