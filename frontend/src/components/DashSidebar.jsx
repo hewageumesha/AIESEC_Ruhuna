@@ -166,7 +166,7 @@ export default function DashSidebar({ tab, subtab }) {
           
           {(currentUser.role === 'LCP' || currentUser.role === 'LCVP') && (
             <>
-              <Link to='/dashboard?tab=project'>
+              {/*<Link to='/dashboard?tab=project'>
                 <Sidebar.Item
                   active={tab === 'project'}
                   icon={HiRectangleStack} // any icon for project
@@ -176,6 +176,7 @@ export default function DashSidebar({ tab, subtab }) {
                   <span className="font-medium">Project</span>
                 </Sidebar.Item>
               </Link>
+              */}
               <Link to='/dashboard?tab=comments'>
                 <Sidebar.Item
                   active={tab === 'comments'}

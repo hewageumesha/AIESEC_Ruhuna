@@ -44,6 +44,9 @@ public class Project {
     @Column(name = "url")
     private Map<String, String> links;
 
+    @Column(nullable = false)
+    private Boolean published = false;
+
     @Embedded
     private Logistics logistics;
 

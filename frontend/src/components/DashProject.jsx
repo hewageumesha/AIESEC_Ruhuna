@@ -7,11 +7,28 @@ import {
   Textarea,
   Modal,
   Select,
-  FileInput,
+  FileInput
 } from "flowbite-react";
-import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { HiOutlineExclamationCircle, HiEye } from "react-icons/hi";
 
-export default function DashProject() {
+export default function DashProject({ currentUser }) {
+  const Badge = ({ color = "gray", children, className = "" }) => {
+    const colorClasses = {
+      gray: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
+      red: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+      yellow: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+      green: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+      blue: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+      purple: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+      pink: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300",
+    };
+
+    return (
+      <span className={`text-xs font-medium px-2.5 py-0.5 rounded ${colorClasses[color]} ${className}`}>
+        {children}
+      </span>
+    );
+  };
   const RichTextEditor = ({ 
     name, 
     value, 
@@ -353,17 +370,14 @@ export default function DashProject() {
     fetchProjects();
   }, []);
 
-  const fetchProjects = async () => {
+   const fetchProjects = async () => {
     try {
-      console.log("Fetching projects from backend...");
-      
       const res = await axios.get("https://aiesecruhuna-production.up.railway.app/api/projects/", {
         headers: {
           'Content-Type': 'application/json',
         }
       });
       
-      console.log("Projects fetched successfully:", res.data);
       setProjects(res.data);
       setErrorMsg("");
     } catch (err) {
@@ -435,11 +449,13 @@ export default function DashProject() {
 
   const handleSubmit = async () => {
   try {
-    const token = localStorage.getItem('authToken'); // Adjust based on your auth mechanism
-    if (!token) {
-      setErrorMsg("No authentication token found. Please log in.");
-      return;
-    }
+      const token = localStorage.getItem('authToken');
+
+      const userRole = localStorage.getItem('userRole');
+      if (!userRole || (userRole !== 'LCP' && userRole !== 'LCVP')) {
+        setErrorMsg("You don't have permission to manage projects");
+        return;
+      }
 
     const linksObject = {};
     if (formData.links && Array.isArray(formData.links)) {
@@ -606,6 +622,27 @@ export default function DashProject() {
     setExpandedRows((prev) =>
       prev.includes(id) ? prev.filter((row) => row !== id) : [...prev, id]
     );
+  };
+
+  const handlePublishToggle = async (id, currentStatus) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      await axios.patch(
+        `https://aiesecruhuna-production.up.railway.app/api/projects/publish/${id}`,
+        { published: !currentStatus },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          }
+        }
+      );
+      
+      setSuccessMsg(`Project ${!currentStatus ? 'published' : 'unpublished'} successfully!`);
+      fetchProjects();
+    } catch (err) {
+      setErrorMsg("Error updating publish status!");
+    }
   };
 
   return (
@@ -973,6 +1010,9 @@ export default function DashProject() {
                 Type
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                 Actions
               </th>
             </tr>
@@ -988,7 +1028,23 @@ export default function DashProject() {
                   <td className="px-6 py-4 text-sm">{p.name}</td>
                   <td className="px-6 py-4 text-sm">{p.type}</td>
                   <td className="px-6 py-4 text-sm">
+                    <Badge color={p.published ? "success" : "warning"}>
+                      {p.published ? "Published" : "Draft"}
+                    </Badge>
+                  </td>
+                  <td className="px-6 py-4 text-sm">
                     <div className="flex gap-2">
+                      <Button
+                        color={p.published ? "gray" : "success"}
+                        size="xs"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePublishToggle(p.id, p.published);
+                        }}
+                      >
+                        {p.published ? <HiEyeOff className="mr-1" /> : <HiEye className="mr-1" />}
+                        {p.published ? "Unpublish" : "Publish"}
+                      </Button>
                       <Button
                         color="warning"
                         size="xs"

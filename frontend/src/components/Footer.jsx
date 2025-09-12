@@ -45,7 +45,7 @@ export default function FooterComponent() {
                 </div>
                 <Footer.Divider />
                 <div className="w-full sm:flex sm:items-center sm:justify-between">
-                    <Footer.Copyright href="#" by="AIESEC UOR" year={new Date().getFullYear()} />
+                    <Footer.Copyright href="/developers" by="Techies" year={new Date().getFullYear()} />
                     <div className="mt-4 flex gap-6 sm:mt-0 sm:justify-center">
                         <Footer.Icon href="https://www.facebook.com/AIESECLK" icon={BsFacebook} />
                         <Footer.Icon href="https://www.instagram.com/aiesecinsrilanka/" icon={BsInstagram} />
