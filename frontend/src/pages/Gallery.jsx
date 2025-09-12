@@ -4,9 +4,6 @@ import { Spin, Modal, Button, message, notification } from 'antd';
 import { DeleteOutlined, SelectOutlined, EyeOutlined, CloseOutlined, CheckCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { deleteImageFromStorage } from '../service/deleteImageFromStorage';
 import axios from 'axios';
-import  LightGallery from "lightgallery/react";
-import lgThumbnail from 'lightgallery/plugins/thumbnail';
-import lgZoom from 'lightgallery/plugins/zoom';
 import lgFullscreen from 'lightgallery/plugins/fullscreen';
 
 
