@@ -25,6 +25,7 @@ import AddBirthday from './pages/birthday/AddBirthday';
 import DashBirthday from './components/DashBirthday';
 import ProjectDetail from "./pages/ProjectDetail";
 import { Navigate } from "react-router-dom";
+import Developers from "./pages/developers";
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
         <Route path="/projects" element={<Project />} />
         <Route path="/projects/:type" element={<Project />} />
         <Route path="/projects/:type/:projectName" element={<ProjectDetail />} />
+        <Route path="/developers" element={<Developers />} />
       </Routes>
       <Footer/>
     </BrowserRouter>

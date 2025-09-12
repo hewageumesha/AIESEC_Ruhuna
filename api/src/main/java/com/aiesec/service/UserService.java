@@ -196,7 +196,7 @@ public class UserService {
         Files.createDirectories(path.getParent()); 
         Files.write(path, profilePhoto.getBytes());
 
-        String photoUrl = "http://localhost:8080/uploads/" + filename;
+        String photoUrl = "https://aiesecruhuna-production.up.railway.app/uploads/" + filename;
         user.setProfilePicture(photoUrl);
     }
 

@@ -19,7 +19,7 @@ export default function Header() {
         const token = sessionStorage.getItem("token");
 
         if (token) {
-        const response = await fetch("http://localhost:8080/api/auth/signout", {
+        const response = await fetch("https://aiesecruhuna-production.up.railway.app/api/auth/signout", {
             method: "POST",
             headers: { "Authorization": `Bearer ${token}` },
         });
@@ -100,11 +100,11 @@ export default function Header() {
                     Functional Area
                 </Link>
             </Navbar.Link >
-            <Navbar.Link active={path === '/projects'} as={'div'}>
+            {/*<Navbar.Link active={path === '/projects'} as={'div'}>
                 <Link to="/projects" className='font-semibold'>
                     Project
                 </Link>
-            </Navbar.Link >
+            </Navbar.Link > */}
             <Navbar.Link active={path === '/event'} as={'div'}>
                 <Link to="event" className='font-semibold'>
                     Event

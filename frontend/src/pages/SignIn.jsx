@@ -62,7 +62,7 @@ export default function SignIn() {
 
     try {
       dispatch(signInStart());
-      const res = await fetch(`http://localhost:8080/api/auth/signin`, {
+      const res = await fetch(`https://aiesecruhuna-production.up.railway.app/api/auth/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -75,7 +75,8 @@ export default function SignIn() {
       }
 
       if (data.token) {
-        sessionStorage.setItem("token", data.token);
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("userRole", data.role);
       }
 
       dispatch(signInSuccess(data));

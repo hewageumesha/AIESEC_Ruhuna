@@ -35,7 +35,7 @@ export default function DashSessionLogs() {
   const fetchLogs = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8080/api/auth/sessions`,
+        `https://aiesecruhuna-production.up.railway.app/api/auth/sessions`,
         {
           headers: { Authorization: `Bearer ${currentUser.token}` },
         }
@@ -56,7 +56,7 @@ export default function DashSessionLogs() {
       if (oldLogs.length > 0) {
         for (const old of oldLogs) {
           await axios.delete(
-            `http://localhost:8080/api/auth/sessions/${old.id}`,
+            `https://aiesecruhuna-production.up.railway.app/api/auth/sessions/${old.id}`,
             { headers: { Authorization: `Bearer ${currentUser.token}` } }
           );
         }
