@@ -38,7 +38,7 @@ const AssignedTasks = () => {
     const fetchTasks = () => {
         console.log("Fetching tasks for userId:", id);
         axios
-            .get(`http://localhost:8080/api/user/${id}/assigned/`)
+            .get(`https://aiesecruhuna-production.up.railway.app/api/user/${id}/assigned/`)
             .then((res) => {
                 console.log("✅ Raw tasks from backend:", res.data);
                 setTasks(res.data);
@@ -87,7 +87,7 @@ const AssignedTasks = () => {
     const handleStatusChange = async (taskId, newStatus) => {
         try {
             const res = await axios.put(
-                `http://localhost:8080/api/user/task/${taskId}/updateStatusWithProof`,
+                `https://aiesecruhuna-production.up.railway.app/api/user/task/${taskId}/updateStatusWithProof`,
                 null,
                 { params: { status: newStatus } }
             );
@@ -111,7 +111,7 @@ const AssignedTasks = () => {
         formData.append("id", id);
 
         try {
-            await axios.post(`http://localhost:8080/api/user/task/${taskId}/upload-proof`, formData, {
+            await axios.post(`https://aiesecruhuna-production.up.railway.app/api/user/task/${taskId}/upload-proof`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             Swal.fire("Success", "Proof uploaded successfully!", "success");

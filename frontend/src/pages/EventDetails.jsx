@@ -59,7 +59,7 @@ const EventDetailsPage = () => {
 
       setLoading(true);
       try {
-        const res = await axios.get(`http://localhost:8080/api/events/${id}`);
+        const res = await axios.get(`https://aiesecruhuna-production.up.railway.app/api/events/${id}`);
         const eventData = res.data;
 
         // Check access permissions
@@ -91,7 +91,7 @@ const EventDetailsPage = () => {
    */
   const fetchMerchandise = async (eventId) => {
     try {
-      const merchRes = await axios.get(`http://localhost:8080/api/merchandise/event/${eventId}`);
+      const merchRes = await axios.get(`https://aiesecruhuna-production.up.railway.app/api/merchandise/event/${eventId}`);
       
       // Ensure array format
       let merchData = merchRes.data;

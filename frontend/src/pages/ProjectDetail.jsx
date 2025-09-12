@@ -16,7 +16,7 @@ export default function ProjectDetail() {
   const fetchProject = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:8080/api/projects/");
+      const res = await axios.get("https://aiesecruhuna-production.up.railway.app/api/projects/");
 
       const nameFromSlug = projectName
         .split("-")

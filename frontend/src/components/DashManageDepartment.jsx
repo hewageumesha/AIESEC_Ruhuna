@@ -19,7 +19,7 @@ export default function DashManageDepartment() {
 
   const fetchDepartments = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/departments/");
+      const res = await axios.get("https://aiesecruhuna-production.up.railway.app/api/departments/");
       setDepartments(res.data);
     } catch (err) {
       setErrorMsg("Failed to fetch departments!");
@@ -33,10 +33,10 @@ export default function DashManageDepartment() {
   const handleSubmit = async () => {
     try {
       if (editingId) {
-        await axios.put(`http://localhost:8080/api/departments/update/${editingId}`, formData);
+        await axios.put(`https://aiesecruhuna-production.up.railway.app/api/departments/update/${editingId}`, formData);
         setSuccessMsg("Department updated successfully!");
       } else {
-        await axios.post(`http://localhost:8080/api/departments/add`, formData);
+        await axios.post(`https://aiesecruhuna-production.up.railway.app/api/departments/add`, formData);
         setSuccessMsg("Department added successfully!");
       }
       setFormData({ name: "" });
@@ -59,7 +59,7 @@ export default function DashManageDepartment() {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/departments/delete/${deleteId}`);
+      await axios.delete(`https://aiesecruhuna-production.up.railway.app/api/departments/delete/${deleteId}`);
       setSuccessMsg("Department deleted successfully!");
       setShowModal(false);
       fetchDepartments();

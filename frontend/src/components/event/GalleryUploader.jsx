@@ -351,7 +351,7 @@ const GalleryUploader = () => {
     try {
       setLoadingCategories(true);
       // Load all categories (not just those with gallery images)
-      const response = await fetch('http://localhost:8080/api/categories');
+      const response = await fetch('https://aiesecruhuna-production.up.railway.app/api/categories');
       if (!response.ok) throw new Error('Failed to load categories');
       const data = await response.json();
       setCategories(data);
@@ -367,7 +367,7 @@ const GalleryUploader = () => {
     try {
       setLoadingVersions(true);
       // Load all versions for the category (not just those with gallery images)
-      const response = await fetch(`http://localhost:8080/api/categories/${categoryId}/versions`);
+      const response = await fetch(`https://aiesecruhuna-production.up.railway.app/api/categories/${categoryId}/versions`);
       if (!response.ok) throw new Error('Failed to load versions');
       const data = await response.json();
       setVersions(data);
@@ -386,7 +386,7 @@ const GalleryUploader = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/categories', {
+      const response = await fetch('https://aiesecruhuna-production.up.railway.app/api/categories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -427,7 +427,7 @@ const GalleryUploader = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/versions', {
+      const response = await fetch('https://aiesecruhuna-production.up.railway.app/api/versions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -515,7 +515,7 @@ const GalleryUploader = () => {
           }
 
           // Upload metadata to backend
-          const galleryResponse = await fetch('http://localhost:8080/api/gallery', {
+          const galleryResponse = await fetch('https://aiesecruhuna-production.up.railway.app/api/gallery', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

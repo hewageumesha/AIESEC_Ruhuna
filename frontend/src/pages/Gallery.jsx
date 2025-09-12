@@ -68,7 +68,7 @@ const GalleryPage = () => {
 
   const loadCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/categories');
+      const response = await axios.get('https://aiesecruhuna-production.up.railway.app/api/categories');
       setCategories(response.data);
       fetchImages();
     } catch (error) {
@@ -81,7 +81,7 @@ const GalleryPage = () => {
   const loadVersions = async (categoryId) => {
     try {
       setLoadingVersions(true);
-      const response = await axios.get(`http://localhost:8080/api/categories/${categoryId}/versions`);
+      const response = await axios.get(`https://aiesecruhuna-production.up.railway.app/api/categories/${categoryId}/versions`);
       setVersions(response.data);
       setSelectedVersion('all');
     } catch (error) {
@@ -100,7 +100,7 @@ const GalleryPage = () => {
         headers['Authorization'] = `Bearer ${authToken}`;
       }
 
-      const res = await fetch('http://localhost:8080/api/gallery', {
+      const res = await fetch('https://aiesecruhuna-production.up.railway.app/api/gallery', {
         headers
       });
       
@@ -235,7 +235,7 @@ const GalleryPage = () => {
         headers['Authorization'] = `Bearer ${authToken}`;
       }
       
-      const batchDeleteResponse = await fetch('http://localhost:8080/api/gallery/batch', {
+      const batchDeleteResponse = await fetch('https://aiesecruhuna-production.up.railway.app/api/gallery/batch', {
         method: 'DELETE',
         headers,
         body: JSON.stringify(galleryIds)
@@ -305,7 +305,7 @@ const GalleryPage = () => {
     if (category && category.isAnnual) {
       if (selectedCategory !== categoryId) {
         try {
-          const response = await axios.get(`http://localhost:8080/api/categories/${categoryId}/versions`);
+          const response = await axios.get(`https://aiesecruhuna-production.up.railway.app/api/categories/${categoryId}/versions`);
           setHoveredCategory({ id: categoryId, versions: response.data });
         } catch (error) {
           console.error('Failed to load versions for hover:', error);

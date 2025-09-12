@@ -19,7 +19,7 @@ export default function Header() {
         const token = sessionStorage.getItem("token");
 
         if (token) {
-        const response = await fetch("http://localhost:8080/api/auth/signout", {
+        const response = await fetch("https://aiesecruhuna-production.up.railway.app/api/auth/signout", {
             method: "POST",
             headers: { "Authorization": `Bearer ${token}` },
         });

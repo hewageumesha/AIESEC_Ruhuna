@@ -11,7 +11,7 @@ const BirthdayForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/api/users/birthdays", formData);
+      await axios.post("https://aiesecruhuna-production.up.railway.app/api/users/birthdays", formData);
       alert("Birthday added successfully!");
       setFormData({ name: "", date: "", photo: "" });
     } catch (err) {

@@ -357,7 +357,7 @@ export default function DashProject() {
     try {
       console.log("Fetching projects from backend...");
       
-      const res = await axios.get("http://localhost:8080/api/projects/", {
+      const res = await axios.get("https://aiesecruhuna-production.up.railway.app/api/projects/", {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -476,13 +476,13 @@ export default function DashProject() {
     let response;
     if (editingId) {
       response = await axios.put(
-        `http://localhost:8080/api/projects/update/${editingId}`,
+        `https://aiesecruhuna-production.up.railway.app/api/projects/update/${editingId}`,
         payload,
         config
       );
     } else {
       response = await axios.post(
-        "http://localhost:8080/api/projects/add",
+        "https://aiesecruhuna-production.up.railway.app/api/projects/add",
         payload,
         config
       );
@@ -591,7 +591,7 @@ export default function DashProject() {
   const confirmDelete = async () => {
     try {
       await axios.delete(
-        `http://localhost:8080/api/projects/delete/${deleteId}`
+        `https://aiesecruhuna-production.up.railway.app/api/projects/delete/${deleteId}`
       );
       setSuccessMsg("Project deleted successfully!");
       setShowModal(false);

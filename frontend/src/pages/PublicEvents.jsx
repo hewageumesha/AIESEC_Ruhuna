@@ -15,7 +15,7 @@ const PublicEventsPage = () => {
   const fetchPublicEvents = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8080/api/events/public');
+      const response = await axios.get('https://aiesecruhuna-production.up.railway.app/api/events/public');
       setPublicEvents(response.data);
     } catch (error) {
       console.error('Failed to fetch public events:', error);

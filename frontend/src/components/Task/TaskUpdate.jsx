@@ -20,13 +20,13 @@ const TaskUpdate = () => {
         const fetchData = async () => {
             try {
                 // 🔥 Fixed URL to use assigner id
-                const taskResponse = await fetch(`http://localhost:8080/api/user/task/${taskId}`);
+                const taskResponse = await fetch(`https://aiesecruhuna-production.up.railway.app/api/user/task/${taskId}`);
                 if (!taskResponse.ok) {
                     throw new Error("Task not found");
                 }
                 const taskData = await taskResponse.json();
 
-                const usersResponse = await fetch("http://localhost:8080/api/user/users");
+                const usersResponse = await fetch("https://aiesecruhuna-production.up.railway.app/api/user/users");
                 const usersData = await usersResponse.json();
 
                 const assignedUser = taskData.assignedTo
@@ -62,7 +62,7 @@ const TaskUpdate = () => {
             };
 
             const updateResponse = await fetch(
-                `http://localhost:8080/api/user/${id}/${taskId}/`,
+                `https://aiesecruhuna-production.up.railway.app/api/user/${id}/${taskId}/`,
                 {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },

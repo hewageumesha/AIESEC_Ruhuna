@@ -10,7 +10,7 @@ export default function SessionManager() {
 
   const callSignoutAPI = async (token) => {
     try {
-      const response = await fetch("http://localhost:8080/api/auth/signout", {
+      const response = await fetch("https://aiesecruhuna-production.up.railway.app/api/auth/signout", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,

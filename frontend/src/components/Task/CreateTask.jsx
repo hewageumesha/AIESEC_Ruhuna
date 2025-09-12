@@ -32,7 +32,7 @@ const CreateTask = () => {
     const [selectedFunction, setSelectedFunction] = useState('');
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/user/users')
+        fetch('https://aiesecruhuna-production.up.railway.app/api/user/users')
             .then((res) => res.json())
             .then((data) => {
                 if (Array.isArray(data)) setUsers(data);
@@ -41,7 +41,7 @@ const CreateTask = () => {
     }, []);
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/users/profile/id/${id}`)
+        fetch(`https://aiesecruhuna-production.up.railway.app/api/users/profile/id/${id}`)
             .then(res => res.json())
             .then(data => {
                 setLoggedInUser(data);
@@ -73,7 +73,7 @@ const CreateTask = () => {
             },
         };
 
-        fetch(`http://localhost:8080/api/user/${id}/task/`, {
+        fetch(`https://aiesecruhuna-production.up.railway.app/api/user/${id}/task/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(taskData),
