@@ -35,6 +35,7 @@ import CreateTask from "./components/Task/CreateTask";
 import TaskUpdate from "./components/Task/TaskUpdate";
 import PublicEventsPage from "./pages/PublicEvents.jsx";
 import EventAnalytics from "./pages/EventAnalytics";
+import Developers from "./pages/developers.jsx";
 
 
 const NotificationsWrapper = () => {
@@ -87,6 +88,7 @@ function App() {
         <Route path="/user/:id/CreateTask" element={<CreateTask/>}/>
         <Route path="/users/:id/tasks/:taskId/edit" element={<TaskUpdate/>}/>
         <Route path="/user/:id/notifications" element={<NotificationsWrapper />} />
+          <Route path="/developers" element={<Developers />} />
         
         {/* Event Routes */}
         <Route path="/public-event" element={<PublicEventsPage />} />
