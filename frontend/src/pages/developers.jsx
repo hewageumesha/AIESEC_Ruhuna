@@ -24,40 +24,7 @@ const TechiesShowcase = () => {
   }, []);
 
   const teamMembers = [
-    {
-      name: "Krishanthi Christina",
-      role: "Frontend Developer",
-      expertise: ["React.js", "UI/UX Design", "Responsive Design"],
-      contributions: [
-          "Task Management",
-          "Task Creation",
-          "Task List views (General View) & (User-Specific View)",
-          "Task Progress & Status Updates",
-          "User Progress view",
-          "Notifications & Alerts"
-              ],
-      image: "LCP.png",
-      linkedin: "https://linkedin.com/in/krishanthichristina",
-      github: "https://github.com/krishanthichristina",
-      icon: <Code className="w-6 h-6" />
-    },
-    {
-      name: "Ishara Palangasinghe",
-      role: "Backend Developer", 
-      expertise: ["Spring Boot", "MySQL", "RESTful APIs", "System Architecture"],
-      contributions: [
-          "Event creation (with public/private visibility)",
-          "Member & guest registrations", 
-          "Gallery system ",
-          "Merchandise handling ",
-          "Registration analytics"
-            ],
-      image: "/api/placeholder/300/300",
-      linkedin: "https://linkedin.com/in/ishara-palangasinghe",
-      github: "https://github.com/ishara425",
-      icon: <Database className="w-6 h-6" />
-    },
-    {
+     {
       name: "M.H. Nethmi Umesha",
       role: "Full-Stack Developer",
       expertise: ["React.js", "Spring Boot", "System Integration", "Project Management"],
@@ -70,11 +37,47 @@ const TechiesShowcase = () => {
           "Project management (LCP,LCVPs)",
           "Session logs management"
       ],
-      image: "/api/placeholder/300/300",
+      image: "/assets/umesha.jpeg",
       linkedin: "https://linkedin.com/in/nethmiumesha",
       github: "https://github.com/hewageumesha",
       icon: <Layers className="w-6 h-6" />
     },
+
+       {
+      name: "Ishara Palangasinghe",
+      role: "Backend Developer", 
+      expertise: ["Spring Boot", "MySQL", "RESTful APIs", "System Architecture"],
+      contributions: [
+          "Event creation (with public/private visibility)",
+          "Member & guest registrations", 
+          "Gallery system ",
+          "Merchandise handling ",
+          "Registration analytics"
+            ],
+      image: "/assets/ishara.jpeg",
+      linkedin: "https://linkedin.com/in/ishara-palangasinghe",
+      github: "https://github.com/ishara425",
+      icon: <Database className="w-6 h-6" />
+    },
+    {
+      name: "Krishanthi Christina",
+      role: "Frontend Developer",
+      expertise: ["React.js", "UI/UX Design", "Responsive Design"],
+      contributions: [
+          "Task Management",
+          "Task Creation",
+          "Task List views (General View) & (User-Specific View)",
+          "Task Progress & Status Updates",
+          "User Progress view",
+          "Notifications & Alerts"
+              ],
+      image: "/assets/krishanthi.jpeg",
+      linkedin: "https://linkedin.com/in/krishanthichristina",
+      github: "https://github.com/krishanthichristina",
+      icon: <Code className="w-6 h-6" />
+    },
+ 
+
     {
       name: "Sajiya Roshan",
       role: "UI/UX Designer",
@@ -85,7 +88,7 @@ const TechiesShowcase = () => {
               "Email sender",
               "Birthday dashboard"
       ],
-      image: "/api/placeholder/300/300",
+      image: "/assets/sajiya.jpeg",
       linkedin: "https://linkedin.com/in/sajiya-roshan",
       github: "https://github.com/sajiya-roshan",
       icon: <Palette className="w-6 h-6" />
