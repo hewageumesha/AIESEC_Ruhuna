@@ -37,7 +37,7 @@ const TechiesShowcase = () => {
           "Project management (LCP,LCVPs)",
           "Session logs management"
       ],
-      image: "/assets/umesha.jpeg",
+      image: "/asset/umesha.jpeg",
       linkedin: "https://linkedin.com/in/nethmiumesha",
       github: "https://github.com/hewageumesha",
       icon: <Layers className="w-6 h-6" />
@@ -54,7 +54,7 @@ const TechiesShowcase = () => {
           "Merchandise handling ",
           "Registration analytics"
             ],
-      image: "/assets/ishara.jpeg",
+      image: "/asset/ishara.jpeg",
       linkedin: "https://linkedin.com/in/ishara-palangasinghe",
       github: "https://github.com/ishara425",
       icon: <Database className="w-6 h-6" />
@@ -71,7 +71,7 @@ const TechiesShowcase = () => {
           "User Progress view",
           "Notifications & Alerts"
               ],
-      image: "/assets/krishanthi.jpeg",
+      image: "/asset/krishanthi.jpeg",
       linkedin: "https://linkedin.com/in/krishanthichristina",
       github: "https://github.com/krishanthichristina",
       icon: <Code className="w-6 h-6" />
@@ -88,7 +88,7 @@ const TechiesShowcase = () => {
               "Email sender",
               "Birthday dashboard"
       ],
-      image: "/assets/sajiya.jpeg",
+      image: "/asset/sajiya.jpeg",
       linkedin: "https://linkedin.com/in/sajiya-roshan",
       github: "https://github.com/sajiya-roshan",
       icon: <Palette className="w-6 h-6" />
